@@ -1,8 +1,6 @@
 # terraform-aws-s3-bucket
 Terraform module which creates S3 bucket resources on AWS
 
-Terraform module which creates S3 Buckets on AWS.
-
 These S3 Bucket configurations are supported:
 
 - cors
@@ -209,3 +207,14 @@ logging {
 | sse_algorithm | The server-side encryption algorithm to use. Valid values are AES256 and aws:kms (It refers to server_side_encryption_configuration/rule/apply_server_side_encryption_by_default/sse_algorithm ) | string | yes |
 | kms_master_key_id | The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of sse_algorithm as aws:kms. The default aws/s3 AWS KMS master key is used if this element is absent while the sse_algorithm is aws:kms. (It refers to server_side_encryption_configuration/rule/apply_server_side_encryption_by_default/kms_master_key_id ) | string | no |
 
+# outputs
+| Name | Description |
+|------|-------------|
+| id | The name of the bucket. |
+| arn | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
+| bucket_domain_name | The bucket domain name. Will be of format bucketname.s3.amazonaws.com. |
+| bucket_regional_domain_name | The bucket region-specific domain name. The bucket domain name including the region name, please refer here for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoint when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL. |
+| hosted_zone_id | The Route 53 Hosted Zone ID for this bucket's region. |
+| region | The AWS region this bucket resides in. |
+| website_endpoint | The website endpoint, if the bucket is configured with a website. If not, this will be an empty string. |
+| website_domain | The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records.
