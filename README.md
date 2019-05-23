@@ -1,8 +1,7 @@
 # terraform-aws-s3-bucket
 Terraform module which creates S3 bucket resources on AWS
 
-__terraform-aws-s3-bucket module compatible with terraform 0.12+ dev version.
-To run the examples, please compile Terraform from the master branch at https://github.com/hashicorp/terraform and use the plugins from "alpha4" release(https://github.com/hashicorp/terraform/releases/tag/v0.12.0-alpha4).__
+__terraform-aws-s3-bucket module compatible with terraform 0.12+.__
 
 These S3 Bucket configurations are supported:
 
