@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 # Created by https://www.gitignore.io/api/terraform
 # Edit at https://www.gitignore.io/?templates=terraform
@@ -31,3 +32,9 @@ override.tf.json
 # !example_override.tf
 
 # End of https://www.gitignore.io/api/terraform
+=======
+.terraform
+terraform.tfstate
+*.tfstate*
+terraform.tfvars
+>>>>>>> upstream/master

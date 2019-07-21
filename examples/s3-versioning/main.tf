@@ -4,7 +4,7 @@ variable "region" {
 
 # Configure the AWS Provider
 provider "aws" {
-  region     = var.region
+  region = var.region
 }
 
 // Calling module:
@@ -14,12 +14,12 @@ module "aws_s3_bucket" {
   bucket = "s3-tf-example-versioning"
   acl    = "private"
 
-versioning_inputs = [
-  {
-    enabled = true
-    mfa_delete = null
-  },
-]
+  versioning_inputs = [
+    {
+      enabled    = true
+      mfa_delete = null
+    },
+  ]
 
 
 }
