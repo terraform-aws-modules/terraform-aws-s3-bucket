@@ -1,48 +1,113 @@
-variable "region" {
-  default = "ca-central-1"
+locals {
+  bucket_name             = "origin-s3-bucket-${random_pet.this.id}"
+  destination_bucket_name = "replica-s3-bucket-${random_pet.this.id}"
+  origin_region           = "eu-west-1"
+  replica_region          = "eu-central-1"
 }
 
-# Configure the AWS Provider
 provider "aws" {
-  region = var.region
+  region = local.origin_region
 }
 
-module "bucket" {
-  source = "../.."
-  bucket = "s3-tf-example-replication"
+provider "aws" {
+  region = local.replica_region
+
+  alias = "replica"
+}
+
+data "aws_caller_identity" "current" {}
+
+resource "random_pet" "this" {
+  length = 2
+}
+
+resource "aws_kms_key" "replica" {
+  provider = "aws.replica"
+
+  description             = "S3 bucket replication KMS key"
+  deletion_window_in_days = 7
+}
+
+module "replica_bucket" {
+  source = "../../"
+
+  providers = {
+    aws = "aws.replica"
+  }
+
+  bucket = local.destination_bucket_name
+  region = local.replica_region
   acl    = "private"
 
-  versioning_inputs = [
-    {
-      enabled    = true
-      mfa_delete = null
-    },
-  ]
+  versioning = {
+    enabled = true
+  }
+}
 
-  replication_configuration_inputs = [
-    {
-      role = "<ROLE_ARN>" // Place the IAM Role to access the destination bucket
+module "s3_bucket" {
+  source = "../../"
 
-      rules_inputs = [
-        {
-          id                               = "foobar"
-          prefix                           = "foo"
-          status                           = "Enabled"
-          priority                         = null
-          source_selection_criteria_inputs = null
-          filter_inputs                    = null
+  bucket = local.bucket_name
+  region = local.origin_region
+  acl    = "private"
 
-          destination_inputs = [
-            {
-              bucket                            = "<DESTINATION_BUCKET>" // Place the destination bicket ARN
-              storage_class                     = "STANDARD"
-              replica_kms_key_id                = null
-              account_id                        = null
-              access_control_translation_inputs = null
-            },
-          ]
-        },
-      ]
-    },
-  ]
+  versioning = {
+    enabled = true
+  }
+
+  replication_configuration = {
+    role = aws_iam_role.replication.arn
+
+    rules = [
+      {
+        id       = "foo"
+        status   = "Enabled"
+        priority = 10
+
+        source_selection_criteria = {
+          sse_kms_encrypted_objects = {
+            enabled = true
+          }
+        }
+
+        filter = {
+          prefix = "one"
+          tags = {
+            ReplicateMe = "Yes"
+          }
+        }
+
+        destination = {
+          bucket             = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class      = "STANDARD"
+          replica_kms_key_id = aws_kms_key.replica.arn
+          account_id         = data.aws_caller_identity.current.account_id
+          access_control_translation = {
+            owner = "Destination"
+          }
+        }
+      },
+      {
+        id       = "bar"
+        status   = "Enabled"
+        priority = 20
+
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
+
+
+        filter = {
+          prefix = "two"
+          tags = {
+            ReplicateMe = "Yes"
+          }
+        }
+
+      },
+
+    ]
+  }
+
 }

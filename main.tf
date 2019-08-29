@@ -1,4 +1,6 @@
 resource "aws_s3_bucket" "this" {
+  count = var.create_bucket ? 1 : 0
+
   bucket              = var.bucket
   bucket_prefix       = var.bucket_prefix
   acl                 = var.acl
@@ -10,121 +12,126 @@ resource "aws_s3_bucket" "this" {
   request_payer       = var.request_payer
 
   dynamic "website" {
-    for_each = var.website_inputs == null ? [] : var.website_inputs
+    for_each = length(keys(var.website)) == 0 ? [] : [var.website]
 
     content {
-      index_document           = website.value.index_document
-      error_document           = website.value.error_document
-      redirect_all_requests_to = website.value.redirect_all_requests_to
-      routing_rules            = website.value.routing_rules
+      index_document           = lookup(website.value, "index_document", null)
+      error_document           = lookup(website.value, "error_document", null)
+      redirect_all_requests_to = lookup(website.value, "redirect_all_requests_to", null)
+      routing_rules            = lookup(website.value, "routing_rules", null)
     }
   }
 
   dynamic "cors_rule" {
-    for_each = var.cors_rule_inputs == null ? [] : var.cors_rule_inputs
+    for_each = length(keys(var.cors_rule)) == 0 ? [] : [var.cors_rule]
 
     content {
-      allowed_headers = cors_rule.value.allowed_headers
       allowed_methods = cors_rule.value.allowed_methods
       allowed_origins = cors_rule.value.allowed_origins
-      expose_headers  = cors_rule.value.expose_headers
-      max_age_seconds = cors_rule.value.max_age_seconds
+      allowed_headers = lookup(cors_rule.value, "allowed_headers", null)
+      expose_headers  = lookup(cors_rule.value, "expose_headers", null)
+      max_age_seconds = lookup(cors_rule.value, "max_age_seconds", null)
     }
   }
 
   dynamic "versioning" {
-    for_each = var.versioning_inputs == null ? [] : var.versioning_inputs
+    for_each = length(keys(var.versioning)) == 0 ? [] : [var.versioning]
 
     content {
-      enabled    = versioning.value.enabled
-      mfa_delete = versioning.value.mfa_delete
+      enabled    = lookup(versioning.value, "enabled", null)
+      mfa_delete = lookup(versioning.value, "mfa_delete", null)
     }
   }
 
-
   dynamic "logging" {
-    for_each = var.logging_inputs == null ? [] : var.logging_inputs
+    for_each = length(keys(var.logging)) == 0 ? [] : [var.logging]
 
     content {
       target_bucket = logging.value.target_bucket
-      target_prefix = logging.value.target_prefix
+      target_prefix = lookup(logging.value, "target_prefix", null)
     }
   }
 
   dynamic "lifecycle_rule" {
-    for_each = var.lifecycle_rule_inputs == null ? [] : var.lifecycle_rule_inputs
+    for_each = var.lifecycle_rule
 
     content {
-      id                                     = lifecycle_rule.value.id
-      prefix                                 = lifecycle_rule.value.prefix
-      tags                                   = lifecycle_rule.value.tags
+      id                                     = lookup(lifecycle_rule.value, "id", null)
+      prefix                                 = lookup(lifecycle_rule.value, "prefix", null)
+      tags                                   = lookup(lifecycle_rule.value, "tags", null)
+      abort_incomplete_multipart_upload_days = lookup(lifecycle_rule.value, "abort_incomplete_multipart_upload_days", null)
       enabled                                = lifecycle_rule.value.enabled
-      abort_incomplete_multipart_upload_days = lifecycle_rule.value.abort_incomplete_multipart_upload_days
 
+      # Max 1 block - expiration
       dynamic "expiration" {
-        for_each = lifecycle_rule.value.expiration_inputs == null ? [] : lifecycle_rule.value.expiration_inputs
+        for_each = length(keys(lookup(lifecycle_rule.value, "expiration", {}))) == 0 ? [] : [lookup(lifecycle_rule.value, "expiration", {})]
 
         content {
-          date                         = expiration.value.date
-          days                         = expiration.value.days
-          expired_object_delete_marker = expiration.value.expired_object_delete_marker
+          date                         = lookup(expiration.value, "date", null)
+          days                         = lookup(expiration.value, "days", null)
+          expired_object_delete_marker = lookup(expiration.value, "expired_object_delete_marker", null)
         }
       }
 
+      # Several blocks - transition
       dynamic "transition" {
-        for_each = lifecycle_rule.value.transition_inputs == null ? [] : lifecycle_rule.value.transition_inputs
+        for_each = lookup(lifecycle_rule.value, "transition", [])
 
         content {
-          date          = transition.value.date
-          days          = transition.value.days
+          date          = lookup(transition.value, "date", null)
+          days          = lookup(transition.value, "days", null)
           storage_class = transition.value.storage_class
         }
       }
 
-      dynamic "noncurrent_version_transition" {
-        for_each = lifecycle_rule.value.noncurrent_version_transition_inputs == null ? [] : lifecycle_rule.value.noncurrent_version_transition_inputs
+      # Max 1 block - noncurrent_version_expiration
+      dynamic "noncurrent_version_expiration" {
+        for_each = length(keys(lookup(lifecycle_rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [lookup(lifecycle_rule.value, "noncurrent_version_expiration", {})]
 
         content {
-          days          = noncurrent_version_transition.value.days
-          storage_class = noncurrent_version_transition.value.storage_class
+          days = lookup(noncurrent_version_expiration.value, "days", null)
         }
       }
 
-      dynamic "noncurrent_version_expiration" {
-        for_each = lifecycle_rule.value.noncurrent_version_expiration_inputs == null ? [] : lifecycle_rule.value.noncurrent_version_expiration_inputs
+      # Several blocks - noncurrent_version_transition
+      dynamic "noncurrent_version_transition" {
+        for_each = lookup(lifecycle_rule.value, "noncurrent_version_transition", [])
 
         content {
-          days = noncurrent_version_expiration.value.days
+          days          = lookup(noncurrent_version_transition.value, "days", null)
+          storage_class = noncurrent_version_transition.value.storage_class
         }
       }
     }
   }
 
+  # Max 1 block - replication_configuration
   dynamic "replication_configuration" {
-    for_each = var.replication_configuration_inputs == null ? [] : var.replication_configuration_inputs
+    for_each = length(keys(var.replication_configuration)) == 0 ? [] : [var.replication_configuration]
 
     content {
       role = replication_configuration.value.role
+
       dynamic "rules" {
-        for_each = replication_configuration.value.rules_inputs == null ? [] : replication_configuration.value.rules_inputs
+        for_each = replication_configuration.value.rules
 
         content {
-          id = rules.value.id
-          // priority                 = rules.value.priority
-          prefix = rules.value.prefix
-          status = rules.value.status
+          id       = lookup(rules.value, "id", null)
+          priority = lookup(rules.value, "priority", null)
+          prefix   = lookup(rules.value, "prefix", null)
+          status   = lookup(rules.value, "status", null)
 
           dynamic "destination" {
-            for_each = rules.value.destination_inputs == null ? [] : rules.value.destination_inputs
+            for_each = length(keys(lookup(rules.value, "destination", {}))) == 0 ? [] : [lookup(rules.value, "destination", {})]
 
             content {
-              bucket             = destination.value.bucket
-              storage_class      = destination.value.storage_class
-              replica_kms_key_id = destination.value.replica_kms_key_id
-              account_id         = destination.value.account_id
+              bucket             = lookup(destination.value, "bucket", null)
+              storage_class      = lookup(destination.value, "storage_class", null)
+              replica_kms_key_id = lookup(destination.value, "replica_kms_key_id", null)
+              account_id         = lookup(destination.value, "account_id", null)
 
               dynamic "access_control_translation" {
-                for_each = destination.value.access_control_translation_inputs == null ? [] : destination.value.access_control_translation_inputs
+                for_each = length(keys(lookup(destination.value, "access_control_translation", {}))) == 0 ? [] : [lookup(destination.value, "access_control_translation", {})]
 
                 content {
                   owner = access_control_translation.value.owner
@@ -134,64 +141,79 @@ resource "aws_s3_bucket" "this" {
           }
 
           dynamic "source_selection_criteria" {
-            for_each = rules.value.source_selection_criteria_inputs == null ? [] : rules.value.source_selection_criteria_inputs
+            for_each = length(keys(lookup(rules.value, "source_selection_criteria", {}))) == 0 ? [] : [lookup(rules.value, "source_selection_criteria", {})]
 
             content {
-              sse_kms_encrypted_objects {
-                enabled = source_selection_criteria.value.enabled
+
+              dynamic "sse_kms_encrypted_objects" {
+                for_each = length(keys(lookup(source_selection_criteria.value, "sse_kms_encrypted_objects", {}))) == 0 ? [] : [lookup(source_selection_criteria.value, "sse_kms_encrypted_objects", {})]
+
+                content {
+
+                  enabled = sse_kms_encrypted_objects.value.enabled
+                }
               }
             }
           }
-          /*
-                     dynamic "filter" {
-                         for_each = rules.value.filter_inputs == null ? [] : rules.value.filter_inputs
 
-                         content {
-                             prefix                            = filter.value.prefix
-                             tags                              = filter.value.tags
-                         }
-                     }
-                     */
+          dynamic "filter" {
+            for_each = length(keys(lookup(rules.value, "filter", {}))) == 0 ? [] : [lookup(rules.value, "filter", {})]
+
+            content {
+              prefix = lookup(filter.value, "prefix", null)
+              tags   = lookup(filter.value, "tags", null)
+            }
+          }
+
         }
       }
     }
   }
 
+  # Max 1 block - server_side_encryption_configuration
   dynamic "server_side_encryption_configuration" {
-    for_each = var.server_side_encryption_configuration_inputs == null ? [] : var.server_side_encryption_configuration_inputs
+    for_each = length(keys(var.server_side_encryption_configuration)) == 0 ? [] : [var.server_side_encryption_configuration]
 
     content {
-      rule {
-        apply_server_side_encryption_by_default {
-          sse_algorithm     = server_side_encryption_configuration.value.sse_algorithm
-          kms_master_key_id = server_side_encryption_configuration.value.kms_master_key_id
+
+      dynamic "rule" {
+        for_each = length(keys(lookup(server_side_encryption_configuration.value, "rule", {}))) == 0 ? [] : [lookup(server_side_encryption_configuration.value, "rule", {})]
+
+        content {
+
+          dynamic "apply_server_side_encryption_by_default" {
+            for_each = length(keys(lookup(rule.value, "apply_server_side_encryption_by_default", {}))) == 0 ? [] : [
+            lookup(rule.value, "apply_server_side_encryption_by_default", {})]
+
+            content {
+              sse_algorithm     = apply_server_side_encryption_by_default.value.sse_algorithm
+              kms_master_key_id = apply_server_side_encryption_by_default.value.kms_master_key_id
+            }
+          }
         }
       }
     }
   }
-  /*
-    dynamic "object_lock_configuration" {
-        for_each = var.object_lock_configuration_inputs == null ? [] : var.object_lock_configuration_inputs
+
+  # Max 1 block - object_lock_configuration
+  dynamic "object_lock_configuration" {
+    for_each = length(keys(var.object_lock_configuration)) == 0 ? [] : [var.object_lock_configuration]
+
+    content {
+      object_lock_enabled = object_lock_configuration.value.object_lock_enabled
+
+      dynamic "rule" {
+        for_each = length(keys(lookup(object_lock_configuration.value, "rule", {}))) == 0 ? [] : [lookup(object_lock_configuration.value, "rule", {})]
 
         content {
-            object_lock_enabled                          = object_lock_configuration.value.object_lock_enabled
-            dynamic "rule" {
-                for_each = object_lock_configuration.value.rule_inputs == null ? [] : object_lock_configuration.value.rule_inputs
-
-                content {
-                    default_retention {
-                            mode                         = rule.value.mode 
-                            days                         = rule.value.days
-                            years                        = rule.value.years
-                    }
-                }
-            }
+          default_retention {
+            mode  = lookup(lookup(rule.value, "default_retention", {}), "mode")
+            days  = lookup(lookup(rule.value, "default_retention", {}), "days", null)
+            years = lookup(lookup(rule.value, "default_retention", {}), "years", null)
+          }
         }
-    }  
-*/
+      }
+    }
+  }
+
 }
-
-
-
-
-
