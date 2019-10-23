@@ -187,7 +187,7 @@ resource "aws_s3_bucket" "this" {
 
             content {
               sse_algorithm     = apply_server_side_encryption_by_default.value.sse_algorithm
-              kms_master_key_id = apply_server_side_encryption_by_default.value.kms_master_key_id
+              kms_master_key_id = lookup(apply_server_side_encryption_by_default.value, "kms_master_key_id", null)
             }
           }
         }
