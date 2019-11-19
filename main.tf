@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "cors_rule" {
-    for_each = length(keys(var.cors_rule)) == 0 ? [] : [var.cors_rule]
+    for_each = var.cors_rule == null ? [] : length(keys(var.cors_rule)) == 0 ? [] : [var.cors_rule]
 
     content {
       allowed_methods = cors_rule.value.allowed_methods
@@ -197,7 +197,7 @@ resource "aws_s3_bucket" "this" {
 
   # Max 1 block - object_lock_configuration
   dynamic "object_lock_configuration" {
-    for_each = length(keys(var.object_lock_configuration)) == 0 ? [] : [var.object_lock_configuration]
+    for_each = var.object_lock_configuration == null ? [] : length(keys(var.object_lock_configuration)) == 0 ? [] : [var.object_lock_configuration]
 
     content {
       object_lock_enabled = object_lock_configuration.value.object_lock_enabled

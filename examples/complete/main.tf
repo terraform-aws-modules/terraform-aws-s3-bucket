@@ -40,7 +40,6 @@ module "s3_bucket" {
         ReplaceKeyPrefixWith : "documents/"
       }
     }])
-
   }
 
   logging = {
