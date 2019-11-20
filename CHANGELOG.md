@@ -3,9 +3,21 @@
 
 
 
+<a name="v1.1.0"></a>
+## [v1.1.0] - 2019-11-20
+
+- Added support for S3 bucket policy (incl. ELB logs delivery policy) ([#10](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/10))
+
+
 <a name="v0.1.0"></a>
 ## [v0.1.0] - 2019-08-29
 
+
+
+<a name="v1.0.0"></a>
+## [v1.0.0] - 2019-08-29
+
+- Updated CHANGELOG
 - Rewrite to match other modules, added all existing S3 features
 
 
@@ -18,5 +30,7 @@
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v0.1.0...HEAD
-[v0.1.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v0.0.1...v0.1.0
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.1.0...HEAD
+[v1.1.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v0.1.0...v1.1.0
+[v0.1.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.0.0...v0.1.0
+[v1.0.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v0.0.1...v1.0.0
