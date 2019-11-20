@@ -4,7 +4,6 @@ resource "aws_s3_bucket" "this" {
   bucket              = var.bucket
   bucket_prefix       = var.bucket_prefix
   acl                 = var.acl
-  policy              = var.policy
   tags                = var.tags
   force_destroy       = var.force_destroy
   acceleration_status = var.acceleration_status
@@ -216,4 +215,39 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+}
+
+resource "aws_s3_bucket_policy" "this" {
+  count = var.create_bucket && (var.attach_elb_log_delivery_policy || var.policy != null) ? 1 : 0
+
+  bucket = aws_s3_bucket.this[0].id
+  policy = var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : var.policy
+}
+
+# AWS Load Balancer access log delivery policy
+data "aws_elb_service_account" "this" {
+  count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
+}
+
+data "aws_iam_policy_document" "elb_log_delivery" {
+  count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
+
+  statement {
+    sid = ""
+
+    principals {
+      type        = "AWS"
+      identifiers = data.aws_elb_service_account.this.*.arn
+    }
+
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${aws_s3_bucket.this[0].id}/*",
+    ]
+  }
 }
