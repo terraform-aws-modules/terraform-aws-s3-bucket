@@ -2,7 +2,7 @@
 
 Configuration in this directory creates S3 bucket which demos such capabilities:
 - static web-site hosting
-- access logging
+- access logging (for S3 and ELB)
 - versioning
 - CORS
 - lifecycle rules

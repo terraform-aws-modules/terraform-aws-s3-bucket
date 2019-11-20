@@ -4,7 +4,8 @@ Terraform module which creates S3 bucket on AWS with all (or almost all) feature
 
 This type of resources are supported:
 
-* [S3 bucket](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html)
+* [S3 Bucket](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html)
+* [S3 Bucket Policy](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html)
 
 These features of S3 bucket configurations are supported:
 
@@ -39,6 +40,22 @@ module "s3_bucket" {
 }
 ```
 
+### Bucket with ELB access log delivery policy attached
+
+```hcl
+module "s3_bucket_for_logs" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket = "my-s3-bucket-for-logs"
+  acl    = "log-delivery-write"
+
+  # Allow deletion of non-empty bucket
+  force_destroy = true
+
+  attach_elb_log_delivery_policy = true
+}
+```
+
 ## Conditional creation
 
 Sometimes you need to have a way to create S3 resources conditionally but Terraform does not allow to use `count` inside `module` block, so the solution is to specify argument `create_bucket`.
@@ -65,6 +82,7 @@ module "s3_bucket" {
 |------|-------------|:----:|:-----:|:-----:|
 | acceleration\_status | (Optional) Sets the accelerate configuration of an existing bucket. Can be Enabled or Suspended. | string | `"null"` | no |
 | acl | (Optional) The canned ACL to apply. Defaults to 'private'. | string | `"private"` | no |
+| attach\_elb\_log\_delivery\_policy | Controls if S3 bucket should have ELB log delivery policy attached | bool | `"false"` | no |
 | bucket | (Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name. | string | `"null"` | no |
 | bucket\_prefix | (Optional, Forces new resource) Creates a unique bucket name beginning with the specified prefix. Conflicts with bucket. | string | `"null"` | no |
 | cors\_rule | Map containing a rule of Cross-Origin Resource Sharing. | any | `{}` | no |

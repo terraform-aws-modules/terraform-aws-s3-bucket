@@ -8,10 +8,12 @@ resource "aws_kms_key" "objects" {
 }
 
 module "log_bucket" {
-  source        = "../../"
-  bucket        = "logs-${random_pet.this.id}"
-  acl           = "log-delivery-write"
-  force_destroy = true
+  source = "../../"
+
+  bucket                         = "logs-${random_pet.this.id}"
+  acl                            = "log-delivery-write"
+  force_destroy                  = true
+  attach_elb_log_delivery_policy = true
 }
 
 module "s3_bucket" {
