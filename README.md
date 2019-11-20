@@ -5,7 +5,7 @@ Terraform module which creates S3 bucket on AWS with all (or almost all) feature
 This type of resources are supported:
 
 * [S3 Bucket](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html)
-* [S3 Bucket Policy](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html)
+* [S3 Bucket Policy](https://www.terraform.io/docs/providers/aws/r/s3_bucket_policy.html)
 
 These features of S3 bucket configurations are supported:
 
