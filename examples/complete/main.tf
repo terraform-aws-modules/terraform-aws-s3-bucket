@@ -1,3 +1,7 @@
+locals {
+  bucket_name = "s3-bucket-${random_pet.this.id}"
+}
+
 resource "random_pet" "this" {
   length = 2
 }
@@ -16,12 +20,29 @@ module "log_bucket" {
   attach_elb_log_delivery_policy = true
 }
 
+data "aws_iam_policy_document" "bucket_policy" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}",
+    ]
+  }
+}
 module "s3_bucket" {
   source = "../../"
 
-  bucket        = "s3-bucket-${random_pet.this.id}"
+  bucket        = local.bucket_name
   acl           = "private"
   force_destroy = true
+  policy        = data.aws_iam_policy_document.bucket_policy.json
 
   tags = {
     Owner = "Anton"
