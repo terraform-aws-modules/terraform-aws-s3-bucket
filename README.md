@@ -17,6 +17,7 @@ These features of S3 bucket configurations are supported:
 - server-side encryption
 - object locking
 - Cross-Region Replication (CRR)
+- ELB log delivery bucket policy
 
 ## Terraform versions
 
@@ -83,6 +84,7 @@ module "s3_bucket" {
 | acceleration\_status | (Optional) Sets the accelerate configuration of an existing bucket. Can be Enabled or Suspended. | string | `"null"` | no |
 | acl | (Optional) The canned ACL to apply. Defaults to 'private'. | string | `"private"` | no |
 | attach\_elb\_log\_delivery\_policy | Controls if S3 bucket should have ELB log delivery policy attached | bool | `"false"` | no |
+| attach\_policy | Controls if S3 bucket should have bucket policy attached (set to `true` to use value of `policy` as bucket policy) | bool | `"false"` | no |
 | bucket | (Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name. | string | `"null"` | no |
 | bucket\_prefix | (Optional, Forces new resource) Creates a unique bucket name beginning with the specified prefix. Conflicts with bucket. | string | `"null"` | no |
 | cors\_rule | Map containing a rule of Cross-Origin Resource Sharing. | any | `{}` | no |

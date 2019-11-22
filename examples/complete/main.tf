@@ -11,20 +11,29 @@ resource "aws_kms_key" "objects" {
   deletion_window_in_days = 7
 }
 
-module "log_bucket" {
-  source = "../../"
-
-  bucket                         = "logs-${random_pet.this.id}"
-  acl                            = "log-delivery-write"
-  force_destroy                  = true
-  attach_elb_log_delivery_policy = true
+resource "aws_iam_role" "this" {
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = [aws_iam_role.this.arn]
     }
 
     actions = [
@@ -36,12 +45,24 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
   }
 }
+
+module "log_bucket" {
+  source = "../../"
+
+  bucket                         = "logs-${random_pet.this.id}"
+  acl                            = "log-delivery-write"
+  force_destroy                  = true
+  attach_elb_log_delivery_policy = true
+}
+
 module "s3_bucket" {
   source = "../../"
 
   bucket        = local.bucket_name
   acl           = "private"
   force_destroy = true
+
+  attach_policy = true
   policy        = data.aws_iam_policy_document.bucket_policy.json
 
   tags = {

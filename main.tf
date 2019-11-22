@@ -218,7 +218,7 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_bucket_policy" "this" {
-  count = var.create_bucket && (var.attach_elb_log_delivery_policy || var.policy != null) ? 1 : 0
+  count = var.create_bucket && (var.attach_elb_log_delivery_policy || var.attach_policy) ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
   policy = var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : var.policy
