@@ -3,9 +3,16 @@
 
 
 
+<a name="v1.5.0"></a>
+## [v1.5.0] - 2020-01-07
+
+- Fix kms_master_key_id to conform with terraform resource ([#5](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/5))
+
+
 <a name="v1.4.0"></a>
 ## [v1.4.0] - 2019-11-22
 
+- Updated CHANGELOG
 - Fix for bucket policy count when value is not computed ([#12](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/12))
 
 
@@ -51,7 +58,8 @@
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.5.0...HEAD
+[v1.5.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.1.0...v1.2.0
