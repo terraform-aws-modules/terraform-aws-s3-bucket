@@ -97,6 +97,7 @@ module "s3_bucket" {
 | region | (Optional) If specified, the AWS region this bucket should reside in. Otherwise, the region used by the callee. | string | `"null"` | no |
 | replication\_configuration | Map containing cross-region replication configuration. | any | `{}` | no |
 | request\_payer | (Optional) Specifies who should bear the cost of Amazon S3 data transfer. Can be either BucketOwner or Requester. By default, the owner of the S3 bucket would incur the costs of any data transfer. See Requester Pays Buckets developer guide for more information. | string | `"null"` | no |
+| alternative_provider | (Optional) | Specifies an alternative provider to use other than the default one. Required when you need to create a bucket in a different region. |
 | server\_side\_encryption\_configuration | Map containing server-side encryption configuration. | any | `{}` | no |
 | tags | (Optional) A mapping of tags to assign to the bucket. | map(string) | `{}` | no |
 | versioning | Map containing versioning configuration. | map(string) | `{}` | no |
