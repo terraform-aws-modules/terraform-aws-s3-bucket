@@ -70,6 +70,12 @@ variable "request_payer" {
   default     = null
 }
 
+variable "alternative_provider" {
+  description = "(Optional) Specifies an alternative provider to use other than the default one. Required when you need to create a bucket in a different region."
+  type        = string
+  default     = null
+}
+
 variable "website" {
   description = "Map containing static web-site hosting or redirect configuration."
   type        = map(string)
