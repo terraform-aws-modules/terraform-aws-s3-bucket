@@ -117,3 +117,27 @@ variable "object_lock_configuration" {
   type        = any
   default     = {}
 }
+
+variable "block_public_acls" {
+  description = "Controls if S3 bucket should be created"
+  type        = bool
+  default     = true
+}
+
+variable "block_public_policy" {
+  description = "Controls if S3 bucket should be created"
+  type        = bool
+  default     = true
+}
+
+variable "ignore_public_acls" {
+  description = "Controls if S3 bucket should be created"
+  type        = bool
+  default     = true
+}
+
+variable "restrict_public_buckets" {
+  description = "Controls if S3 bucket should be created"
+  type        = bool
+  default     = true
+}
