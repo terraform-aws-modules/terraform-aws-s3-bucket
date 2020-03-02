@@ -101,6 +101,10 @@ module "s3_bucket" {
 | tags | (Optional) A mapping of tags to assign to the bucket. | map(string) | `{}` | no |
 | versioning | Map containing versioning configuration. | map(string) | `{}` | no |
 | website | Map containing static web-site hosting or redirect configuration. | map(string) | `{}` | no |
+| block_public_acls | (Optional, Default:true) Whether Amazon S3 should block public ACLs for this bucket | bool | `true` | no |
+| block_public_policy | (Optional, Default:true) Whether Amazon S3 should block public bucket policies for this bucket | bool | `true` | no |
+| ignore_public_acls | (Optional, Default:true) Whether Amazon S3 should ignore public ACLs for this bucket | bool | `true` | no |
+| restrict_public_buckets | (Optional, Default:true) Whether Amazon S3 should restrict public bucket policies for this bucket | bool | `true` | no |
 
 ## Outputs
 
