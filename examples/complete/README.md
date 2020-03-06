@@ -9,7 +9,7 @@ Configuration in this directory creates S3 bucket which demos such capabilities:
 - server-side encryption
 - object locking
 
-Please check [S3 replication example](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete) to see Cross-Region Replication (CRR) supported by this module.
+Please check [S3 replication example](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-replication) to see Cross-Region Replication (CRR) supported by this module.
 
 ## Usage
 
