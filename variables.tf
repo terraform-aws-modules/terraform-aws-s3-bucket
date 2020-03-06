@@ -119,25 +119,25 @@ variable "object_lock_configuration" {
 }
 
 variable "block_public_acls" {
-  description = "(Optional, Default:true) Whether Amazon S3 should block public ACLs for this bucket"
+  description = "Whether Amazon S3 should block public ACLs for this bucket."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "block_public_policy" {
-  description = "(Optional, Default:true) Whether Amazon S3 should block public bucket policies for this bucket"
+  description = "Whether Amazon S3 should block public bucket policies for this bucket."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "ignore_public_acls" {
-  description = "(Optional, Default:true) Whether Amazon S3 should ignore public ACLs for this bucket"
+  description = "Whether Amazon S3 should ignore public ACLs for this bucket."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "restrict_public_buckets" {
-  description = "(Optional, Default:true) Whether Amazon S3 should restrict public bucket policies for this bucket"
+  description = "Whether Amazon S3 should restrict public bucket policies for this bucket."
   type        = bool
-  default     = true
+  default     = false
 }
