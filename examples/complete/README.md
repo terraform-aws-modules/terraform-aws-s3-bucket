@@ -9,7 +9,7 @@ Configuration in this directory creates S3 bucket which demos such capabilities:
 - server-side encryption
 - object locking
 
-Please check [S3 replication example](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete) to see Cross-Region Replication (CRR) supported by this module.
+Please check [S3 replication example](https://github.com/youse-seguradora/terraform-aws-s3-bucket/tree/master/examples/complete) to see Cross-Region Replication (CRR) supported by this module.
 
 ## Usage
 
@@ -24,6 +24,10 @@ $ terraform apply
 Note that this example may create resources which cost money. Run `terraform destroy` when you don't need these resources.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+No requirements.
+
 ## Providers
 
 | Name | Version |

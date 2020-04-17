@@ -26,30 +26,25 @@ No requirements.
 | Name | Version |
 |------|---------|
 | aws | n/a |
-| aws.replica | n/a |
 | random | n/a |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| origin\_bucket\_name | n/a | `any` | n/a | yes |
-| origin\_region | n/a | `any` | n/a | yes |
-| replica\_bucket\_name | n/a | `any` | n/a | yes |
-| replica\_region | n/a | `any` | n/a | yes |
+| bucket\_name | n/a | `any` | n/a | yes |
+| region | n/a | `any` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| this\_replica\_s3\_bucket\_id | The name of the bucket. |
 | this\_s3\_bucket\_arn | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
 | this\_s3\_bucket\_bucket\_domain\_name | The bucket domain name. Will be of format bucketname.s3.amazonaws.com. |
 | this\_s3\_bucket\_bucket\_regional\_domain\_name | The bucket region-specific domain name. The bucket domain name including the region name, please refer here for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoint when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL. |
 | this\_s3\_bucket\_hosted\_zone\_id | The Route 53 Hosted Zone ID for this bucket's region. |
 | this\_s3\_bucket\_id | The name of the bucket. |
 | this\_s3\_bucket\_region | The AWS region this bucket resides in. |
-| this\_s3\_bucket\_replica\_region | The AWS region this bucket resides in. |
 | this\_s3\_bucket\_website\_domain | The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records. |
 | this\_s3\_bucket\_website\_endpoint | The website endpoint, if the bucket is configured with a website. If not, this will be an empty string. |
 
