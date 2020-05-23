@@ -22,7 +22,7 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "cors_rule" {
-    for_each = compact(flatten([var.cors_rule]))
+    for_each = [for s in flatten([var.cors_rule]) : s if s != null && s != {}]
 
     content {
       allowed_methods = cors_rule.value.allowed_methods
