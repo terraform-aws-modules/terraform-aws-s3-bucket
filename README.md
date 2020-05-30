@@ -6,6 +6,7 @@ This type of resources are supported:
 
 * [S3 Bucket](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html)
 * [S3 Bucket Policy](https://www.terraform.io/docs/providers/aws/r/s3_bucket_policy.html)
+* [S3 Bucket Notification](https://www.terraform.io/docs/providers/aws/r/s3_bucket_notification.html) - use [modules/notification](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/notification) to configure notifications to Lambda functions, SQS queues, and SNS topics.
 
 These features of S3 bucket configurations are supported:
 
@@ -76,6 +77,8 @@ module "s3_bucket" {
 
 * [Complete](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete) - Complete S3 bucket with most of supported features enabled
 * [Cross-Region Replication](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-replication) - S3 bucket with Cross-Region Replication (CRR) enabled
+- [S3 bucket Notifications](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/notification) - S3 bucket notifications to Lambda functions, SQS queues, and SNS topics.
+
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
