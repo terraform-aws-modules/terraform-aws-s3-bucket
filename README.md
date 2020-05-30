@@ -18,6 +18,7 @@ These features of S3 bucket configurations are supported:
 - object locking
 - Cross-Region Replication (CRR)
 - ELB log delivery bucket policy
+- ACL policy grants
 
 ## Terraform versions
 
@@ -26,7 +27,7 @@ Only Terraform 0.12 is supported.
 ## Usage
 
 ### Private bucket with versioning enabled
-
+terraform-aws-s3-bucket
 ```hcl
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"

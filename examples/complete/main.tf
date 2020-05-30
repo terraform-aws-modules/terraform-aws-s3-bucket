@@ -1,3 +1,5 @@
+# data "aws_canonical_user_id" "current" {}
+
 provider "aws" {
   access_key                  = "mock_access_key"
   region                      = "eu-west-1"
@@ -93,7 +95,7 @@ module "s3_bucket" {
   source = "../../"
 
   bucket        = local.bucket_name
-  acl           = "private"
+  # acl           = "private"
   force_destroy = true
 
   attach_policy = true
@@ -208,6 +210,19 @@ module "s3_bucket" {
       }
     }
   }
+
+  grant = [
+    {
+      id          = data.aws_canonical_user_id.current.id
+      type        = "CanonicalUser"
+      permissions = ["FULL_CONTROL"]
+    },
+    {
+      type        = "Group"
+      permissions = ["READ_ACP", "WRITE"]
+      uri         = "http://acs.amazonaws.com/groups/s3/LogDelivery"
+    }
+  ]
 
   // S3 bucket-level Public Access Block configuration
   block_public_acls       = true
