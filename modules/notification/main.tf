@@ -61,7 +61,7 @@ resource "aws_lambda_permission" "allow" {
   statement_id_prefix = "AllowLambdaS3BucketNotification-"
   action              = "lambda:InvokeFunction"
   function_name       = each.value.function_name
-  qualifier = lookup(each.value, "qualifier", null)
+  qualifier           = lookup(each.value, "qualifier", null)
   principal           = "s3.amazonaws.com"
   source_arn          = local.bucket_arn
 }

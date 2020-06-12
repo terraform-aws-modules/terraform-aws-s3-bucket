@@ -85,17 +85,17 @@ module "all_notifications" {
 
   lambda_notifications = {
     lambda1 = {
-      function_arn = module.lambda_function1.this_lambda_function_arn
+      function_arn  = module.lambda_function1.this_lambda_function_arn
       function_name = module.lambda_function1.this_lambda_function_name
-      events              = ["s3:ObjectCreated:Put"]
-      filter_prefix       = "prefix/"
-      filter_suffix       = ".json"
+      events        = ["s3:ObjectCreated:Put"]
+      filter_prefix = "prefix/"
+      filter_suffix = ".json"
     }
 
     lambda2 = {
-      function_arn = module.lambda_function2.this_lambda_function_arn
+      function_arn  = module.lambda_function2.this_lambda_function_arn
       function_name = module.lambda_function2.this_lambda_function_name
-      events              = ["s3:ObjectCreated:Post"]
+      events        = ["s3:ObjectCreated:Post"]
     }
   }
 

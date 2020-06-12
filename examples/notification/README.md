@@ -24,6 +24,7 @@ No requirements.
 | Name | Version |
 |------|---------|
 | aws | n/a |
+| null | n/a |
 | random | n/a |
 
 ## Inputs
