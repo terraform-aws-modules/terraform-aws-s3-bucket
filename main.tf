@@ -253,7 +253,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 }
 
 resource "aws_s3_bucket_public_access_block" "this" {
-  count = var.create_bucket ? 1 : 0
+  count = var.create_bucket && var.attach_public_policy ? 1 : 0
 
   // Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
   // to prevent "A conflicting conditional operation is currently in progress against this resource."
