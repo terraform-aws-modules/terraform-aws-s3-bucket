@@ -16,6 +16,12 @@ variable "attach_policy" {
   default     = false
 }
 
+variable "attach_public_policy" {
+  description = "Controls if a user defined public bucket policy will be attached (set to `false` to allow upstream to apply defaults to the bucket)"
+  type        = bool
+  default     = true
+}
+
 variable "bucket" {
   description = "(Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name."
   type        = string
