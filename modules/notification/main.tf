@@ -16,7 +16,7 @@ resource "aws_s3_bucket_notification" "this" {
 
     content {
       id                  = lambda_function.key
-      lambda_function_arn = lambda_function.value.lambda_function_arn
+      lambda_function_arn = lambda_function.value.function_arn
       events              = lambda_function.value.events
       filter_prefix       = lookup(lambda_function.value, "filter_prefix", null)
       filter_suffix       = lookup(lambda_function.value, "filter_suffix", null)
@@ -60,7 +60,8 @@ resource "aws_lambda_permission" "allow" {
 
   statement_id_prefix = "AllowLambdaS3BucketNotification-"
   action              = "lambda:InvokeFunction"
-  function_name       = each.value.lambda_function_arn
+  function_name       = each.value.function_name
+  qualifier           = lookup(each.value, "qualifier", null)
   principal           = "s3.amazonaws.com"
   source_arn          = local.bucket_arn
 }

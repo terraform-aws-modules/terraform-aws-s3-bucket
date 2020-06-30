@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.8.0"></a>
+## [v1.8.0] - 2020-06-12
+
+- feat: Added attach_public_policy as conditional switch ([#34](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/34))
+- feat: Updated variable name in notification module
+
+
 <a name="v1.7.0"></a>
 ## [v1.7.0] - 2020-05-24
 
@@ -69,7 +76,8 @@ All notable changes to this project will be documented in this file.
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.8.0...HEAD
+[v1.8.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.6.0...v1.7.0
 [v1.6.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.5.0...v1.6.0
 [v1.5.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.4.0...v1.5.0
