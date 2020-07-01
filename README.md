@@ -84,7 +84,7 @@ module "s3_bucket" {
 
 | Name | Version |
 |------|---------|
-| terraform | ~> 0.12.6 |
+| terraform | >= 0.12.6, < 0.14 |
 | aws | ~> 2.35 |
 
 ## Providers
