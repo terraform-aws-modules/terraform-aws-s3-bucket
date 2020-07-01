@@ -22,7 +22,7 @@ These features of S3 bucket configurations are supported:
 
 ## Terraform versions
 
-Only Terraform 0.12 is supported.
+Terraform 0.12 and above are supported.
 
 ## Usage
 
