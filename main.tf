@@ -21,6 +21,12 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  lifecycle {
+    ignore_changes = [
+      lifecycle_rule
+    ]
+  }
+
   dynamic "cors_rule" {
     for_each = length(keys(var.cors_rule)) == 0 ? [] : [var.cors_rule]
 
