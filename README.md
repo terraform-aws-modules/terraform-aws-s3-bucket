@@ -114,7 +114,6 @@ module "s3_bucket" {
 | logging | Map containing access bucket logging configuration. | `map(string)` | `{}` | no |
 | object\_lock\_configuration | Map containing S3 object locking configuration. | `any` | `{}` | no |
 | policy | (Optional) A valid bucket policy JSON document. Note that if the policy document is not specific enough (but still valid), Terraform may view the policy as constantly changing in a terraform plan. In this case, please make sure you use the verbose/specific version of the policy. For more information about building AWS IAM policy documents with Terraform, see the AWS IAM Policy Document Guide. | `string` | `null` | no |
-| region | (Optional) If specified, the AWS region this bucket should reside in. Otherwise, the region used by the callee. | `string` | `null` | no |
 | replication\_configuration | Map containing cross-region replication configuration. | `any` | `{}` | no |
 | request\_payer | (Optional) Specifies who should bear the cost of Amazon S3 data transfer. Can be either BucketOwner or Requester. By default, the owner of the S3 bucket would incur the costs of any data transfer. See Requester Pays Buckets developer guide for more information. | `string` | `null` | no |
 | restrict\_public\_buckets | Whether Amazon S3 should restrict public bucket policies for this bucket. | `bool` | `false` | no |
