@@ -197,13 +197,13 @@ resource "aws_s3_bucket" "this" {
 
   # Max 1 block - object_lock_configuration
   dynamic "object_lock_configuration" {
-    for_each = var.object_lock_configuration == null ? [] : length(keys(var.object_lock_configuration)) == 0 ? [] : [var.object_lock_configuration]
+    for_each = length(try(keys(var.object_lock_configuration), {})) == 0 ? [] : [var.object_lock_configuration]
 
     content {
       object_lock_enabled = object_lock_configuration.value.object_lock_enabled
 
       dynamic "rule" {
-        for_each = length(keys(lookup(object_lock_configuration.value, "rule", {}))) == 0 ? [] : [lookup(object_lock_configuration.value, "rule", {})]
+        for_each = length(keys(try(lookup(object_lock_configuration.value, "rule", {}), {}))) == 0 ? [] : [lookup(object_lock_configuration.value, "rule", {})]
 
         content {
           default_retention {
