@@ -92,13 +92,13 @@ module "s3_bucket" {
     target_prefix = "log/"
   }
 
-  cors_rule = {
+  cors_rules = [{
     allowed_methods = ["PUT", "POST"]
     allowed_origins = ["https://modules.tf", "https://terraform-aws-modules.modules.tf"]
     allowed_headers = ["*"]
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
-  }
+  }]
 
   lifecycle_rule = [
     {
