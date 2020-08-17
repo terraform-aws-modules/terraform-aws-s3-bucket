@@ -22,7 +22,7 @@ These features of S3 bucket configurations are supported:
 
 ## Terraform versions
 
-Only Terraform 0.12 is supported.
+Terraform 0.12 and above are supported.
 
 ## Usage
 
@@ -84,14 +84,14 @@ module "s3_bucket" {
 
 | Name | Version |
 |------|---------|
-| terraform | ~> 0.12.6 |
-| aws | ~> 2.35 |
+| terraform | >= 0.12.6, < 0.14 |
+| aws | >= 3.0, < 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~> 2.35 |
+| aws | >= 3.0, < 4.0 |
 
 ## Inputs
 
@@ -106,7 +106,7 @@ module "s3_bucket" {
 | block\_public\_policy | Whether Amazon S3 should block public bucket policies for this bucket. | `bool` | `false` | no |
 | bucket | (Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name. | `string` | `null` | no |
 | bucket\_prefix | (Optional, Forces new resource) Creates a unique bucket name beginning with the specified prefix. Conflicts with bucket. | `string` | `null` | no |
-| cors\_rule | Map containing a rule of Cross-Origin Resource Sharing. | `any` | `{}` | no |
+| cors\_rule | List of maps containing rules for Cross-Origin Resource Sharing. | `list(any)` | `[]` | no |
 | create\_bucket | Controls if S3 bucket should be created | `bool` | `true` | no |
 | force\_destroy | (Optional, Default:false ) A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `false` | no |
 | ignore\_public\_acls | Whether Amazon S3 should ignore public ACLs for this bucket. | `bool` | `false` | no |
@@ -114,7 +114,6 @@ module "s3_bucket" {
 | logging | Map containing access bucket logging configuration. | `map(string)` | `{}` | no |
 | object\_lock\_configuration | Map containing S3 object locking configuration. | `any` | `{}` | no |
 | policy | (Optional) A valid bucket policy JSON document. Note that if the policy document is not specific enough (but still valid), Terraform may view the policy as constantly changing in a terraform plan. In this case, please make sure you use the verbose/specific version of the policy. For more information about building AWS IAM policy documents with Terraform, see the AWS IAM Policy Document Guide. | `string` | `null` | no |
-| region | (Optional) If specified, the AWS region this bucket should reside in. Otherwise, the region used by the callee. | `string` | `null` | no |
 | replication\_configuration | Map containing cross-region replication configuration. | `any` | `{}` | no |
 | request\_payer | (Optional) Specifies who should bear the cost of Amazon S3 data transfer. Can be either BucketOwner or Requester. By default, the owner of the S3 bucket would incur the costs of any data transfer. See Requester Pays Buckets developer guide for more information. | `string` | `null` | no |
 | restrict\_public\_buckets | Whether Amazon S3 should restrict public bucket policies for this bucket. | `bool` | `false` | no |

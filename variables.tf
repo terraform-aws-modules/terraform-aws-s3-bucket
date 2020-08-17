@@ -64,12 +64,6 @@ variable "acceleration_status" {
   default     = null
 }
 
-variable "region" {
-  description = "(Optional) If specified, the AWS region this bucket should reside in. Otherwise, the region used by the callee."
-  type        = string
-  default     = null
-}
-
 variable "request_payer" {
   description = "(Optional) Specifies who should bear the cost of Amazon S3 data transfer. Can be either BucketOwner or Requester. By default, the owner of the S3 bucket would incur the costs of any data transfer. See Requester Pays Buckets developer guide for more information."
   type        = string
@@ -83,9 +77,9 @@ variable "website" {
 }
 
 variable "cors_rule" {
-  description = "Map containing a rule of Cross-Origin Resource Sharing."
-  type        = any # should be `map`, but it produces an error "all map elements must have the same type"
-  default     = {}
+  description = "List of maps containing rules for Cross-Origin Resource Sharing."
+  type        = list(any)
+  default     = []
 }
 
 variable "versioning" {
