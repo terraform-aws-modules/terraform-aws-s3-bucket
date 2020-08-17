@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.12.0"></a>
+## [v1.12.0] - 2020-08-17
+
+- fix: Using required arguments instead of lookup in replication_configuration ([#35](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/35))
+
+
 <a name="v1.11.0"></a>
 ## [v1.11.0] - 2020-08-17
 
@@ -94,7 +100,8 @@ All notable changes to this project will be documented in this file.
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.11.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.12.0...HEAD
+[v1.12.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.11.0...v1.12.0
 [v1.11.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.10.0...v1.11.0
 [v1.10.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.8.0...v1.9.0
