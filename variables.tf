@@ -77,9 +77,9 @@ variable "website" {
 }
 
 variable "cors_rule" {
-  description = "Map containing a rule of Cross-Origin Resource Sharing."
-  type        = any # should be `map`, but it produces an error "all map elements must have the same type"
-  default     = {}
+  description = "List of maps containing rules for Cross-Origin Resource Sharing."
+  type        = list(any)
+  default     = []
 }
 
 variable "versioning" {
