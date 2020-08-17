@@ -21,7 +21,7 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "cors_rule" {
-    for_each = var.cors_rules
+    for_each = var.cors_rule
 
     content {
       allowed_methods = cors_rule.value.allowed_methods
