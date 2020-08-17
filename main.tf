@@ -117,13 +117,13 @@ resource "aws_s3_bucket" "this" {
           id       = lookup(rules.value, "id", null)
           priority = lookup(rules.value, "priority", null)
           prefix   = lookup(rules.value, "prefix", null)
-          status   = lookup(rules.value, "status", null)
+          status   = rules.value.status
 
           dynamic "destination" {
             for_each = length(keys(lookup(rules.value, "destination", {}))) == 0 ? [] : [lookup(rules.value, "destination", {})]
 
             content {
-              bucket             = lookup(destination.value, "bucket", null)
+              bucket             = destination.value.bucket
               storage_class      = lookup(destination.value, "storage_class", null)
               replica_kms_key_id = lookup(destination.value, "replica_kms_key_id", null)
               account_id         = lookup(destination.value, "account_id", null)
