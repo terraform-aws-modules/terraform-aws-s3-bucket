@@ -7,7 +7,6 @@ resource "aws_s3_bucket" "this" {
   tags                = var.tags
   force_destroy       = var.force_destroy
   acceleration_status = var.acceleration_status
-  region              = var.region
   request_payer       = var.request_payer
 
   dynamic "website" {
@@ -22,7 +21,7 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "cors_rule" {
-    for_each = length(keys(var.cors_rule)) == 0 ? [] : [var.cors_rule]
+    for_each = var.cors_rule
 
     content {
       allowed_methods = cors_rule.value.allowed_methods
@@ -118,13 +117,13 @@ resource "aws_s3_bucket" "this" {
           id       = lookup(rules.value, "id", null)
           priority = lookup(rules.value, "priority", null)
           prefix   = lookup(rules.value, "prefix", null)
-          status   = lookup(rules.value, "status", null)
+          status   = rules.value.status
 
           dynamic "destination" {
             for_each = length(keys(lookup(rules.value, "destination", {}))) == 0 ? [] : [lookup(rules.value, "destination", {})]
 
             content {
-              bucket             = lookup(destination.value, "bucket", null)
+              bucket             = destination.value.bucket
               storage_class      = lookup(destination.value, "storage_class", null)
               replica_kms_key_id = lookup(destination.value, "replica_kms_key_id", null)
               account_id         = lookup(destination.value, "account_id", null)
@@ -253,9 +252,14 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 }
 
 resource "aws_s3_bucket_public_access_block" "this" {
-  bucket                  = var.bucket
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  count = var.create_bucket && var.attach_public_policy ? 1 : 0
+
+  // Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
+  // to prevent "A conflicting conditional operation is currently in progress against this resource."
+  bucket = (var.attach_elb_log_delivery_policy || var.attach_policy) ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
+
+  block_public_acls       = var.block_public_acls
+  block_public_policy     = var.block_public_policy
+  ignore_public_acls      = var.ignore_public_acls
+  restrict_public_buckets = var.restrict_public_buckets
 }

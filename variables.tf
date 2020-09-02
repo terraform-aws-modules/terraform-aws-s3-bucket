@@ -16,6 +16,12 @@ variable "attach_policy" {
   default     = false
 }
 
+variable "attach_public_policy" {
+  description = "Controls if a user defined public bucket policy will be attached (set to `false` to allow upstream to apply defaults to the bucket)"
+  type        = bool
+  default     = true
+}
+
 variable "bucket" {
   description = "(Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name."
   type        = string
@@ -58,12 +64,6 @@ variable "acceleration_status" {
   default     = null
 }
 
-variable "region" {
-  description = "(Optional) If specified, the AWS region this bucket should reside in. Otherwise, the region used by the callee."
-  type        = string
-  default     = null
-}
-
 variable "request_payer" {
   description = "(Optional) Specifies who should bear the cost of Amazon S3 data transfer. Can be either BucketOwner or Requester. By default, the owner of the S3 bucket would incur the costs of any data transfer. See Requester Pays Buckets developer guide for more information."
   type        = string
@@ -77,9 +77,9 @@ variable "website" {
 }
 
 variable "cors_rule" {
-  description = "Map containing a rule of Cross-Origin Resource Sharing."
-  type        = any # should be `map`, but it produces an error "all map elements must have the same type"
-  default     = {}
+  description = "List of maps containing rules for Cross-Origin Resource Sharing."
+  type        = list(any)
+  default     = []
 }
 
 variable "versioning" {
@@ -116,4 +116,28 @@ variable "object_lock_configuration" {
   description = "Map containing S3 object locking configuration."
   type        = any
   default     = {}
+}
+
+variable "block_public_acls" {
+  description = "Whether Amazon S3 should block public ACLs for this bucket."
+  type        = bool
+  default     = false
+}
+
+variable "block_public_policy" {
+  description = "Whether Amazon S3 should block public bucket policies for this bucket."
+  type        = bool
+  default     = false
+}
+
+variable "ignore_public_acls" {
+  description = "Whether Amazon S3 should ignore public ACLs for this bucket."
+  type        = bool
+  default     = false
+}
+
+variable "restrict_public_buckets" {
+  description = "Whether Amazon S3 should restrict public bucket policies for this bucket."
+  type        = bool
+  default     = false
 }

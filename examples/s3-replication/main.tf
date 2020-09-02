@@ -36,7 +36,6 @@ module "replica_bucket" {
   }
 
   bucket = local.destination_bucket_name
-  region = local.replica_region
   acl    = "private"
 
   versioning = {
@@ -48,7 +47,6 @@ module "s3_bucket" {
   source = "../../"
 
   bucket = local.bucket_name
-  region = local.origin_region
   acl    = "private"
 
   versioning = {
