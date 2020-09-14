@@ -35,7 +35,7 @@ variable "bucket_prefix" {
 }
 
 variable "acl" {
-  description = "(Optional) The canned ACL to apply. Defaults to 'private'."
+  description = "(Optional) The canned ACL to apply. Defaults to 'private'. Conflicts with `grant`"
   type        = string
   default     = "private"
 }
@@ -92,6 +92,12 @@ variable "logging" {
   description = "Map containing access bucket logging configuration."
   type        = map(string)
   default     = {}
+}
+
+variable "grant" {
+  description = "An ACL policy grant. Conflicts with `acl`"
+  type        = list(any)
+  default     = []
 }
 
 variable "lifecycle_rule" {
