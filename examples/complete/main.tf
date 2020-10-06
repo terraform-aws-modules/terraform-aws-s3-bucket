@@ -204,7 +204,7 @@ module "s3_bucket" {
     }
   }
 
-  // S3 bucket-level Public Access Block configuration
+  # S3 bucket-level Public Access Block configuration
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true

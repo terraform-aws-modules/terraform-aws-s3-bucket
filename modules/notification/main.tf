@@ -1,8 +1,8 @@
 locals {
   bucket_arn = coalesce(var.bucket_arn, "arn:aws:s3:::${var.bucket}")
 
-  // Convert from "arn:aws:sqs:eu-west-1:835367859851:bold-starling-0" into "https://sqs.eu-west-1.amazonaws.com/835367859851/bold-starling-0" if queue_id was not specified
-  // queue_url used in aws_sqs_queue_policy is not the same as arn which is used in all other places
+  # Convert from "arn:aws:sqs:eu-west-1:835367859851:bold-starling-0" into "https://sqs.eu-west-1.amazonaws.com/835367859851/bold-starling-0" if queue_id was not specified
+  # queue_url used in aws_sqs_queue_policy is not the same as arn which is used in all other places
   queue_ids = { for k, v in var.sqs_notifications : k => format("https://%s.%s.amazonaws.com/%s/%s", data.aws_arn.queue[k].service, data.aws_arn.queue[k].region, data.aws_arn.queue[k].account, data.aws_arn.queue[k].resource) if lookup(v, "queue_id", "") == "" }
 }
 
@@ -54,7 +54,7 @@ resource "aws_s3_bucket_notification" "this" {
   ]
 }
 
-// Lambda
+# Lambda
 resource "aws_lambda_permission" "allow" {
   for_each = var.lambda_notifications
 
@@ -66,7 +66,7 @@ resource "aws_lambda_permission" "allow" {
   source_arn          = local.bucket_arn
 }
 
-// SQS Queue
+# SQS Queue
 data "aws_arn" "queue" {
   for_each = var.sqs_notifications
 
@@ -107,7 +107,7 @@ resource "aws_sqs_queue_policy" "allow" {
   policy    = data.aws_iam_policy_document.sqs[each.key].json
 }
 
-// SNS Topic
+# SNS Topic
 data "aws_iam_policy_document" "sns" {
   for_each = var.sns_notifications
 
