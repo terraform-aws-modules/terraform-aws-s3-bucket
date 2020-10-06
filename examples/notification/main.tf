@@ -81,7 +81,7 @@ module "all_notifications" {
 
   bucket = module.s3_bucket.this_s3_bucket_id
 
-  // Common error - Error putting S3 notification configuration: InvalidArgument: Configuration is ambiguously defined. Cannot have overlapping suffixes in two rules if the prefixes are overlapping for the same event type.
+  # Common error - Error putting S3 notification configuration: InvalidArgument: Configuration is ambiguously defined. Cannot have overlapping suffixes in two rules if the prefixes are overlapping for the same event type.
 
   lambda_notifications = {
     lambda1 = {
@@ -106,7 +106,7 @@ module "all_notifications" {
       filter_prefix = "prefix2/"
       filter_suffix = ".txt"
 
-      //      queue_id =  aws_sqs_queue.this[0].id // optional
+      #      queue_id =  aws_sqs_queue.this[0].id // optional
     }
 
     sqs2 = {

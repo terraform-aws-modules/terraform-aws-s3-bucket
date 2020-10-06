@@ -50,6 +50,17 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  dynamic "grant" {
+    for_each = var.grant
+
+    content {
+      id          = lookup(grant.value, "id", null)
+      type        = grant.value.type
+      permissions = grant.value.permissions
+      uri         = lookup(grant.value, "uri", null)
+    }
+  }
+
   dynamic "lifecycle_rule" {
     for_each = var.lifecycle_rule
 
@@ -254,8 +265,8 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 resource "aws_s3_bucket_public_access_block" "this" {
   count = var.create_bucket && var.attach_public_policy ? 1 : 0
 
-  // Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
-  // to prevent "A conflicting conditional operation is currently in progress against this resource."
+  # Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
+  # to prevent "A conflicting conditional operation is currently in progress against this resource."
   bucket = (var.attach_elb_log_delivery_policy || var.attach_policy) ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
 
   block_public_acls       = var.block_public_acls

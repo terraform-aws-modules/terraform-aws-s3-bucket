@@ -2,6 +2,8 @@ locals {
   bucket_name = "s3-bucket-${random_pet.this.id}"
 }
 
+data "aws_canonical_user_id" "current" {}
+
 resource "random_pet" "this" {
   length = 2
 }
@@ -53,6 +55,25 @@ module "log_bucket" {
   acl                            = "log-delivery-write"
   force_destroy                  = true
   attach_elb_log_delivery_policy = true
+}
+
+module "cloudfront_log_bucket" {
+  source = "../../"
+
+  bucket = "cloudfront-logs-${random_pet.this.id}"
+  acl    = null # conflicts with default of `acl = "private"` so set to null to use grants
+  grant = [{
+    type        = "CanonicalUser"
+    permissions = ["FULL_CONTROL"]
+    id          = data.aws_canonical_user_id.current.id
+    }, {
+    type        = "CanonicalUser"
+    permissions = ["FULL_CONTROL"]
+    id          = "c4c1ede66af53448b93c283ce9448c4ba468c9432aa01d700d3878632f77d2d0"
+    # Ref. https://github.com/terraform-providers/terraform-provider-aws/issues/12512
+    # Ref. https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
+  }]
+  force_destroy = true
 }
 
 module "s3_bucket" {
@@ -183,7 +204,7 @@ module "s3_bucket" {
     }
   }
 
-  // S3 bucket-level Public Access Block configuration
+  # S3 bucket-level Public Access Block configuration
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
