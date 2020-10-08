@@ -96,7 +96,7 @@ variable "logging" {
 
 variable "grant" {
   description = "An ACL policy grant. Conflicts with `acl`"
-  type        = list(any)
+  type        = any
   default     = []
 }
 

@@ -109,7 +109,7 @@ module "s3_bucket" {
 | cors\_rule | List of maps containing rules for Cross-Origin Resource Sharing. | `list(any)` | `[]` | no |
 | create\_bucket | Controls if S3 bucket should be created | `bool` | `true` | no |
 | force\_destroy | (Optional, Default:false ) A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `false` | no |
-| grant | An ACL policy grant. Conflicts with `acl` | `list(any)` | `[]` | no |
+| grant | An ACL policy grant. Conflicts with `acl` | `any` | `[]` | no |
 | ignore\_public\_acls | Whether Amazon S3 should ignore public ACLs for this bucket. | `bool` | `false` | no |
 | lifecycle\_rule | List of maps containing configuration of object lifecycle management. | `any` | `[]` | no |
 | logging | Map containing access bucket logging configuration. | `map(string)` | `{}` | no |
