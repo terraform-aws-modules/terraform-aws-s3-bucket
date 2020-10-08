@@ -78,7 +78,7 @@ variable "website" {
 
 variable "cors_rule" {
   description = "List of maps containing rules for Cross-Origin Resource Sharing."
-  type        = list(any)
+  type        = any
   default     = []
 }
 
