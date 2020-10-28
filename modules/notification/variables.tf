@@ -4,6 +4,18 @@ variable "create" {
   default     = true
 }
 
+variable "create_sns_policy" {
+  description = "Whether to create a policy for SNS permissions or not?"
+  type        = bool
+  default     = true
+}
+
+variable "create_sqs_policy" {
+  description = "Whether to create a policy for SQS permissions or not?"
+  type        = bool
+  default     = true
+}
+
 variable "bucket" {
   description = "Name of S3 bucket to use"
   type        = string
