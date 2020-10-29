@@ -74,7 +74,7 @@ data "aws_arn" "queue" {
 }
 
 data "aws_iam_policy_document" "sqs" {
-  for_each = var.sqs_notifications
+  for_each = var.create_sqs_policy ? var.sqs_notifications : {}
 
   statement {
     sid = "AllowSQSS3BucketNotification"
@@ -109,7 +109,7 @@ resource "aws_sqs_queue_policy" "allow" {
 
 # SNS Topic
 data "aws_iam_policy_document" "sns" {
-  for_each = var.sns_notifications
+  for_each = var.create_sns_policy ? var.sns_notifications : {}
 
   statement {
     sid = "AllowSNSS3BucketNotification"
