@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.16.0"></a>
+## [v1.16.0] - 2020-10-30
+
+- feat: Creating SNS/SQS policies should be optional ([#54](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/54))
+
+
 <a name="v1.15.0"></a>
 ## [v1.15.0] - 2020-10-08
 
@@ -119,7 +125,8 @@ All notable changes to this project will be documented in this file.
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.15.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.16.0...HEAD
+[v1.16.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.15.0...v1.16.0
 [v1.15.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.14.0...v1.15.0
 [v1.14.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.13.0...v1.14.0
 [v1.13.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.12.0...v1.13.0
