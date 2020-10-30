@@ -4,6 +4,18 @@ variable "create" {
   default     = true
 }
 
+variable "create_sns_policy" {
+  description = "Whether to create a policy for SNS permissions or not?"
+  type        = bool
+  default     = true
+}
+
+variable "create_sqs_policy" {
+  description = "Whether to create a policy for SQS permissions or not?"
+  type        = bool
+  default     = true
+}
+
 variable "bucket" {
   description = "Name of S3 bucket to use"
   type        = string
@@ -18,18 +30,18 @@ variable "bucket_arn" {
 
 variable "lambda_notifications" {
   description = "Map of S3 bucket notifications to Lambda function"
-  type        = any # map(map(any)) is better, but Terraform 0.12.25 panics
+  type        = any
   default     = {}
 }
 
 variable "sqs_notifications" {
   description = "Map of S3 bucket notifications to SQS queue"
-  type        = any # map(map(any)) is better, but Terraform 0.12.25 panics
+  type        = any
   default     = {}
 }
 
 variable "sns_notifications" {
   description = "Map of S3 bucket notifications to SNS topic"
-  type        = any # map(map(any)) is better, but Terraform 0.12.25 panics
+  type        = any
   default     = {}
 }

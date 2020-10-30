@@ -84,14 +84,14 @@ module "s3_bucket" {
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.6, < 0.14 |
-| aws | >= 3.0, < 4.0 |
+| terraform | >= 0.12.6 |
+| aws | >= 3.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 3.0, < 4.0 |
+| aws | >= 3.0 |
 
 ## Inputs
 

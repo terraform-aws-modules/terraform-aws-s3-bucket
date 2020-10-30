@@ -74,7 +74,7 @@ data "aws_arn" "queue" {
 }
 
 data "aws_iam_policy_document" "sqs" {
-  for_each = var.sqs_notifications
+  for_each = var.create_sqs_policy ? var.sqs_notifications : tomap({})
 
   statement {
     sid = "AllowSQSS3BucketNotification"
@@ -101,7 +101,7 @@ data "aws_iam_policy_document" "sqs" {
 }
 
 resource "aws_sqs_queue_policy" "allow" {
-  for_each = var.sqs_notifications
+  for_each = var.create_sqs_policy ? var.sqs_notifications : tomap({})
 
   queue_url = lookup(each.value, "queue_id", lookup(local.queue_ids, each.key, null))
   policy    = data.aws_iam_policy_document.sqs[each.key].json
@@ -109,7 +109,7 @@ resource "aws_sqs_queue_policy" "allow" {
 
 # SNS Topic
 data "aws_iam_policy_document" "sns" {
-  for_each = var.sns_notifications
+  for_each = var.create_sns_policy ? var.sns_notifications : tomap({})
 
   statement {
     sid = "AllowSNSS3BucketNotification"
@@ -136,7 +136,7 @@ data "aws_iam_policy_document" "sns" {
 }
 
 resource "aws_sns_topic_policy" "allow" {
-  for_each = var.sns_notifications
+  for_each = var.create_sns_policy ? var.sns_notifications : tomap({})
 
   arn    = each.value.topic_arn
   policy = data.aws_iam_policy_document.sns[each.key].json
