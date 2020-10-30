@@ -30,18 +30,18 @@ variable "bucket_arn" {
 
 variable "lambda_notifications" {
   description = "Map of S3 bucket notifications to Lambda function"
-  type        = any # map(map(any)) is better, but Terraform 0.12.25 panics
+  type        = any
   default     = {}
 }
 
 variable "sqs_notifications" {
   description = "Map of S3 bucket notifications to SQS queue"
-  type        = any # map(map(any)) is better, but Terraform 0.12.25 panics
+  type        = any
   default     = {}
 }
 
 variable "sns_notifications" {
   description = "Map of S3 bucket notifications to SNS topic"
-  type        = any # map(map(any)) is better, but Terraform 0.12.25 panics
+  type        = any
   default     = {}
 }
