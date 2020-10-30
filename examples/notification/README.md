@@ -19,18 +19,18 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.6, < 0.14 |
-| aws | >= 3.0, < 4.0 |
-| null | ~> 2 |
-| random | ~> 2 |
+| terraform | >= 0.12.6 |
+| aws | >= 3.0 |
+| null | >= 2 |
+| random | >= 2 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 3.0, < 4.0 |
-| null | ~> 2 |
-| random | ~> 2 |
+| aws | >= 3.0 |
+| null | >= 2 |
+| random | >= 2 |
 
 ## Inputs
 

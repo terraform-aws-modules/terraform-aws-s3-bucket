@@ -79,7 +79,7 @@ resource "aws_sqs_queue" "this" {
 # SQS policy created outside of the module
 data "aws_iam_policy_document" "sqs_external" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["sqs:SendMessage"]
 
     principals {
