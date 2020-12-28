@@ -239,11 +239,6 @@ data "aws_elb_service_account" "this" {
   count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
 }
 
-# AWS Cloudtrail account
-data "aws_cloudtrail_service_account" "this" {
-  count = var.create_bucket && var.attach_cloudtrail_log_delivery_policy ? 1 : 0
-}
-
 # AWS Redshift account
 data "aws_redshift_service_account" "this" {
   count  = var.create_bucket && var.attach_redshift_log_delivery_policy ? local.redshift_region_count : 0
@@ -304,8 +299,8 @@ data "aws_iam_policy_document" "generated_policy" {
     iterator = item
     content {
       principals {
-        identifiers = data.aws_cloudtrail_service_account.this.*.arn
-        type        = "AWS"
+        identifiers = ["cloudtrail.amazonaws.com"]
+        type        = "Service"
       }
       effect = "Allow"
       actions = [
@@ -324,8 +319,8 @@ data "aws_iam_policy_document" "generated_policy" {
     iterator = item
     content {
       principals {
-        identifiers = data.aws_cloudtrail_service_account.this.*.arn
-        type        = "AWS"
+        identifiers = ["cloudtrail.amazonaws.com"]
+        type        = "Service"
       }
       effect    = "Allow"
       actions   = ["s3:GetBucketAcl"]
