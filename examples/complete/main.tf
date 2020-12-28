@@ -48,13 +48,24 @@ data "aws_iam_policy_document" "bucket_policy" {
   }
 }
 
+module "billing_bucket" {
+  source = "../../"
+
+  bucket                             = "billing-${random_pet.this.id}"
+  force_destroy                      = true
+  attach_billing_log_delivery_policy = true
+}
+
 module "log_bucket" {
   source = "../../"
 
-  bucket                         = "logs-${random_pet.this.id}"
-  acl                            = "log-delivery-write"
-  force_destroy                  = true
-  attach_elb_log_delivery_policy = true
+  bucket                                = "logs-${random_pet.this.id}"
+  acl                                   = "log-delivery-write"
+  force_destroy                         = true
+  attach_elb_log_delivery_policy        = true
+  attach_redshift_log_delivery_policy   = true
+  redshift_service_account_regions      = ["us-east-1", "eu-central-1"]
+  attach_cloudtrail_log_delivery_policy = true
 }
 
 module "cloudfront_log_bucket" {

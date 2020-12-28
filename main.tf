@@ -228,37 +228,172 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_bucket_policy" "this" {
-  count = var.create_bucket && (var.attach_elb_log_delivery_policy || var.attach_policy) ? 1 : 0
+  count = var.create_bucket && (local.attach_generated_policy || var.attach_policy) ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
-  policy = var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : var.policy
+  policy = local.attach_generated_policy ? data.aws_iam_policy_document.generated_policy[0].json : var.policy
 }
 
-# AWS Load Balancer access log delivery policy
+# AWS Load Balancer account
 data "aws_elb_service_account" "this" {
   count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
 }
 
-data "aws_iam_policy_document" "elb_log_delivery" {
-  count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
+# AWS Cloudtrail account
+data "aws_cloudtrail_service_account" "this" {
+  count = var.create_bucket && var.attach_cloudtrail_log_delivery_policy ? 1 : 0
+}
 
-  statement {
-    sid = ""
+# AWS Redshift account
+data "aws_redshift_service_account" "this" {
+  count  = var.create_bucket && var.attach_redshift_log_delivery_policy ? local.redshift_region_count : 0
+  region = local.redshift_region_count == 1 ? null : var.redshift_service_account_regions[count.index]
+}
 
-    principals {
-      type        = "AWS"
-      identifiers = data.aws_elb_service_account.this.*.arn
+locals {
+  # if we do not have any region in redshift_log_delivery_policy_regions than we put
+  # it to 1 and generate policy only for current region, else loop over the redshift_log_delivery_policy_regions
+  # and get redshift account id for each region
+  redshift_region_count = length(var.redshift_service_account_regions) > 0 ? length(var.redshift_service_account_regions) : 1
+
+  # if any of attach_<service>_log_delivery_policy is enabled, than we should generate aws_iam_policy_document for it
+  attach_generated_policy = contains([var.attach_elb_log_delivery_policy, var.attach_cloudtrail_log_delivery_policy, var.attach_billing_log_delivery_policy, var.attach_redshift_log_delivery_policy], true)
+}
+
+data "aws_iam_policy_document" "generated_policy" {
+  count = var.create_bucket && local.attach_generated_policy ? 1 : 0
+
+  # ELB log delivery policy
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html
+  dynamic "statement" {
+    for_each = var.attach_elb_log_delivery_policy ? [0] : []
+    iterator = item
+    content {
+      principals {
+        identifiers = data.aws_elb_service_account.this.*.arn
+        type        = "AWS"
+      }
+      effect    = "Allow"
+      actions   = ["s3:GetBucketAcl"]
+      resources = aws_s3_bucket.this.*.arn
     }
+  }
+  dynamic "statement" {
+    for_each = var.attach_elb_log_delivery_policy ? [0] : []
+    iterator = item
+    content {
+      principals {
+        type        = "AWS"
+        identifiers = data.aws_elb_service_account.this.*.arn
+      }
+      effect    = "Allow"
+      actions   = ["s3:PutObject"]
+      resources = ["${aws_s3_bucket.this[0].arn}/*"]
+      condition {
+        test     = "StringEquals"
+        values   = ["bucket-owner-full-control"]
+        variable = "s3:x-amz-acl"
+      }
+    }
+  }
 
-    effect = "Allow"
+  # Cloudtrail log delivery policy
+  # https://docs.aws.amazon.com/awscloudtrail/latest/userguide/create-s3-bucket-policy-for-cloudtrail.html
+  dynamic "statement" {
+    for_each = var.attach_cloudtrail_log_delivery_policy ? [0] : []
+    iterator = item
+    content {
+      principals {
+        identifiers = data.aws_cloudtrail_service_account.this.*.arn
+        type        = "AWS"
+      }
+      effect = "Allow"
+      actions = [
+        "s3:PutObject"
+      ]
+      resources = ["${aws_s3_bucket.this[0].arn}/*"]
+      condition {
+        test     = "StringEquals"
+        values   = ["bucket-owner-full-control"]
+        variable = "s3:x-amz-acl"
+      }
+    }
+  }
+  dynamic "statement" {
+    for_each = var.attach_cloudtrail_log_delivery_policy ? [0] : []
+    iterator = item
+    content {
+      principals {
+        identifiers = data.aws_cloudtrail_service_account.this.*.arn
+        type        = "AWS"
+      }
+      effect    = "Allow"
+      actions   = ["s3:GetBucketAcl"]
+      resources = aws_s3_bucket.this.*.arn
+    }
+  }
 
-    actions = [
-      "s3:PutObject",
-    ]
+  # Redshift log delivery policy
+  # https://docs.aws.amazon.com/redshift/latest/mgmt/db-auditing.html
+  dynamic "statement" {
+    for_each = var.attach_redshift_log_delivery_policy ? [0] : []
+    iterator = item
+    content {
+      principals {
+        identifiers = data.aws_redshift_service_account.this.*.arn
+        type        = "AWS"
+      }
+      effect    = "Allow"
+      actions   = ["s3:GetBucketAcl"]
+      resources = aws_s3_bucket.this.*.arn
+    }
+  }
+  dynamic "statement" {
+    for_each = var.attach_redshift_log_delivery_policy ? [0] : []
+    iterator = item
+    content {
+      principals {
+        identifiers = data.aws_redshift_service_account.this.*.arn
+        type        = "AWS"
+      }
+      effect    = "Allow"
+      actions   = ["s3:PutObject"]
+      resources = ["${aws_s3_bucket.this[0].arn}/*"]
+      condition {
+        test     = "StringEquals"
+        values   = ["bucket-owner-full-control"]
+        variable = "s3:x-amz-acl"
+      }
+    }
+  }
 
-    resources = [
-      "${aws_s3_bucket.this[0].arn}/*",
-    ]
+  # Billing delivery policy
+  # https://docs.aws.amazon.com/cur/latest/userguide/cur-s3.html
+  dynamic "statement" {
+    for_each = var.attach_billing_log_delivery_policy ? [0] : []
+    iterator = item
+    content {
+      principals {
+        identifiers = ["billingreports.amazonaws.com"]
+        type        = "Service"
+      }
+      effect    = "Allow"
+      actions   = ["s3:GetBucketAcl"]
+      resources = aws_s3_bucket.this.*.arn
+    }
+  }
+  dynamic "statement" {
+    for_each = var.attach_billing_log_delivery_policy ? [0] : []
+    iterator = item
+    content {
+      principals {
+        identifiers = ["billingreports.amazonaws.com"]
+        type        = "Service"
+      }
+      effect    = "Allow"
+      actions   = ["s3:PutObject"]
+      resources = ["${aws_s3_bucket.this[0].arn}/*"]
+    }
   }
 }
 
@@ -267,7 +402,7 @@ resource "aws_s3_bucket_public_access_block" "this" {
 
   # Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
   # to prevent "A conflicting conditional operation is currently in progress against this resource."
-  bucket = (var.attach_elb_log_delivery_policy || var.attach_policy) ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
+  bucket = (local.attach_generated_policy || var.attach_policy) ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
 
   block_public_acls       = var.block_public_acls
   block_public_policy     = var.block_public_policy

@@ -10,6 +10,30 @@ variable "attach_elb_log_delivery_policy" {
   default     = false
 }
 
+variable "attach_cloudtrail_log_delivery_policy" {
+  description = "Controls if S3 bucket should have Cloudtrail log delivery policy attached"
+  type        = bool
+  default     = false
+}
+
+variable "attach_redshift_log_delivery_policy" {
+  description = "Controls if S3 bucket should have Redshift log delivery policy attached"
+  type        = bool
+  default     = false
+}
+
+variable "redshift_service_account_regions" {
+  description = "Controls where Reshift log delivery policy should be configured only for current region or for other regions as well"
+  type        = list(string)
+  default     = []
+}
+
+variable "attach_billing_log_delivery_policy" {
+  description = "Controls if S3 bucket should have Billing report delivery policy attached"
+  type        = bool
+  default     = false
+}
+
 variable "attach_policy" {
   description = "Controls if S3 bucket should have bucket policy attached (set to `true` to use value of `policy` as bucket policy)"
   type        = bool
