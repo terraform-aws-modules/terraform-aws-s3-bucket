@@ -8,6 +8,7 @@ Configuration in this directory creates S3 bucket which demos such capabilities:
 - lifecycle rules
 - server-side encryption
 - object locking
+- grants (required for CloudFront logs)
 
 Please check [S3 replication example](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-replication) to see Cross-Region Replication (CRR) supported by this module.
 
@@ -26,14 +27,18 @@ Note that this example may create resources which cost money. Run `terraform des
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12.6, < 0.14 |
+| aws | >= 3.0, < 4.0 |
+| random | ~> 2 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
-| random | n/a |
+| aws | >= 3.0, < 4.0 |
+| random | ~> 2 |
 
 ## Inputs
 

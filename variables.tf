@@ -35,7 +35,7 @@ variable "bucket_prefix" {
 }
 
 variable "acl" {
-  description = "(Optional) The canned ACL to apply. Defaults to 'private'."
+  description = "(Optional) The canned ACL to apply. Defaults to 'private'. Conflicts with `grant`"
   type        = string
   default     = "private"
 }
@@ -78,7 +78,7 @@ variable "website" {
 
 variable "cors_rule" {
   description = "List of maps containing rules for Cross-Origin Resource Sharing."
-  type        = list(any)
+  type        = any
   default     = []
 }
 
@@ -92,6 +92,12 @@ variable "logging" {
   description = "Map containing access bucket logging configuration."
   type        = map(string)
   default     = {}
+}
+
+variable "grant" {
+  description = "An ACL policy grant. Conflicts with `acl`"
+  type        = any
+  default     = []
 }
 
 variable "lifecycle_rule" {

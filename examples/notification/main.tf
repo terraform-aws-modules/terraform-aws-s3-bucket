@@ -76,12 +76,32 @@ resource "aws_sqs_queue" "this" {
   name  = "${random_pet.this.id}-${count.index}"
 }
 
+# SQS policy created outside of the module
+data "aws_iam_policy_document" "sqs_external" {
+  statement {
+    effect  = "Allow"
+    actions = ["sqs:SendMessage"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    resources = [aws_sqs_queue.this[0].arn]
+  }
+}
+
+resource "aws_sqs_queue_policy" "allow_external" {
+  queue_url = aws_sqs_queue.this[0].id
+  policy    = data.aws_iam_policy_document.sqs_external.json
+}
+
 module "all_notifications" {
   source = "../../modules/notification"
 
   bucket = module.s3_bucket.this_s3_bucket_id
 
-  // Common error - Error putting S3 notification configuration: InvalidArgument: Configuration is ambiguously defined. Cannot have overlapping suffixes in two rules if the prefixes are overlapping for the same event type.
+  # Common error - Error putting S3 notification configuration: InvalidArgument: Configuration is ambiguously defined. Cannot have overlapping suffixes in two rules if the prefixes are overlapping for the same event type.
 
   lambda_notifications = {
     lambda1 = {
@@ -106,7 +126,7 @@ module "all_notifications" {
       filter_prefix = "prefix2/"
       filter_suffix = ".txt"
 
-      //      queue_id =  aws_sqs_queue.this[0].id // optional
+      #      queue_id =  aws_sqs_queue.this[0].id // optional
     }
 
     sqs2 = {
@@ -129,4 +149,6 @@ module "all_notifications" {
     }
   }
 
+  # Creation of policy is handled outside of the module
+  create_sqs_policy = false
 }

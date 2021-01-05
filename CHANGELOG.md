@@ -7,6 +7,37 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.17.0"></a>
+## [v1.17.0] - 2020-12-09
+
+- fix: Change ELB Log Delivery Policy to use ARN output to support Gov Cloud ([#60](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/60))
+
+
+<a name="v1.16.0"></a>
+## [v1.16.0] - 2020-10-30
+
+- feat: Creating SNS/SQS policies should be optional ([#54](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/54))
+
+
+<a name="v1.15.0"></a>
+## [v1.15.0] - 2020-10-08
+
+- fix: Fixed cors_rules variable type ([#49](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/49))
+
+
+<a name="v1.14.0"></a>
+## [v1.14.0] - 2020-10-08
+
+- fix: Fixed grant variable type ([#46](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/46))
+
+
+<a name="v1.13.0"></a>
+## [v1.13.0] - 2020-10-06
+
+- feat: Add bucket acl policy grants ([#44](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/44))
+- Updated docs
+
+
 <a name="v1.12.0"></a>
 ## [v1.12.0] - 2020-08-17
 
@@ -100,7 +131,12 @@ All notable changes to this project will be documented in this file.
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.12.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.17.0...HEAD
+[v1.17.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.16.0...v1.17.0
+[v1.16.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.15.0...v1.16.0
+[v1.15.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.14.0...v1.15.0
+[v1.14.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.13.0...v1.14.0
+[v1.13.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.12.0...v1.13.0
 [v1.12.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.11.0...v1.12.0
 [v1.11.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.10.0...v1.11.0
 [v1.10.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.9.0...v1.10.0
