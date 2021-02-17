@@ -17,6 +17,21 @@ Creates S3 bucket notification resource with all supported types of deliveries: 
 |------|---------|
 | aws | >= 3.0 |
 
+## Modules
+
+No Modules.
+
+## Resources
+
+| Name |
+|------|
+| [aws_arn](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/data-sources/arn) |
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/data-sources/iam_policy_document) |
+| [aws_lambda_permission](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/lambda_permission) |
+| [aws_s3_bucket_notification](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/s3_bucket_notification) |
+| [aws_sns_topic_policy](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/sns_topic_policy) |
+| [aws_sqs_queue_policy](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/sqs_queue_policy) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -35,5 +50,4 @@ Creates S3 bucket notification resource with all supported types of deliveries: 
 | Name | Description |
 |------|-------------|
 | this\_s3\_bucket\_notification\_id | ID of S3 bucket |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
