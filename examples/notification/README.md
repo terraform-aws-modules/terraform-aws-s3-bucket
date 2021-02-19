@@ -48,8 +48,8 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name |
 |------|
 | [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/data-sources/iam_policy_document) |
-| [aws_sqs_queue](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/sqs_queue) |
 | [aws_sqs_queue_policy](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/sqs_queue_policy) |
+| [aws_sqs_queue](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/sqs_queue) |
 | [null_data_source](https://registry.terraform.io/providers/hashicorp/null/2/docs/data-sources/data_source) |
 | [null_resource](https://registry.terraform.io/providers/hashicorp/null/2/docs/resources/resource) |
 | [random_pet](https://registry.terraform.io/providers/hashicorp/random/2/docs/resources/pet) |
