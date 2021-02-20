@@ -40,6 +40,24 @@ Note that this example may create resources which cost money. Run `terraform des
 | aws | >= 3.0, < 4.0 |
 | random | ~> 2 |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| cloudfront_log_bucket | ../../ |  |
+| log_bucket | ../../ |  |
+| s3_bucket | ../../ |  |
+
+## Resources
+
+| Name |
+|------|
+| [aws_canonical_user_id](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/data-sources/canonical_user_id) |
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/data-sources/iam_policy_document) |
+| [aws_iam_role](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/iam_role) |
+| [aws_kms_key](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/kms_key) |
+| [random_pet](https://registry.terraform.io/providers/hashicorp/random/2/docs/resources/pet) |
+
 ## Inputs
 
 No input.
@@ -56,5 +74,4 @@ No input.
 | this\_s3\_bucket\_region | The AWS region this bucket resides in. |
 | this\_s3\_bucket\_website\_domain | The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records. |
 | this\_s3\_bucket\_website\_endpoint | The website endpoint, if the bucket is configured with a website. If not, this will be an empty string. |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

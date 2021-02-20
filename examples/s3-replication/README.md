@@ -33,6 +33,24 @@ Note that this example may create resources which cost money. Run `terraform des
 | aws.replica | >= 3.0 |
 | random | >= 2.0 |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| replica_bucket | ../../ |  |
+| s3_bucket | ../../ |  |
+
+## Resources
+
+| Name |
+|------|
+| [aws_caller_identity](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/data-sources/caller_identity) |
+| [aws_iam_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/iam_policy_attachment) |
+| [aws_iam_policy](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/iam_policy) |
+| [aws_iam_role](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/iam_role) |
+| [aws_kms_key](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/kms_key) |
+| [random_pet](https://registry.terraform.io/providers/hashicorp/random/2.0/docs/resources/pet) |
+
 ## Inputs
 
 No input.
@@ -49,5 +67,4 @@ No input.
 | this\_s3\_bucket\_region | The AWS region this bucket resides in. |
 | this\_s3\_bucket\_website\_domain | The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records. |
 | this\_s3\_bucket\_website\_endpoint | The website endpoint, if the bucket is configured with a website. If not, this will be an empty string. |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

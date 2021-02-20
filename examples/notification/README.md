@@ -32,6 +32,28 @@ Note that this example may create resources which cost money. Run `terraform des
 | null | >= 2 |
 | random | >= 2 |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| all_notifications | ../../modules/notification |  |
+| lambda_function1 | terraform-aws-modules/lambda/aws | ~> 1.0 |
+| lambda_function2 | terraform-aws-modules/lambda/aws | ~> 1.0 |
+| s3_bucket | ../../ |  |
+| sns_topic1 | terraform-aws-modules/cloudwatch/aws//examples/fixtures/aws_sns_topic |  |
+| sns_topic2 | terraform-aws-modules/cloudwatch/aws//examples/fixtures/aws_sns_topic |  |
+
+## Resources
+
+| Name |
+|------|
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/data-sources/iam_policy_document) |
+| [aws_sqs_queue_policy](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/sqs_queue_policy) |
+| [aws_sqs_queue](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/sqs_queue) |
+| [null_data_source](https://registry.terraform.io/providers/hashicorp/null/2/docs/data-sources/data_source) |
+| [null_resource](https://registry.terraform.io/providers/hashicorp/null/2/docs/resources/resource) |
+| [random_pet](https://registry.terraform.io/providers/hashicorp/random/2/docs/resources/pet) |
+
 ## Inputs
 
 No input.
@@ -48,5 +70,4 @@ No input.
 | this\_s3\_bucket\_region | The AWS region this bucket resides in. |
 | this\_s3\_bucket\_website\_domain | The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records. |
 | this\_s3\_bucket\_website\_endpoint | The website endpoint, if the bucket is configured with a website. If not, this will be an empty string. |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
