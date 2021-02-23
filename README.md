@@ -101,11 +101,11 @@ No Modules.
 
 | Name |
 |------|
-| [aws_elb_service_account](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/data-sources/elb_service_account) |
-| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/data-sources/iam_policy_document) |
-| [aws_s3_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/s3_bucket_policy) |
-| [aws_s3_bucket_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/s3_bucket_public_access_block) |
-| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/3.0/docs/resources/s3_bucket) |
+| [aws_elb_service_account](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/elb_service_account) |
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) |
+| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) |
+| [aws_s3_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) |
+| [aws_s3_bucket_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) |
 
 ## Inputs
 
