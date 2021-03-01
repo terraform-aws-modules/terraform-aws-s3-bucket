@@ -7,8 +7,15 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.20.0"></a>
+## [v1.20.0] - 2021-03-01
+
+- fix: Update syntax for Terraform 0.15 ([#71](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/71))
+- fix: Updated example to prevent from accidental object locking
+
+
 <a name="v1.19.0"></a>
-## [v1.19.0] - 2021-02-23
+## [v1.19.0] - 2021-03-01
 
 - chore: add ci-cd workflow for pre-commit checks ([#68](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/68))
 
@@ -143,7 +150,8 @@ All notable changes to this project will be documented in this file.
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.19.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.20.0...HEAD
+[v1.20.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.19.0...v1.20.0
 [v1.19.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.18.0...v1.19.0
 [v1.18.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.17.0...v1.18.0
 [v1.17.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.16.0...v1.17.0
