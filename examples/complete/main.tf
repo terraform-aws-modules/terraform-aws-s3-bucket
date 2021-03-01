@@ -198,8 +198,8 @@ module "s3_bucket" {
     object_lock_enabled = "Enabled"
     rule = {
       default_retention = {
-        mode  = "COMPLIANCE"
-        years = 5
+        mode = "GOVERNANCE"
+        days = 1
       }
     }
   }
