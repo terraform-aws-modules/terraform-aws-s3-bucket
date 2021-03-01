@@ -29,15 +29,15 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.6, < 0.14 |
-| aws | >= 3.0, < 4.0 |
+| terraform | >= 0.12.26 |
+| aws | >= 3.0 |
 | random | ~> 2 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 3.0, < 4.0 |
+| aws | >= 3.0 |
 | random | ~> 2 |
 
 ## Modules
@@ -52,11 +52,11 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name |
 |------|
-| [aws_canonical_user_id](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/data-sources/canonical_user_id) |
-| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/data-sources/iam_policy_document) |
-| [aws_iam_role](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/iam_role) |
-| [aws_kms_key](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/kms_key) |
-| [random_pet](https://registry.terraform.io/providers/hashicorp/random/2/docs/resources/pet) |
+| [aws_canonical_user_id](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/canonical_user_id) |
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) |
+| [aws_iam_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) |
+| [aws_kms_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) |
+| [random_pet](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) |
 
 ## Inputs
 
