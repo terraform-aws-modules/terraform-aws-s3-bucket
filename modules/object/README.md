@@ -7,7 +7,7 @@ Creates S3 bucket objects with different configurations.
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.6 |
+| terraform | >= 0.13 |
 | aws | >= 3.0 |
 
 ## Providers

@@ -19,9 +19,8 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.26 |
+| terraform | >= 0.13 |
 | aws | >= 3.0 |
-| null | >= 2 |
 | random | >= 2 |
 
 ## Providers
