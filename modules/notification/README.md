@@ -9,7 +9,6 @@ Creates S3 bucket notification resource with all supported types of deliveries: 
 |------|---------|
 | terraform | >= 0.12.6 |
 | aws | >= 3.0 |
-| random | >= 2.0 |
 
 ## Providers
 
