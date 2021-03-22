@@ -1,11 +1,12 @@
 resource "aws_s3_bucket" "this" {
   count = var.create_bucket ? 1 : 0
 
-  bucket              = var.bucket
-  bucket_prefix       = var.bucket_prefix
+  bucket        = var.bucket
+  bucket_prefix = var.bucket_prefix
 
   # hack when `null` value can't be used (eg, from terragrunt, https://github.com/gruntwork-io/terragrunt/pull/1367)
-  acl                 = var.acl != "null"? var.acl : null
+  acl = var.acl != "null" ? var.acl : null
+
   tags                = var.tags
   force_destroy       = var.force_destroy
   acceleration_status = var.acceleration_status
