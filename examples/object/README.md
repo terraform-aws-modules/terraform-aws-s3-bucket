@@ -19,45 +19,45 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.13 |
-| aws | >= 3.0 |
-| random | >= 2 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 2 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 3.0 |
-| random | >= 2 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 2 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| object | ../../modules/object |  |
-| object_complete | ../../modules/object |  |
-| object_locked | ../../modules/object |  |
-| s3_bucket | ../../ |  |
-| s3_bucket_with_object_lock | ../../ |  |
+| <a name="module_object"></a> [object](#module\_object) | ../../modules/object |  |
+| <a name="module_object_complete"></a> [object\_complete](#module\_object\_complete) | ../../modules/object |  |
+| <a name="module_object_locked"></a> [object\_locked](#module\_object\_locked) | ../../modules/object |  |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ |  |
+| <a name="module_s3_bucket_with_object_lock"></a> [s3\_bucket\_with\_object\_lock](#module\_s3\_bucket\_with\_object\_lock) | ../../ |  |
 
 ## Resources
 
-| Name |
-|------|
-| [aws_kms_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) |
-| [random_pet](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) |
+| Name | Type |
+|------|------|
+| [aws_kms_key.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
+| [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
 
 ## Inputs
 
-No input.
+No inputs.
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| this\_s3\_bucket\_arn | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
-| this\_s3\_bucket\_id | The name of the bucket. |
-| this\_s3\_bucket\_object\_etag | The ETag generated for the object (an MD5 sum of the object content). |
-| this\_s3\_bucket\_object\_id | The key of S3 object |
-| this\_s3\_bucket\_object\_version\_id | A unique version ID value for the object, if bucket versioning is enabled. |
+| <a name="output_this_s3_bucket_arn"></a> [this\_s3\_bucket\_arn](#output\_this\_s3\_bucket\_arn) | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
+| <a name="output_this_s3_bucket_id"></a> [this\_s3\_bucket\_id](#output\_this\_s3\_bucket\_id) | The name of the bucket. |
+| <a name="output_this_s3_bucket_object_etag"></a> [this\_s3\_bucket\_object\_etag](#output\_this\_s3\_bucket\_object\_etag) | The ETag generated for the object (an MD5 sum of the object content). |
+| <a name="output_this_s3_bucket_object_id"></a> [this\_s3\_bucket\_object\_id](#output\_this\_s3\_bucket\_object\_id) | The key of S3 object |
+| <a name="output_this_s3_bucket_object_version_id"></a> [this\_s3\_bucket\_object\_version\_id](#output\_this\_s3\_bucket\_object\_version\_id) | A unique version ID value for the object, if bucket versioning is enabled. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
