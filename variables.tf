@@ -10,6 +10,12 @@ variable "attach_elb_log_delivery_policy" {
   default     = false
 }
 
+variable "attach_deny_insecure_transport_policy" {
+  description = "Controls if S3 bucket should have deny non-encrypted transport policy attached"
+  type        = bool
+  default     = false
+}
+
 variable "attach_policy" {
   description = "Controls if S3 bucket should have bucket policy attached (set to `true` to use value of `policy` as bucket policy)"
   type        = bool

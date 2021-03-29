@@ -51,10 +51,11 @@ data "aws_iam_policy_document" "bucket_policy" {
 module "log_bucket" {
   source = "../../"
 
-  bucket                         = "logs-${random_pet.this.id}"
-  acl                            = "log-delivery-write"
-  force_destroy                  = true
-  attach_elb_log_delivery_policy = true
+  bucket                                = "logs-${random_pet.this.id}"
+  acl                                   = "log-delivery-write"
+  force_destroy                         = true
+  attach_elb_log_delivery_policy        = true
+  attach_deny_insecure_transport_policy = true
 }
 
 module "cloudfront_log_bucket" {
