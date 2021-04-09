@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.23.0"></a>
+## [v1.23.0] - 2021-04-09
+
+- feat: Add ability to create deny insecure transport policy ([#77](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/77))
+- chore: update documentation and pin `terraform_docs` version to avoid future changes ([#76](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/76))
+
+
 <a name="v1.22.0"></a>
 ## [v1.22.0] - 2021-03-22
 
@@ -106,6 +113,18 @@ All notable changes to this project will be documented in this file.
 
 - feat: Added modules/notifications for S3 bucket notifications ([#31](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/31))
 - docs: Fix link for complete S3 example to replication S3 example ([#19](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/19))
+- Merge pull request [#28](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/28) from terraform-aws-modules/terraform-provider-githubfile-1584635339745142000
+- [ci skip] Create ".chglog/CHANGELOG.tpl.md".
+- Merge pull request [#27](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/27) from terraform-aws-modules/terraform-provider-githubfile-1584537276011746000
+- Merge pull request [#25](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/25) from terraform-aws-modules/terraform-provider-githubfile-1584537276011708000
+- Merge pull request [#24](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/24) from terraform-aws-modules/terraform-provider-githubfile-1584537276011758000
+- Merge pull request [#26](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/26) from terraform-aws-modules/terraform-provider-githubfile-1584537276011817000
+- Merge pull request [#23](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/23) from terraform-aws-modules/terraform-provider-githubfile-1584537276011808000
+- [ci skip] Create ".editorconfig".
+- [ci skip] Create "LICENSE".
+- [ci skip] Create ".pre-commit-config.yaml".
+- [ci skip] Create "Makefile".
+- [ci skip] Create ".gitignore".
 
 
 <a name="v1.6.0"></a>
@@ -163,7 +182,8 @@ All notable changes to this project will be documented in this file.
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.22.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.23.0...HEAD
+[v1.23.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.22.0...v1.23.0
 [v1.22.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.21.0...v1.22.0
 [v1.21.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.20.0...v1.21.0
 [v1.20.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.19.0...v1.20.0
