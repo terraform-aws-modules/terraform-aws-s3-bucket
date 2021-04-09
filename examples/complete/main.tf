@@ -87,6 +87,8 @@ module "s3_bucket" {
   attach_policy = true
   policy        = data.aws_iam_policy_document.bucket_policy.json
 
+  attach_deny_insecure_transport_policy = true
+
   tags = {
     Owner = "Anton"
   }
