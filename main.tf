@@ -28,7 +28,7 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "cors_rule" {
-    for_each = var.cors_rule
+    for_each = try(jsondecode(var.cors_rule), var.cors_rule)
 
     content {
       allowed_methods = cors_rule.value.allowed_methods
@@ -58,7 +58,7 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "grant" {
-    for_each = var.grant
+    for_each = try(jsondecode(var.grant), var.grant)
 
     content {
       id          = lookup(grant.value, "id", null)
@@ -69,7 +69,7 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "lifecycle_rule" {
-    for_each = var.lifecycle_rule
+    for_each = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
 
     content {
       id                                     = lookup(lifecycle_rule.value, "id", null)
