@@ -69,6 +69,22 @@ module "s3_bucket" {
 }
 ```
 
+## Terragrunt and `variable "..." { type = any }`
+
+There is a bug [#1211](https://github.com/gruntwork-io/terragrunt/issues/1211) in Terragrunt related to the way how the variables of type `any` are passed to Terraform.
+
+This module solves this issue by supporting `jsonencode()`-string in addition to the expected type (`list` or `map`).
+
+In `terragrunt.hcl` you can write:
+
+```terraform
+inputs = {
+  bucket    = "foobar"            # `bucket` has type `string`, no need to jsonencode() 
+  cors_rule = jsonencode([...])   # `cors_rule` has type `any`, so `jsonencode()` is required
+}
+```
+
+
 ## Examples:
 
 * [Complete](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete) - Complete S3 bucket with most of supported features enabled
