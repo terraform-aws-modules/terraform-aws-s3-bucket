@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.24.0"></a>
+## [v1.24.0] - 2021-04-09
+
+- feat: Added workaround for variable type `any` ([#79](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/79))
+
+
 <a name="v1.23.0"></a>
 ## [v1.23.0] - 2021-04-09
 
@@ -182,7 +188,8 @@ All notable changes to this project will be documented in this file.
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.23.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.24.0...HEAD
+[v1.24.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.23.0...v1.24.0
 [v1.23.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.22.0...v1.23.0
 [v1.22.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.21.0...v1.22.0
 [v1.21.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v1.20.0...v1.21.0
