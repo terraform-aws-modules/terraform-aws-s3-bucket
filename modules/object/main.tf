@@ -23,6 +23,7 @@ resource "aws_s3_bucket_object" "this" {
 
   server_side_encryption = var.server_side_encryption
   kms_key_id             = var.kms_key_id
+  bucket_key_enabled     = var.bucket_key_enabled
 
   object_lock_legal_hold_status = try(tobool(var.object_lock_legal_hold_status) ? "ON" : upper(var.object_lock_legal_hold_status), var.object_lock_legal_hold_status)
   object_lock_mode              = try(upper(var.object_lock_mode), var.object_lock_mode)

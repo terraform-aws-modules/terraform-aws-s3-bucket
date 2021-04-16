@@ -100,6 +100,12 @@ variable "kms_key_id" {
   default     = null
 }
 
+variable "bucket_key_enabled" {
+  description = "Whether or not to use Amazon S3 Bucket Keys for SSE-KMS."
+  type        = bool
+  default     = null
+}
+
 variable "metadata" {
   description = "A map of keys/values to provision metadata (will be automatically prefixed by x-amz-meta-, note that only lowercase label are currently supported by the AWS Go API)."
   type        = map(string)
