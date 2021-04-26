@@ -112,7 +112,7 @@ module "s3_bucket" {
   }
 
   logging = {
-    target_bucket = module.log_bucket.this_s3_bucket_id
+    target_bucket = module.log_bucket.s3_bucket_id
     target_prefix = "log/"
   }
 

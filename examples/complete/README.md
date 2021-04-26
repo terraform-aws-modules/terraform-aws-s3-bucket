@@ -66,12 +66,12 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_this_s3_bucket_arn"></a> [this\_s3\_bucket\_arn](#output\_this\_s3\_bucket\_arn) | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
-| <a name="output_this_s3_bucket_bucket_domain_name"></a> [this\_s3\_bucket\_bucket\_domain\_name](#output\_this\_s3\_bucket\_bucket\_domain\_name) | The bucket domain name. Will be of format bucketname.s3.amazonaws.com. |
-| <a name="output_this_s3_bucket_bucket_regional_domain_name"></a> [this\_s3\_bucket\_bucket\_regional\_domain\_name](#output\_this\_s3\_bucket\_bucket\_regional\_domain\_name) | The bucket region-specific domain name. The bucket domain name including the region name, please refer here for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoint when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL. |
-| <a name="output_this_s3_bucket_hosted_zone_id"></a> [this\_s3\_bucket\_hosted\_zone\_id](#output\_this\_s3\_bucket\_hosted\_zone\_id) | The Route 53 Hosted Zone ID for this bucket's region. |
-| <a name="output_this_s3_bucket_id"></a> [this\_s3\_bucket\_id](#output\_this\_s3\_bucket\_id) | The name of the bucket. |
-| <a name="output_this_s3_bucket_region"></a> [this\_s3\_bucket\_region](#output\_this\_s3\_bucket\_region) | The AWS region this bucket resides in. |
-| <a name="output_this_s3_bucket_website_domain"></a> [this\_s3\_bucket\_website\_domain](#output\_this\_s3\_bucket\_website\_domain) | The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records. |
-| <a name="output_this_s3_bucket_website_endpoint"></a> [this\_s3\_bucket\_website\_endpoint](#output\_this\_s3\_bucket\_website\_endpoint) | The website endpoint, if the bucket is configured with a website. If not, this will be an empty string. |
+| <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
+| <a name="output_s3_bucket_bucket_domain_name"></a> [s3\_bucket\_bucket\_domain\_name](#output\_s3\_bucket\_bucket\_domain\_name) | The bucket domain name. Will be of format bucketname.s3.amazonaws.com. |
+| <a name="output_s3_bucket_bucket_regional_domain_name"></a> [s3\_bucket\_bucket\_regional\_domain\_name](#output\_s3\_bucket\_bucket\_regional\_domain\_name) | The bucket region-specific domain name. The bucket domain name including the region name, please refer here for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoint when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL. |
+| <a name="output_s3_bucket_hosted_zone_id"></a> [s3\_bucket\_hosted\_zone\_id](#output\_s3\_bucket\_hosted\_zone\_id) | The Route 53 Hosted Zone ID for this bucket's region. |
+| <a name="output_s3_bucket_id"></a> [s3\_bucket\_id](#output\_s3\_bucket\_id) | The name of the bucket. |
+| <a name="output_s3_bucket_region"></a> [s3\_bucket\_region](#output\_s3\_bucket\_region) | The AWS region this bucket resides in. |
+| <a name="output_s3_bucket_website_domain"></a> [s3\_bucket\_website\_domain](#output\_s3\_bucket\_website\_domain) | The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records. |
+| <a name="output_s3_bucket_website_endpoint"></a> [s3\_bucket\_website\_endpoint](#output\_s3\_bucket\_website\_endpoint) | The website endpoint, if the bucket is configured with a website. If not, this will be an empty string. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

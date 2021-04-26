@@ -49,5 +49,5 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_this_s3_bucket_notification_id"></a> [this\_s3\_bucket\_notification\_id](#output\_this\_s3\_bucket\_notification\_id) | ID of S3 bucket |
+| <a name="output_s3_bucket_notification_id"></a> [s3\_bucket\_notification\_id](#output\_s3\_bucket\_notification\_id) | ID of S3 bucket |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
