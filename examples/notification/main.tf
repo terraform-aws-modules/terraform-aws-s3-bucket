@@ -32,13 +32,6 @@ resource "null_resource" "download_package" {
   }
 }
 
-data "null_data_source" "downloaded_package" {
-  inputs = {
-    id       = null_resource.download_package.id
-    filename = local.downloaded
-  }
-}
-
 module "lambda_function1" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 1.0"
@@ -48,7 +41,7 @@ module "lambda_function1" {
   runtime       = "python3.8"
 
   create_package         = false
-  local_existing_package = data.null_data_source.downloaded_package.outputs["filename"]
+  local_existing_package = local.downloaded
 }
 
 module "lambda_function2" {
@@ -60,7 +53,7 @@ module "lambda_function2" {
   runtime       = "python3.8"
 
   create_package         = false
-  local_existing_package = data.null_data_source.downloaded_package.outputs["filename"]
+  local_existing_package = local.downloaded
 }
 
 module "sns_topic1" {
@@ -99,7 +92,7 @@ resource "aws_sqs_queue_policy" "allow_external" {
 module "all_notifications" {
   source = "../../modules/notification"
 
-  bucket = module.s3_bucket.this_s3_bucket_id
+  bucket = module.s3_bucket.s3_bucket_id
 
   # Common error - Error putting S3 notification configuration: InvalidArgument: Configuration is ambiguously defined. Cannot have overlapping suffixes in two rules if the prefixes are overlapping for the same event type.
 

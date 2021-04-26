@@ -12,7 +12,7 @@ provider "aws" {
 module "object" {
   source = "../../modules/object"
 
-  bucket = module.s3_bucket.this_s3_bucket_id
+  bucket = module.s3_bucket.s3_bucket_id
   key    = "${random_pet.this.id}-local"
 
   file_source = "README.md"
@@ -26,7 +26,7 @@ module "object" {
 module "object_complete" {
   source = "../../modules/object"
 
-  bucket = module.s3_bucket.this_s3_bucket_id
+  bucket = module.s3_bucket.s3_bucket_id
   key    = "${random_pet.this.id}-complete"
 
   content = jsonencode({ data : "value" })
@@ -54,7 +54,7 @@ module "object_complete" {
 module "object_locked" {
   source = "../../modules/object"
 
-  bucket = module.s3_bucket_with_object_lock.this_s3_bucket_id
+  bucket = module.s3_bucket_with_object_lock.s3_bucket_id
   key    = "${random_pet.this.id}-locked"
 
   content = "some-content-locked-by-governance"
