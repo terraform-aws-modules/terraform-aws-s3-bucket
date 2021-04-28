@@ -37,11 +37,11 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_all_notifications"></a> [all\_notifications](#module\_all\_notifications) | ../../modules/notification |  |
-| <a name="module_lambda_function1"></a> [lambda\_function1](#module\_lambda\_function1) | terraform-aws-modules/lambda/aws | ~> 1.0 |
-| <a name="module_lambda_function2"></a> [lambda\_function2](#module\_lambda\_function2) | terraform-aws-modules/lambda/aws | ~> 1.0 |
+| <a name="module_lambda_function1"></a> [lambda\_function1](#module\_lambda\_function1) | terraform-aws-modules/lambda/aws | ~> 2.0 |
+| <a name="module_lambda_function2"></a> [lambda\_function2](#module\_lambda\_function2) | terraform-aws-modules/lambda/aws | ~> 2.0 |
 | <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ |  |
-| <a name="module_sns_topic1"></a> [sns\_topic1](#module\_sns\_topic1) | terraform-aws-modules/cloudwatch/aws//examples/fixtures/aws_sns_topic |  |
-| <a name="module_sns_topic2"></a> [sns\_topic2](#module\_sns\_topic2) | terraform-aws-modules/cloudwatch/aws//examples/fixtures/aws_sns_topic |  |
+| <a name="module_sns_topic1"></a> [sns\_topic1](#module\_sns\_topic1) | terraform-aws-modules/sns/aws | ~> 3.0 |
+| <a name="module_sns_topic2"></a> [sns\_topic2](#module\_sns\_topic2) | terraform-aws-modules/sns/aws | ~> 3.0 |
 
 ## Resources
 
