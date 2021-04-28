@@ -34,7 +34,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function1" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   function_name = "${random_pet.this.id}-lambda1"
   handler       = "index.lambda_handler"
@@ -46,7 +46,7 @@ module "lambda_function1" {
 
 module "lambda_function2" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   function_name = "${random_pet.this.id}-lambda2"
   handler       = "index.lambda_handler"
@@ -57,11 +57,17 @@ module "lambda_function2" {
 }
 
 module "sns_topic1" {
-  source = "terraform-aws-modules/cloudwatch/aws//examples/fixtures/aws_sns_topic"
+  source  = "terraform-aws-modules/sns/aws"
+  version = "~> 3.0"
+
+  name_prefix = "${random_pet.this.id}-2"
 }
 
 module "sns_topic2" {
-  source = "terraform-aws-modules/cloudwatch/aws//examples/fixtures/aws_sns_topic"
+  source  = "terraform-aws-modules/sns/aws"
+  version = "~> 3.0"
+
+  name_prefix = "${random_pet.this.id}-2"
 }
 
 resource "aws_sqs_queue" "this" {
@@ -98,16 +104,16 @@ module "all_notifications" {
 
   lambda_notifications = {
     lambda1 = {
-      function_arn  = module.lambda_function1.this_lambda_function_arn
-      function_name = module.lambda_function1.this_lambda_function_name
+      function_arn  = module.lambda_function1.lambda_function_arn
+      function_name = module.lambda_function1.lambda_function_name
       events        = ["s3:ObjectCreated:Put"]
       filter_prefix = "prefix/"
       filter_suffix = ".json"
     }
 
     lambda2 = {
-      function_arn  = module.lambda_function2.this_lambda_function_arn
-      function_name = module.lambda_function2.this_lambda_function_name
+      function_arn  = module.lambda_function2.lambda_function_arn
+      function_name = module.lambda_function2.lambda_function_name
       events        = ["s3:ObjectCreated:Post"]
     }
   }
@@ -130,14 +136,14 @@ module "all_notifications" {
 
   sns_notifications = {
     sns1 = {
-      topic_arn     = module.sns_topic1.this_sns_topic_arn
+      topic_arn     = module.sns_topic1.sns_topic_arn
       events        = ["s3:ObjectRemoved:Delete"]
       filter_prefix = "prefix3/"
       filter_suffix = ".csv"
     }
 
     sns2 = {
-      topic_arn = module.sns_topic2.this_sns_topic_arn
+      topic_arn = module.sns_topic2.sns_topic_arn
       events    = ["s3:ObjectRemoved:DeleteMarkerCreated"]
     }
   }
