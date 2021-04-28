@@ -196,6 +196,7 @@ resource "aws_s3_bucket" "this" {
         for_each = length(keys(lookup(server_side_encryption_configuration.value, "rule", {}))) == 0 ? [] : [lookup(server_side_encryption_configuration.value, "rule", {})]
 
         content {
+          bucket_key_enabled = lookup(rule.value, "bucket_key_enabled", null)
 
           dynamic "apply_server_side_encryption_by_default" {
             for_each = length(keys(lookup(rule.value, "apply_server_side_encryption_by_default", {}))) == 0 ? [] : [
