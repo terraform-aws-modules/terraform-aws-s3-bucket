@@ -8,13 +8,13 @@ Creates S3 bucket objects with different configurations.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.28 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.36 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.28 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.36 |
 
 ## Modules
 
@@ -32,6 +32,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_acl"></a> [acl](#input\_acl) | The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, bucket-owner-read, and bucket-owner-full-control. Defaults to private. | `string` | `null` | no |
 | <a name="input_bucket"></a> [bucket](#input\_bucket) | The name of the bucket to put the file in. Alternatively, an S3 access point ARN can be specified. | `string` | `""` | no |
+| <a name="input_bucket_key_enabled"></a> [bucket\_key\_enabled](#input\_bucket\_key\_enabled) | Whether or not to use Amazon S3 Bucket Keys for SSE-KMS. | `bool` | `null` | no |
 | <a name="input_cache_control"></a> [cache\_control](#input\_cache\_control) | Specifies caching behavior along the request/reply chain. | `string` | `null` | no |
 | <a name="input_content"></a> [content](#input\_content) | Literal string value to use as the object content, which will be uploaded as UTF-8-encoded text. | `string` | `null` | no |
 | <a name="input_content_base64"></a> [content\_base64](#input\_content\_base64) | Base64-encoded data that will be decoded and uploaded as raw bytes for the object content. This allows safely uploading non-UTF8 binary data, but is recommended only for small content such as the result of the gzipbase64 function with small text strings. For larger objects, use source to stream the content from a disk file. | `string` | `null` | no |
@@ -45,7 +46,6 @@ No modules.
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Allow the object to be deleted by removing any legal hold on any object version. Default is false. This value should be set to true only if the bucket has S3 object lock enabled. | `bool` | `false` | no |
 | <a name="input_key"></a> [key](#input\_key) | The name of the object once it is in the bucket. | `string` | `""` | no |
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | Amazon Resource Name (ARN) of the KMS Key to use for object encryption. If the S3 Bucket has server-side encryption enabled, that value will automatically be used. If referencing the aws\_kms\_key resource, use the arn attribute. If referencing the aws\_kms\_alias data source or resource, use the target\_key\_arn attribute. Terraform will only perform drift detection if a configuration value is provided. | `string` | `null` | no |
-| <a name="input_bucket_key_enabled"></a> [bucket\_key\_enabled](#input\_bucket\_key\_enabled) | Whether or not to use Amazon S3 Bucket Keys for SSE-KMS. | `bool` | `null` | no |
 | <a name="input_metadata"></a> [metadata](#input\_metadata) | A map of keys/values to provision metadata (will be automatically prefixed by x-amz-meta-, note that only lowercase label are currently supported by the AWS Go API). | `map(string)` | `{}` | no |
 | <a name="input_object_lock_legal_hold_status"></a> [object\_lock\_legal\_hold\_status](#input\_object\_lock\_legal\_hold\_status) | The legal hold status that you want to apply to the specified object. Valid values are ON and OFF. | `string` | `null` | no |
 | <a name="input_object_lock_mode"></a> [object\_lock\_mode](#input\_object\_lock\_mode) | The object lock retention mode that you want to apply to this object. Valid values are GOVERNANCE and COMPLIANCE. | `string` | `null` | no |

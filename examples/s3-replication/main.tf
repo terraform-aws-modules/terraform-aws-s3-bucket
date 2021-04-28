@@ -22,7 +22,7 @@ resource "random_pet" "this" {
 }
 
 resource "aws_kms_key" "replica" {
-  provider = "aws.replica"
+  provider = aws.replica
 
   description             = "S3 bucket replication KMS key"
   deletion_window_in_days = 7
@@ -32,7 +32,7 @@ module "replica_bucket" {
   source = "../../"
 
   providers = {
-    aws = "aws.replica"
+    aws = aws.replica
   }
 
   bucket = local.destination_bucket_name
