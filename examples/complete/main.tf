@@ -51,10 +51,11 @@ data "aws_iam_policy_document" "bucket_policy" {
 module "log_bucket" {
   source = "../../"
 
-  bucket                         = "logs-${random_pet.this.id}"
-  acl                            = "log-delivery-write"
-  force_destroy                  = true
-  attach_elb_log_delivery_policy = true
+  bucket                                = "logs-${random_pet.this.id}"
+  acl                                   = "log-delivery-write"
+  force_destroy                         = true
+  attach_elb_log_delivery_policy        = true
+  attach_deny_insecure_transport_policy = true
 }
 
 module "cloudfront_log_bucket" {
@@ -86,6 +87,8 @@ module "s3_bucket" {
   attach_policy = true
   policy        = data.aws_iam_policy_document.bucket_policy.json
 
+  attach_deny_insecure_transport_policy = true
+
   tags = {
     Owner = "Anton"
   }
@@ -109,7 +112,7 @@ module "s3_bucket" {
   }
 
   logging = {
-    target_bucket = module.log_bucket.this_s3_bucket_id
+    target_bucket = module.log_bucket.s3_bucket_id
     target_prefix = "log/"
   }
 
@@ -198,8 +201,8 @@ module "s3_bucket" {
     object_lock_enabled = "Enabled"
     rule = {
       default_retention = {
-        mode  = "COMPLIANCE"
-        years = 5
+        mode = "GOVERNANCE"
+        days = 1
       }
     }
   }
