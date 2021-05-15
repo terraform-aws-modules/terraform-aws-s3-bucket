@@ -1,4 +1,21 @@
 repos:
+  - repo: local  # @todo: move to pre-commit-terraform, add support for multiple module dirs, and run before terraform_docs
+    hooks:
+      - id: terraform_wrapper
+        name: "Terraform module wrapper - root"
+        entry: /Users/Bob/Sites/terraform-aws-modules/scripts/generate-terraform-wrappers.sh --overwrite
+        language: system
+        pass_filenames: false
+      - id: terraform_wrapper
+        name: "Terraform module wrapper - object"
+        entry: /Users/Bob/Sites/terraform-aws-modules/scripts/generate-terraform-wrappers.sh --module-dir modules/object --overwrite
+        language: system
+        pass_filenames: false
+      - id: terraform_wrapper
+        name: "Terraform module wrapper - notification"
+        entry: /Users/Bob/Sites/terraform-aws-modules/scripts/generate-terraform-wrappers.sh --module-dir modules/notification --overwrite
+        language: system
+        pass_filenames: false
   - repo: git://github.com/antonbabenko/pre-commit-terraform
     rev: v1.50.0
     hooks:
