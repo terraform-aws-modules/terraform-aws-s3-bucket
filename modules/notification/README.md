@@ -14,7 +14,7 @@ Creates S3 bucket notification resource with all supported types of deliveries: 
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.37.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.28 |
 
 ## Modules
 

@@ -29,16 +29,16 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.37.0 |
-| <a name="provider_aws.replica"></a> [aws.replica](#provider\_aws.replica) | 3.37.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.1.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.36 |
+| <a name="provider_aws.replica"></a> [aws.replica](#provider\_aws.replica) | >= 3.36 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_replica_bucket"></a> [replica\_bucket](#module\_replica\_bucket) | ../../ | n/a |
-| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
+| <a name="module_replica_bucket"></a> [replica\_bucket](#module\_replica\_bucket) | ../../ |  |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ |  |
 
 ## Resources
 
