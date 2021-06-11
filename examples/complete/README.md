@@ -2,7 +2,7 @@
 
 Configuration in this directory creates S3 bucket which demos such capabilities:
 - static web-site hosting
-- access logging (for S3 and ELB)
+- access logging (for S3, ELB and ALB/NLB)
 - versioning
 - CORS
 - lifecycle rules
@@ -37,16 +37,16 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.36 |
-| <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.37.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.1.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cloudfront_log_bucket"></a> [cloudfront\_log\_bucket](#module\_cloudfront\_log\_bucket) | ../../ |  |
-| <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | ../../ |  |
-| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ |  |
+| <a name="module_cloudfront_log_bucket"></a> [cloudfront\_log\_bucket](#module\_cloudfront\_log\_bucket) | ../../ | n/a |
+| <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | ../../ | n/a |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
 
 ## Resources
 

@@ -10,8 +10,8 @@ variable "attach_elb_log_delivery_policy" {
   default     = false
 }
 
-variable "attach_nlb_log_delivery_policy" {
-  description = "Controls if S3 bucket should have NLB log delivery policy attached"
+variable "attach_lb_log_delivery_policy" {
+  description = "Controls if S3 bucket should have ALB/NLB log delivery policy attached"
   type        = bool
   default     = false
 }
