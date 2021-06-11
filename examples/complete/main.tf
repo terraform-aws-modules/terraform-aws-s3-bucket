@@ -55,6 +55,7 @@ module "log_bucket" {
   acl                                   = "log-delivery-write"
   force_destroy                         = true
   attach_elb_log_delivery_policy        = true
+  attach_lb_log_delivery_policy         = true
   attach_deny_insecure_transport_policy = true
 }
 
