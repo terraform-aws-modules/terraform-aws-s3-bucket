@@ -5,6 +5,7 @@ module "wrapper" {
 
   create_bucket                         = lookup(each.value, "create_bucket", true)
   attach_elb_log_delivery_policy        = lookup(each.value, "attach_elb_log_delivery_policy", false)
+  attach_lb_log_delivery_policy         = lookup(each.value, "attach_lb_log_delivery_policy", false)
   attach_deny_insecure_transport_policy = lookup(each.value, "attach_deny_insecure_transport_policy", false)
   attach_policy                         = lookup(each.value, "attach_policy", false)
   attach_public_policy                  = lookup(each.value, "attach_public_policy", true)
