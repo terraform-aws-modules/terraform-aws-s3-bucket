@@ -326,7 +326,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}",
+      aws_s3_bucket.this[0].arn,
     ]
 
   }
