@@ -61,7 +61,8 @@ module "s3_bucket_for_logs" {
   # Allow deletion of non-empty bucket
   force_destroy = true
 
-  attach_lb_log_delivery_policy = true
+  attach_elb_log_delivery_policy = true  # Required for ALB logs
+  attach_lb_log_delivery_policy  = true  # Required for ALB/NLB logs
 }
 ```
 
