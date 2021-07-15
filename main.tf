@@ -375,3 +375,13 @@ resource "aws_s3_bucket_public_access_block" "this" {
   ignore_public_acls      = var.ignore_public_acls
   restrict_public_buckets = var.restrict_public_buckets
 }
+
+resource "aws_s3_bucket_ownership_controls" "this" {
+  count = var.create_bucket ? 1 : 0
+
+  bucket = aws_s3_bucket.this[0].id
+
+  rule {
+    object_ownership = var.object_ownership
+  }
+}
