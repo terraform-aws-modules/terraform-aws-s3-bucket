@@ -1,5 +1,5 @@
 locals {
-  attach_policy = var.attach_elb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
+  attach_policy = var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
 }
 
 resource "aws_s3_bucket" "this" {
@@ -247,6 +247,7 @@ data "aws_iam_policy_document" "combined" {
 
   source_policy_documents = compact([
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
+    var.attach_lb_log_delivery_policy ? data.aws_iam_policy_document.lb_log_delivery[0].json : "",
     var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
     var.attach_policy ? var.policy : ""
   ])
@@ -277,6 +278,57 @@ data "aws_iam_policy_document" "elb_log_delivery" {
     resources = [
       "${aws_s3_bucket.this[0].arn}/*",
     ]
+  }
+}
+
+# ALB/NLB
+
+data "aws_iam_policy_document" "lb_log_delivery" {
+  count = var.create_bucket && var.attach_lb_log_delivery_policy ? 1 : 0
+
+  statement {
+    sid = "AWSLogDeliveryWrite"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.this[0].arn}/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryAclCheck"
+
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:GetBucketAcl",
+    ]
+
+    resources = [
+      aws_s3_bucket.this[0].arn,
+    ]
+
   }
 }
 
