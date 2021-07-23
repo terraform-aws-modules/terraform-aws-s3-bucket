@@ -132,10 +132,11 @@ resource "aws_s3_bucket" "this" {
         for_each = replication_configuration.value.rules
 
         content {
-          id       = lookup(rules.value, "id", null)
-          priority = lookup(rules.value, "priority", null)
-          prefix   = lookup(rules.value, "prefix", null)
-          status   = rules.value.status
+          id                               = lookup(rules.value, "id", null)
+          priority                         = lookup(rules.value, "priority", null)
+          prefix                           = lookup(rules.value, "prefix", null)
+          delete_marker_replication_status = lookup(rules.value, "delete_marker_replication_status", null)
+          status                           = rules.value.status
 
           dynamic "destination" {
             for_each = length(keys(lookup(rules.value, "destination", {}))) == 0 ? [] : [lookup(rules.value, "destination", {})]
