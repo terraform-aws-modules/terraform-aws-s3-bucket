@@ -108,13 +108,13 @@ inputs = {
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12.26 |
-| aws | >= 3.36 |
+| aws | >= 3.50 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 3.36 |
+| aws | >= 3.50 |
 
 ## Inputs
 
