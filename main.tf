@@ -172,8 +172,16 @@ resource "aws_s3_bucket" "this" {
             }
           }
 
+          # Send empty map if `filter` is an empty map or absent entirely
           dynamic "filter" {
-            for_each = length(keys(lookup(rules.value, "filter", {}))) == 0 ? [] : [lookup(rules.value, "filter", {})]
+            for_each = length(keys(lookup(rules.value, "filter", {}))) == 0 ? [{}] : []
+
+            content {}
+          }
+
+          # Send `filter` if it is present and has at least one field
+          dynamic "filter" {
+            for_each = length(keys(lookup(rules.value, "filter", {}))) != 0 ? [lookup(rules.value, "filter", {})] : []
 
             content {
               prefix = lookup(filter.value, "prefix", null)
