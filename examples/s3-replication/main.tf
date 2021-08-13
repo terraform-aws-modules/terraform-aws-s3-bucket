@@ -58,7 +58,7 @@ module "s3_bucket" {
 
     rules = [
       {
-        id       = "foo"
+        id       = "something-with-kms-and-filter"
         status   = "Enabled"
         priority = 10
 
@@ -86,15 +86,9 @@ module "s3_bucket" {
         }
       },
       {
-        id       = "bar"
+        id       = "something-with-filter"
         status   = "Enabled"
         priority = 20
-
-        destination = {
-          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
-          storage_class = "STANDARD"
-        }
-
 
         filter = {
           prefix = "two"
@@ -103,8 +97,34 @@ module "s3_bucket" {
           }
         }
 
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
       },
+      {
+        id       = "everything-with-filter"
+        status   = "Enabled"
+        priority = 30
 
+        filter = {
+          prefix = ""
+        }
+
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
+      },
+      {
+        id     = "everything-without-filters"
+        status = "Enabled"
+
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
+      },
     ]
   }
 
