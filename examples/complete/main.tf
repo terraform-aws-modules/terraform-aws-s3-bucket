@@ -213,4 +213,8 @@ module "s3_bucket" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+
+  # S3 Bucket Ownership Controls
+  control_object_ownership = true
+  object_ownership         = "BucketOwnerPreferred"
 }
