@@ -384,6 +384,12 @@ resource "aws_s3_bucket_public_access_block" "this" {
   block_public_policy     = var.block_public_policy
   ignore_public_acls      = var.ignore_public_acls
   restrict_public_buckets = var.restrict_public_buckets
+
+  # This `depends_on` is to prevent "A conflicting conditional operation is currently in progress against this resource."
+  depends_on = [
+    aws_s3_bucket.this,
+    aws_s3_bucket_policy.this
+  ]
 }
 
 resource "aws_s3_bucket_ownership_controls" "this" {
