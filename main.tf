@@ -173,8 +173,16 @@ resource "aws_s3_bucket" "this" {
             }
           }
 
+          # Send empty map if `filter` is an empty map or absent entirely
           dynamic "filter" {
-            for_each = length(keys(lookup(rules.value, "filter", {}))) == 0 ? [] : [lookup(rules.value, "filter", {})]
+            for_each = length(keys(lookup(rules.value, "filter", {}))) == 0 ? [{}] : []
+
+            content {}
+          }
+
+          # Send `filter` if it is present and has at least one field
+          dynamic "filter" {
+            for_each = length(keys(lookup(rules.value, "filter", {}))) != 0 ? [lookup(rules.value, "filter", {})] : []
 
             content {
               prefix = lookup(filter.value, "prefix", null)
@@ -369,10 +377,29 @@ resource "aws_s3_bucket_public_access_block" "this" {
 
   # Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
   # to prevent "A conflicting conditional operation is currently in progress against this resource."
+  # Ref: https://github.com/hashicorp/terraform-provider-aws/issues/7628
+
   bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
 
   block_public_acls       = var.block_public_acls
   block_public_policy     = var.block_public_policy
   ignore_public_acls      = var.ignore_public_acls
   restrict_public_buckets = var.restrict_public_buckets
+}
+
+resource "aws_s3_bucket_ownership_controls" "this" {
+  count = var.create_bucket && var.control_object_ownership ? 1 : 0
+
+  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
+
+  rule {
+    object_ownership = var.object_ownership
+  }
+
+  # This `depends_on` is to prevent "A conflicting conditional operation is currently in progress against this resource."
+  depends_on = [
+    aws_s3_bucket_policy.this,
+    aws_s3_bucket_public_access_block.this,
+    aws_s3_bucket.this
+  ]
 }
