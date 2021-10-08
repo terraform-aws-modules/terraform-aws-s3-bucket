@@ -33,6 +33,7 @@ EOF
 
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
+    effect: "Deny" 
     principals {
       type        = "AWS"
       identifiers = [aws_iam_role.this.arn]
