@@ -123,7 +123,7 @@ resource "aws_s3_bucket" "this" {
 
   # Max 1 block - replication_configuration
   dynamic "replication_configuration" {
-    for_each = length(keys(var.replication_configuration)) == 0 ? [] : [var.replication_configuration]
+    for_each = try(length(keys(var.replication_configuration)), 0) == 0 ? [] : [var.replication_configuration]
 
     content {
       role = replication_configuration.value.role
