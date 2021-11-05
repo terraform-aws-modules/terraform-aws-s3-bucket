@@ -84,11 +84,11 @@ module "s3_bucket" {
             owner = "Destination"
           }
           replication_time = {
-            status = "Enabled"
+            status  = "Enabled"
             minutes = 15
           }
           metrics = {
-            status = "Enabled"
+            status  = "Enabled"
             minutes = 15
           }
         }
