@@ -1,3 +1,14 @@
+# Changelog
+
+All notable changes to this project will be documented in this file
+
+## [2.11.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.11.0...v2.11.1) (2021-11-07)
+
+
+### Bug Fixes
+
+* update CI/CD process to enable auto-release workflow ([#116](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/116)) ([1b7ac99](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/1b7ac9958150f43f251e6cad4fffa493c22c4c68))
+
 <a name="v2.11.0"></a>
 ## [v2.11.0] - 2021-11-07
 
