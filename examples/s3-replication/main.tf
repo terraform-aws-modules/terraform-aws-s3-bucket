@@ -83,6 +83,14 @@ module "s3_bucket" {
           access_control_translation = {
             owner = "Destination"
           }
+          replication_time = {
+            status  = "Enabled"
+            minutes = 15
+          }
+          metrics = {
+            status  = "Enabled"
+            minutes = 15
+          }
         }
       },
       {

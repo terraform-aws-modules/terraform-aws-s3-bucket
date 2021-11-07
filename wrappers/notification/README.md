@@ -6,7 +6,7 @@ You may want to use a single Terragrunt configuration file to manage multiple re
 
 This wrapper does not implement any extra functionality.
 
-# Usage with Terragrunt
+## Usage with Terragrunt
 
 `terragrunt.hcl`:
 
@@ -28,7 +28,7 @@ inputs = {
 }
 ```
 
-## Usage with Terraform:
+## Usage with Terraform
 
 ```hcl
 module "wrapper" {
