@@ -163,6 +163,7 @@ resource "aws_s3_bucket" "this" {
                   minutes = replication_time.value.minutes
                 }
               }
+
               dynamic "metrics" {
                 for_each = length(keys(lookup(destination.value, "metrics", {}))) == 0 ? [] : [lookup(destination.value, "metrics", {})]
 
