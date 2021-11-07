@@ -1,15 +1,121 @@
+# AWS S3 bucket Terraform module
+
+Terraform module which creates S3 bucket on AWS with all (or almost all) features provided by Terraform AWS provider.
+
+These features of S3 bucket configurations are supported:
+
+- static web-site hosting
+- access logging
+- versioning
+- CORS
+- lifecycle rules
+- server-side encryption
+- object locking
+- Cross-Region Replication (CRR)
+- ELB log delivery bucket policy
+- ALB/NLB log delivery bucket policy
+
+## Usage
+
+### Private bucket with versioning enabled
+
+```hcl
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket = "my-s3-bucket"
+  acl    = "private"
+
+  versioning = {
+    enabled = true
+  }
+
+}
+```
+
+### Bucket with ELB access log delivery policy attached
+
+```hcl
+module "s3_bucket_for_logs" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket = "my-s3-bucket-for-logs"
+  acl    = "log-delivery-write"
+
+  # Allow deletion of non-empty bucket
+  force_destroy = true
+
+  attach_elb_log_delivery_policy = true
+}
+```
+
+### Bucket with ALB/NLB access log delivery policy attached
+
+```hcl
+module "s3_bucket_for_logs" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket = "my-s3-bucket-for-logs"
+  acl    = "log-delivery-write"
+
+  # Allow deletion of non-empty bucket
+  force_destroy = true
+
+  attach_elb_log_delivery_policy = true  # Required for ALB logs
+  attach_lb_log_delivery_policy  = true  # Required for ALB/NLB logs
+}
+```
+
+## Conditional creation
+
+Sometimes you need to have a way to create S3 resources conditionally but Terraform does not allow to use `count` inside `module` block, so the solution is to specify argument `create_bucket`.
+
+```hcl
+# This S3 bucket will not be created
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  create_bucket = false
+  # ... omitted
+}
+```
+
+## Terragrunt and `variable "..." { type = any }`
+
+There is a bug [#1211](https://github.com/gruntwork-io/terragrunt/issues/1211) in Terragrunt related to the way how the variables of type `any` are passed to Terraform.
+
+This module solves this issue by supporting `jsonencode()`-string in addition to the expected type (`list` or `map`).
+
+In `terragrunt.hcl` you can write:
+
+```terraform
+inputs = {
+  bucket    = "foobar"            # `bucket` has type `string`, no need to jsonencode()
+  cors_rule = jsonencode([...])   # `cors_rule` has type `any`, so `jsonencode()` is required
+}
+```
+
+## Examples:
+
+- [Complete](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete) - Complete S3 bucket with most of supported features enabled
+- [Cross-Region Replication](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-replication) - S3 bucket with Cross-Region Replication (CRR) enabled
+- [S3 Bucket Notifications](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/notification) - S3 bucket notifications to Lambda functions, SQS queues, and SNS topics.
+- [S3 Bucket Object](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/object) - Manage S3 bucket objects.
+
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.64.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.64 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.64.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.64 |
 
 ## Modules
 
