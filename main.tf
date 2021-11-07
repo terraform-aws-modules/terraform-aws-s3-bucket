@@ -159,7 +159,7 @@ resource "aws_s3_bucket" "this" {
                 for_each = length(keys(lookup(destination.value, "replication_time", {}))) == 0 ? [] : [lookup(destination.value, "replication_time", {})]
 
                 content {
-                  status = replication_time.value.status
+                  status  = replication_time.value.status
                   minutes = replication_time.value.minutes
                 }
               }
@@ -167,7 +167,7 @@ resource "aws_s3_bucket" "this" {
                 for_each = length(keys(lookup(destination.value, "metrics", {}))) == 0 ? [] : [lookup(destination.value, "metrics", {})]
 
                 content {
-                  status = metrics.value.status
+                  status  = metrics.value.status
                   minutes = metrics.value.minutes
                 }
               }
