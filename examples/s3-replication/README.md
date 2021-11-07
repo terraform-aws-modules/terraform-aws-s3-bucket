@@ -37,8 +37,8 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_replica_bucket"></a> [replica\_bucket](#module\_replica\_bucket) | ../../ |  |
-| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ |  |
+| <a name="module_replica_bucket"></a> [replica\_bucket](#module\_replica\_bucket) | ../../ | n/a |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
 
 ## Resources
 
