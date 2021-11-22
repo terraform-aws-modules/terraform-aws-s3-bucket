@@ -19,7 +19,7 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.50 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 
@@ -34,11 +34,11 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_object"></a> [object](#module\_object) | ../../modules/object |  |
-| <a name="module_object_complete"></a> [object\_complete](#module\_object\_complete) | ../../modules/object |  |
-| <a name="module_object_locked"></a> [object\_locked](#module\_object\_locked) | ../../modules/object |  |
-| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ |  |
-| <a name="module_s3_bucket_with_object_lock"></a> [s3\_bucket\_with\_object\_lock](#module\_s3\_bucket\_with\_object\_lock) | ../../ |  |
+| <a name="module_object"></a> [object](#module\_object) | ../../modules/object | n/a |
+| <a name="module_object_complete"></a> [object\_complete](#module\_object\_complete) | ../../modules/object | n/a |
+| <a name="module_object_locked"></a> [object\_locked](#module\_object\_locked) | ../../modules/object | n/a |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
+| <a name="module_s3_bucket_with_object_lock"></a> [s3\_bucket\_with\_object\_lock](#module\_s3\_bucket\_with\_object\_lock) | ../../ | n/a |
 
 ## Resources
 

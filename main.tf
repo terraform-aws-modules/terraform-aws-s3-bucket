@@ -154,6 +154,24 @@ resource "aws_s3_bucket" "this" {
                   owner = access_control_translation.value.owner
                 }
               }
+
+              dynamic "replication_time" {
+                for_each = length(keys(lookup(destination.value, "replication_time", {}))) == 0 ? [] : [lookup(destination.value, "replication_time", {})]
+
+                content {
+                  status  = replication_time.value.status
+                  minutes = replication_time.value.minutes
+                }
+              }
+
+              dynamic "metrics" {
+                for_each = length(keys(lookup(destination.value, "metrics", {}))) == 0 ? [] : [lookup(destination.value, "metrics", {})]
+
+                content {
+                  status  = metrics.value.status
+                  minutes = metrics.value.minutes
+                }
+              }
             }
           }
 

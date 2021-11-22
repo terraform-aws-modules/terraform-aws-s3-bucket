@@ -1,10 +1,25 @@
-# Change Log
+# Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file
 
-<a name="unreleased"></a>
-## [Unreleased]
+## [2.11.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.11.0...v2.11.1) (2021-11-07)
 
+
+### Bug Fixes
+
+* update CI/CD process to enable auto-release workflow ([#116](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/116)) ([1b7ac99](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/1b7ac9958150f43f251e6cad4fffa493c22c4c68))
+
+<a name="v2.11.0"></a>
+## [v2.11.0] - 2021-11-07
+
+- chore: Update CI workflow to use composite actions and update pre-commit versions ([#115](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/115))
+- feat: Added Replication Time Control for Bucket Replication ([#114](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/114))
+
+
+<a name="v2.10.0"></a>
+## [v2.10.0] - 2021-10-29
+
+- feat: Replace hardcoded cloudfront canonical user ID in example ([#113](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/113))
 
 
 <a name="v2.9.0"></a>
@@ -243,7 +258,9 @@ All notable changes to this project will be documented in this file.
 - Initial commit
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.9.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.11.0...HEAD
+[v2.11.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.10.0...v2.11.0
+[v2.10.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.9.0...v2.10.0
 [v2.9.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.8.0...v2.9.0
 [v2.8.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.7.0...v2.8.0
 [v2.7.0]: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.6.0...v2.7.0

@@ -28,7 +28,7 @@ inputs = {
 }
 ```
 
-## Usage with Terraform:
+## Usage with Terraform
 
 ```hcl
 module "wrapper" {

@@ -30,4 +30,6 @@ module "wrapper" {
   block_public_policy                   = lookup(each.value, "block_public_policy", false)
   ignore_public_acls                    = lookup(each.value, "ignore_public_acls", false)
   restrict_public_buckets               = lookup(each.value, "restrict_public_buckets", false)
+  control_object_ownership              = lookup(each.value, "control_object_ownership", false)
+  object_ownership                      = lookup(each.value, "object_ownership", "ObjectWriter")
 }
