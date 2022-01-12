@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.12.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.11.2...v2.12.0) (2022-01-12)
+
+
+### Features
+
+* Update object_ownership variable description ([#121](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/121)) ([ce9e719](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/ce9e719082c42db0560ad77a703cee5ee780e9a4))
+
 ### [2.11.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.11.1...v2.11.2) (2022-01-10)
 
 
