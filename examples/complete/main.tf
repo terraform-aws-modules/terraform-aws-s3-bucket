@@ -2,11 +2,6 @@ locals {
   bucket_name = "s3-bucket-${random_pet.this.id}"
 }
 
-provider "aws" {
-  region  = "us-east-2"
-  profile = "merstab-terraform"
-}
-
 data "aws_canonical_user_id" "current" {}
 
 data "aws_cloudfront_log_delivery_canonical_user_id" "cloudfront" {}
