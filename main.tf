@@ -1,5 +1,5 @@
 locals {
-  attach_policy = var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
+  attach_policy = var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_cloudtrail_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
 }
 
 resource "aws_s3_bucket" "this" {
@@ -259,7 +259,6 @@ resource "aws_s3_bucket" "this" {
       }
     }
   }
-
 }
 
 resource "aws_s3_bucket_policy" "this" {
@@ -275,6 +274,7 @@ data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
     var.attach_lb_log_delivery_policy ? data.aws_iam_policy_document.lb_log_delivery[0].json : "",
+    var.attach_cloudtrail_log_delivery_policy ? data.aws_iam_policy_document.cloudtrail_log_delivery[0].json : "",
     var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
     var.attach_policy ? var.policy : ""
   ])
@@ -309,9 +309,27 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 }
 
 # ALB/NLB
-
 data "aws_iam_policy_document" "lb_log_delivery" {
   count = var.create_bucket && var.attach_lb_log_delivery_policy ? 1 : 0
+
+  statement {
+    sid = "AWSLogDeliveryAclCheck"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    effect = "Allow"
+
+    actions = [
+      "s3:GetBucketAcl",
+    ]
+
+    resources = [
+      aws_s3_bucket.this[0].arn,
+    ]
+  }
 
   statement {
     sid = "AWSLogDeliveryWrite"
@@ -337,16 +355,23 @@ data "aws_iam_policy_document" "lb_log_delivery" {
       values   = ["bucket-owner-full-control"]
     }
   }
+}
+
+# Cloudtrail
+data "aws_caller_identity" "this" {}
+
+data "aws_iam_policy_document" "cloudtrail_log_delivery" {
+  count = var.create_bucket && var.attach_cloudtrail_log_delivery_policy ? 1 : 0
 
   statement {
-    sid = "AWSLogDeliveryAclCheck"
-
-    effect = "Allow"
+    sid = "AWSCloudTrailAclCheck"
 
     principals {
       type        = "Service"
-      identifiers = ["delivery.logs.amazonaws.com"]
+      identifiers = ["cloudtrail.amazonaws.com"]
     }
+
+    effect = "Allow"
 
     actions = [
       "s3:GetBucketAcl",
@@ -355,7 +380,31 @@ data "aws_iam_policy_document" "lb_log_delivery" {
     resources = [
       aws_s3_bucket.this[0].arn,
     ]
+  }
 
+  statement {
+    sid = "AWSCloudTrailWrite"
+
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.this[0].arn}/AWSLogs/${data.aws_caller_identity.this.account_id}/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
   }
 }
 

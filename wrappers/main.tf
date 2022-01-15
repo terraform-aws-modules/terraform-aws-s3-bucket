@@ -4,6 +4,7 @@ module "wrapper" {
   for_each = var.items
 
   create_bucket                         = lookup(each.value, "create_bucket", true)
+  attach_cloudtrail_log_delivery_policy = lookup(each.value, "attach_cloudtrail_log_delivery_policy", false)
   attach_elb_log_delivery_policy        = lookup(each.value, "attach_elb_log_delivery_policy", false)
   attach_lb_log_delivery_policy         = lookup(each.value, "attach_lb_log_delivery_policy", false)
   attach_deny_insecure_transport_policy = lookup(each.value, "attach_deny_insecure_transport_policy", false)

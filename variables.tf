@@ -16,6 +16,12 @@ variable "attach_lb_log_delivery_policy" {
   default     = false
 }
 
+variable "attach_cloudtrail_log_delivery_policy" {
+  description = "Controls if S3 bucket should have CloudTrail log delivery policy attached"
+  type        = bool
+  default     = false
+}
+
 variable "attach_deny_insecure_transport_policy" {
   description = "Controls if S3 bucket should have deny non-SSL transport policy attached"
   type        = bool
