@@ -177,3 +177,15 @@ variable "object_ownership" {
   type        = string
   default     = "ObjectWriter"
 }
+
+variable "policy_cloudtrail_log_prefix" {
+  description = "(Optional) Set the log prefix for the CloudTrail log delivery policy attached"
+  type        = string
+  default     = ""
+}
+
+variable "policy_cloudtrail_source_arn" {
+  description = "(Optional) Set the CloudTrail ARN as source for the CloudTrail log delivery policy attached"
+  type        = string
+  default     = ""
+}

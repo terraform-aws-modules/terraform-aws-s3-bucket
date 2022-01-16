@@ -1,6 +1,10 @@
 locals {
   attach_policy = var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_cloudtrail_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
+
+  policy_cloudtrail_log_prefix = var.policy_cloudtrail_log_prefix != "" ? "${var.policy_cloudtrail_log_prefix}/" : ""
 }
+
+data "aws_caller_identity" "this" {}
 
 resource "aws_s3_bucket" "this" {
   count = var.create_bucket ? 1 : 0
@@ -358,13 +362,11 @@ data "aws_iam_policy_document" "lb_log_delivery" {
 }
 
 # Cloudtrail
-data "aws_caller_identity" "this" {}
-
 data "aws_iam_policy_document" "cloudtrail_log_delivery" {
   count = var.create_bucket && var.attach_cloudtrail_log_delivery_policy ? 1 : 0
 
   statement {
-    sid = "AWSCloudTrailAclCheck"
+    sid = "AWSCloudTrailAclCheck20150319"
 
     principals {
       type        = "Service"
@@ -383,7 +385,7 @@ data "aws_iam_policy_document" "cloudtrail_log_delivery" {
   }
 
   statement {
-    sid = "AWSCloudTrailWrite"
+    sid = "AWSCloudTrailWrite20150319"
 
     effect = "Allow"
 
@@ -397,13 +399,23 @@ data "aws_iam_policy_document" "cloudtrail_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/AWSLogs/${data.aws_caller_identity.this.account_id}/*",
+      "${aws_s3_bucket.this[0].arn}/${local.policy_cloudtrail_log_prefix}AWSLogs/${data.aws_caller_identity.this.account_id}/*",
     ]
 
     condition {
       test     = "StringEquals"
       variable = "s3:x-amz-acl"
       values   = ["bucket-owner-full-control"]
+    }
+
+    dynamic "condition" {
+      for_each = var.policy_cloudtrail_source_arn != "" ? [var.policy_cloudtrail_source_arn] : []
+
+      content {
+        test     = "StringEquals"
+        variable = "AWS:SourceArn"
+        values   = [condition.value]
+      }
     }
   }
 }
