@@ -178,18 +178,6 @@ variable "object_ownership" {
   default     = "ObjectWriter"
 }
 
-variable "policy_elb_log_prefix" {
-  description = "(Optional) Set the log prefix for the ELB log delivery policy attached"
-  type        = string
-  default     = ""
-}
-
-variable "policy_lb_log_prefix" {
-  description = "(Optional) Set the log prefix for the ALB/NLB log delivery policy attached"
-  type        = string
-  default     = ""
-}
-
 variable "policy_cloudtrail_log_prefix" {
   description = "(Optional) Set the log prefix for the CloudTrail log delivery policy attached"
   type        = string
