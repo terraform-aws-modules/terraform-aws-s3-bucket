@@ -1,6 +1,8 @@
 locals {
   attach_policy = var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_cloudtrail_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
 
+  policy_elb_log_prefix        = var.policy_elb_log_prefix != "" ? "${var.policy_elb_log_prefix}/" : ""
+  policy_lb_log_prefix         = var.policy_lb_log_prefix != "" ? "${var.policy_lb_log_prefix}/" : ""
   policy_cloudtrail_log_prefix = var.policy_cloudtrail_log_prefix != "" ? "${var.policy_cloudtrail_log_prefix}/" : ""
 }
 
@@ -307,7 +309,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*",
+      "${aws_s3_bucket.this[0].arn}/${local.policy_elb_log_prefix}AWSLogs/${data.aws_caller_identity.this.account_id}/*",
     ]
   }
 }
@@ -350,7 +352,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*",
+      "${aws_s3_bucket.this[0].arn}/${local.policy_lb_log_prefix}AWSLogs/${data.aws_caller_identity.this.account_id}/*",
     ]
 
     condition {
