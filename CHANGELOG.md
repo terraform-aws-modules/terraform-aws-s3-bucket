@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.13.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.12.0...v2.13.0) (2022-01-15)
+
+
+### Features
+
+* Added optional bucket policy for requiring TLS 1.2 ([#126](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/126)) ([c56c684](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/c56c684a9cc148ad1bad9883514b6e4ec2c4c67a))
+
 ## [2.12.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.11.2...v2.12.0) (2022-01-12)
 
 

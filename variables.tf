@@ -22,6 +22,12 @@ variable "attach_deny_insecure_transport_policy" {
   default     = false
 }
 
+variable "attach_require_latest_tls_policy" {
+  description = "Controls if S3 bucket should require the latest version of TLS"
+  type        = bool
+  default     = false
+}
+
 variable "attach_policy" {
   description = "Controls if S3 bucket should have bucket policy attached (set to `true` to use value of `policy` as bucket policy)"
   type        = bool

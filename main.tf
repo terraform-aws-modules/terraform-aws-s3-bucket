@@ -1,5 +1,5 @@
 locals {
-  attach_policy = var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
+  attach_policy = var.attach_require_latest_tls_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
 }
 
 resource "aws_s3_bucket" "this" {
@@ -275,6 +275,7 @@ data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
     var.attach_lb_log_delivery_policy ? data.aws_iam_policy_document.lb_log_delivery[0].json : "",
+    var.attach_require_latest_tls_policy ? data.aws_iam_policy_document.require_latest_tls[0].json : "",
     var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
     var.attach_policy ? var.policy : ""
   ])
@@ -385,6 +386,37 @@ data "aws_iam_policy_document" "deny_insecure_transport" {
       variable = "aws:SecureTransport"
       values = [
         "false"
+      ]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "require_latest_tls" {
+  count = var.create_bucket && var.attach_require_latest_tls_policy ? 1 : 0
+
+  statement {
+    sid    = "denyOutdatedTLS"
+    effect = "Deny"
+
+    actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      aws_s3_bucket.this[0].arn,
+      "${aws_s3_bucket.this[0].arn}/*",
+    ]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values = [
+        "1.2"
       ]
     }
   }

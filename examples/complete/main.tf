@@ -59,6 +59,7 @@ module "log_bucket" {
   attach_elb_log_delivery_policy        = true
   attach_lb_log_delivery_policy         = true
   attach_deny_insecure_transport_policy = true
+  attach_require_latest_tls_policy      = true
 }
 
 module "cloudfront_log_bucket" {
@@ -90,6 +91,7 @@ module "s3_bucket" {
   policy        = data.aws_iam_policy_document.bucket_policy.json
 
   attach_deny_insecure_transport_policy = true
+  attach_require_latest_tls_policy      = true
 
   tags = {
     Owner = "Anton"
