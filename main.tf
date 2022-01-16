@@ -411,12 +411,12 @@ data "aws_iam_policy_document" "cloudtrail_log_delivery" {
     }
 
     dynamic "condition" {
-      for_each = var.policy_cloudtrail_source_arn != "" ? [var.policy_cloudtrail_source_arn] : []
+      for_each = var.policy_cloudtrail_source_arn != "" ? [true] : []
 
       content {
         test     = "StringEquals"
         variable = "AWS:SourceArn"
-        values   = [condition.value]
+        values   = [var.policy_cloudtrail_source_arn]
       }
     }
   }
