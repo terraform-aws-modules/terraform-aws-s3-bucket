@@ -218,4 +218,36 @@ module "s3_bucket" {
   # S3 Bucket Ownership Controls
   control_object_ownership = true
   object_ownership         = "BucketOwnerPreferred"
+
+  # S3 Bucket Metrics
+  bucket_metrics = [
+    {
+      name = "EntireBucket"
+    },
+    {
+      name = "PrefixFilter"
+      filter = {
+        prefix = "prefix/"
+      }
+    },
+    {
+      name = "TagsFilter"
+      filter = {
+        tags = {
+          my-first-tag  = "my-value"
+          my-second-tag = "my-value"
+        }
+      }
+    },
+    {
+      name = "FullFilter"
+      filter = {
+        prefix = "prefix/"
+        tags = {
+          my-first-tag  = "my-value"
+          my-second-tag = "my-value"
+        }
+      }
+    }
+  ]
 }

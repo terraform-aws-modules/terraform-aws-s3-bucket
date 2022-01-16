@@ -421,3 +421,19 @@ resource "aws_s3_bucket_ownership_controls" "this" {
     aws_s3_bucket.this
   ]
 }
+
+resource "aws_s3_bucket_metric" "this" {
+  for_each = var.create_bucket ? { for m in var.bucket_metrics : m.name => m } : tomap({})
+
+  bucket = aws_s3_bucket.this[0].bucket
+  name   = each.key
+
+  dynamic "filter" {
+    for_each = length(keys(lookup(each.value, "filter", {}))) == 0 ? [] : [lookup(each.value, "filter", {})]
+
+    content {
+      prefix = lookup(filter.value, "prefix", null)
+      tags   = lookup(filter.value, "tags", null)
+    }
+  }
+}

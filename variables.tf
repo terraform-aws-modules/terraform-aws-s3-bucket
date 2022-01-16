@@ -171,3 +171,9 @@ variable "object_ownership" {
   type        = string
   default     = "ObjectWriter"
 }
+
+variable "bucket_metrics" {
+  description = "(Optional) Specifies bucket metrics."
+  type        = any
+  default     = []
+}
