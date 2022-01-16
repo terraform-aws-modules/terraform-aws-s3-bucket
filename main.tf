@@ -399,7 +399,7 @@ data "aws_iam_policy_document" "cloudtrail_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/${local.policy_cloudtrail_log_prefix}AWSLogs/${data.aws_caller_identity.this.account_id}/*",
+      var.restrict_log_delivery_policies ? "${aws_s3_bucket.this[0].arn}/${local.policy_cloudtrail_log_prefix}AWSLogs/${data.aws_caller_identity.this.account_id}/*" : "${aws_s3_bucket.this[0].arn}/*"
     ]
 
     condition {
