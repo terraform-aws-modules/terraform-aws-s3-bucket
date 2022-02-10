@@ -45,9 +45,3 @@ variable "sns_notifications" {
   type        = any
   default     = {}
 }
-
-variable "source_account" {
-  description = "This parameter is used for S3 and SES. The AWS account ID (without a hyphen) of the source owner"
-  type        = string
-  default     = ""
-}
