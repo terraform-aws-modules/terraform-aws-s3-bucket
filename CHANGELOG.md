@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.14.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.13.0...v2.14.0) (2022-02-10)
+
+
+### Features
+
+* Added source_account for lambda_permission resource ([#135](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/135)) ([e9f0fcc](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/e9f0fcc5aaa90d19fd93800fc9bb99b270546f13))
+
+
+### Bug Fixes
+
+* Changelog duplicate header ([#133](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/133)) ([8d4d28e](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/8d4d28e051cbe48356f63c05ba678d2750c94b8d))
+
 ## [2.13.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.12.0...v2.13.0) (2022-01-15)
 
 
