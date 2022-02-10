@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [2.14.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.14.0...v2.14.1) (2022-02-10)
+
+
+### Bug Fixes
+
+* Pin version to v3 due to number of breaking changes in v4 ([#136](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/136)) ([7dd9a65](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/7dd9a655e5654291e29332b6f43c8065ad60a11b))
+
 ## [2.14.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.13.0...v2.14.0) (2022-02-10)
 
 
