@@ -64,6 +64,7 @@ resource "aws_lambda_permission" "allow" {
   qualifier           = lookup(each.value, "qualifier", null)
   principal           = "s3.amazonaws.com"
   source_arn          = local.bucket_arn
+  source_account      = var.source_account
 }
 
 # SQS Queue
