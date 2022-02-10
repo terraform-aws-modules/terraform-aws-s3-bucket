@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "eu-west-1"
+  region = local.region
 
   # Make it faster by skipping something
   skip_get_ec2_platforms      = true
@@ -7,6 +7,10 @@ provider "aws" {
   skip_region_validation      = true
   skip_credentials_validation = true
   skip_requesting_account_id  = true
+}
+
+locals {
+  region = "eu-west-1"
 }
 
 module "object" {
