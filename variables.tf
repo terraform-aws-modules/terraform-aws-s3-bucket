@@ -90,7 +90,7 @@ variable "request_payer" {
 
 variable "website" {
   description = "Map containing static web-site hosting or redirect configuration."
-  type        = map(string)
+  type        = map(any)
   default     = {}
 }
 
@@ -112,7 +112,7 @@ variable "logging" {
   default     = {}
 }
 
-variable "grant" {
+variable "access_control_policy" {
   description = "An ACL policy grant. Conflicts with `acl`"
   type        = any
   default     = []
