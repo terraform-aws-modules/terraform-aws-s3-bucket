@@ -90,7 +90,7 @@ variable "request_payer" {
 
 variable "website" {
   description = "Map containing static web-site hosting or redirect configuration."
-  type        = map(any)
+  type        = map(string)
   default     = {}
 }
 
