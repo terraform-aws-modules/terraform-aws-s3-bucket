@@ -53,7 +53,7 @@ variable "bucket_prefix" {
 }
 
 variable "acl" {
-  description = "(Optional) The canned ACL to apply. Defaults to 'private'. Conflicts with `grant`"
+  description = "(Optional) The canned ACL to apply. Defaults to 'private'. Conflicts with `access_control_policy`"
   type        = string
   default     = "private"
 }

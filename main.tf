@@ -217,7 +217,6 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
   status = var.acceleration_status
 }
 
-# TODO: This should accept both ACL and Grant, exclusively
 resource "aws_s3_bucket_acl" "this" {
   bucket = aws_s3_bucket.this[0].id
   acl    = var.acl != "null" ? var.acl : null
@@ -257,6 +256,7 @@ resource "aws_s3_bucket_cors_configuration" "this" {
     for_each = try(jsondecode(var.cors_rule), var.cors_rule)
 
     content {
+      id              = lookup(cors_rule.value, "id", null)
       allowed_methods = cors_rule.value.allowed_methods
       allowed_origins = cors_rule.value.allowed_origins
       allowed_headers = lookup(cors_rule.value, "allowed_headers", null)
