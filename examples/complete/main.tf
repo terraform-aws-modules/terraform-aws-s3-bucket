@@ -11,7 +11,7 @@ provider "aws" {
 
 locals {
   bucket_name = "s3-bucket-${random_pet.this.id}"
-  region      = "eu-west-1"
+  region      = "us-west-2"
 }
 
 data "aws_canonical_user_id" "current" {}
@@ -79,16 +79,19 @@ module "cloudfront_log_bucket" {
 
   bucket = "cloudfront-logs-${random_pet.this.id}"
   acl    = null # conflicts with default of `acl = "private"` so set to null to use grants
-  grant = [{
-    type        = "CanonicalUser"
-    permissions = ["FULL_CONTROL"]
-    id          = data.aws_canonical_user_id.current.id
-    }, {
-    type        = "CanonicalUser"
-    permissions = ["FULL_CONTROL"]
-    id          = data.aws_cloudfront_log_delivery_canonical_user_id.cloudfront.id
-    # Ref. https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
-  }]
+  access_control_policy = {
+    grants : [{
+      type       = "CanonicalUser"
+      permission = "FULL_CONTROL"
+      id         = data.aws_canonical_user_id.current.id
+      }, {
+      type       = "CanonicalUser"
+      permission = "FULL_CONTROL"
+      id         = data.aws_cloudfront_log_delivery_canonical_user_id.cloudfront.id
+      # Ref. https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
+    }],
+    owner_id : data.aws_canonical_user_id.current.id
+  }
   force_destroy = true
 }
 
@@ -110,18 +113,18 @@ module "s3_bucket" {
   }
 
   versioning = {
-    enabled = true
+    status = "Enabled"
   }
 
   website = {
     index_document = "index.html"
     error_document = "error.html"
     routing_rules = jsonencode([{
-      Condition : {
-        KeyPrefixEquals : "docs/"
+      condition : {
+        key_prefix_equals : "docs/"
       },
-      Redirect : {
-        ReplaceKeyPrefixWith : "documents/"
+      redirect : {
+        replace_key_prefix_with : "documents/"
       }
     }])
 
@@ -150,9 +153,9 @@ module "s3_bucket" {
 
   lifecycle_rule = [
     {
-      id      = "log"
-      enabled = true
-      prefix  = "log/"
+      id     = "log"
+      status = "Enabled"
+      prefix = "log/"
 
       tags = {
         rule      = "log"
@@ -179,7 +182,7 @@ module "s3_bucket" {
     },
     {
       id                                     = "log1"
-      enabled                                = true
+      status                                 = "Enabled"
       prefix                                 = "log1/"
       abort_incomplete_multipart_upload_days = 7
 

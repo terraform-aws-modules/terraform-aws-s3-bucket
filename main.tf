@@ -223,11 +223,11 @@ resource "aws_s3_bucket_acl" "this" {
   acl    = var.acl != "null" ? var.acl : null
 
   dynamic "access_control_policy" {
-    for_each = try(jsondecode(var.access_control_policy), var.access_control_policy)
+    for_each = length(try(jsondecode(var.access_control_policy), var.access_control_policy)) == 0 ? [] : [try(jsondecode(var.access_control_policy), var.access_control_policy)]
 
     content {
       dynamic "grant" {
-        for_each = lookup(access_control_policy.value, "grants", [])
+        for_each = lookup(access_control_policy.value, "grants")
 
         content {
           grantee {
@@ -250,6 +250,7 @@ resource "aws_s3_bucket_acl" "this" {
 }
 
 resource "aws_s3_bucket_cors_configuration" "this" {
+  count  = length(try(jsondecode(var.cors_rule), var.cors_rule)) > 0 ? 1 : 0
   bucket = aws_s3_bucket.this[0].id
 
   dynamic "cors_rule" {
@@ -267,17 +268,18 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
+  count  = length(try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)) > 0 ? 1 : 0
   bucket = aws_s3_bucket.this[0].id
 
   dynamic "rule" {
     for_each = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
 
     content {
-      id     = lookup(rule, "id", null)
-      status = lookup(rule, "status", null)
+      id     = lookup(rule.value, "id", null)
+      status = lookup(rule.value, "status", null)
 
       dynamic "abort_incomplete_multipart_upload" {
-        for_each = lookup(rule, "abort_incomplete_multipart_upload_days", null) == null ? [] : [lookup(rule, "abort_incomplete_multipart_upload_days")]
+        for_each = lookup(rule.value, "abort_incomplete_multipart_upload_days", null) == null ? [] : [lookup(rule.value, "abort_incomplete_multipart_upload_days")]
 
         content {
           days_after_initiation = abort_incomplete_multipart_upload.value
@@ -326,7 +328,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - expiration
       dynamic "expiration" {
-        for_each = length(keys(lookup(rule, "expiration", {}))) == 0 ? [] : [lookup(rule, "expiration", {})]
+        for_each = length(keys(lookup(rule.value, "expiration", {}))) == 0 ? [] : [lookup(rule, "expiration", {})]
 
         content {
           date                         = lookup(expiration.value, "date", null)
@@ -337,7 +339,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Several blocks - transition
       dynamic "transition" {
-        for_each = lookup(rule, "transition", [])
+        for_each = lookup(rule.value, "transition", [])
 
         content {
           date          = lookup(transition.value, "date", null)
@@ -348,20 +350,22 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - noncurrent_version_expiration
       dynamic "noncurrent_version_expiration" {
-        for_each = length(keys(lookup(rule, "noncurrent_version_expiration", {}))) == 0 ? [] : [lookup(rule, "noncurrent_version_expiration", {})]
+        for_each = length(keys(lookup(rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [lookup(rule.value, "noncurrent_version_expiration", {})]
 
         content {
-          days = lookup(noncurrent_version_expiration.value, "days", null)
+          newer_noncurrent_versions = lookup(noncurrent_version_expiration.value, "newer_noncurrent_versions", null)
+          noncurrent_days           = lookup(noncurrent_version_expiration.value, "days", null)
         }
       }
 
       # Several blocks - noncurrent_version_transition
       dynamic "noncurrent_version_transition" {
-        for_each = lookup(rule, "noncurrent_version_transition", [])
+        for_each = lookup(rule.value, "noncurrent_version_transition", [])
 
         content {
-          days          = lookup(noncurrent_version_transition.value, "days", null)
-          storage_class = noncurrent_version_transition.value.storage_class
+          newer_noncurrent_versions = lookup(noncurrent_version_transition.value, "newer_noncurrent_versions", null)
+          noncurrent_days           = lookup(noncurrent_version_transition.value, "days", null)
+          storage_class             = noncurrent_version_transition.value.storage_class
         }
       }
     }
@@ -397,6 +401,8 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 }
 
 resource "aws_s3_bucket_replication_configuration" "this" {
+  count = length(keys(var.replication_configuration)) == 0 ? 0 : 1
+
   bucket = aws_s3_bucket.this[0].id
   role   = lookup(var.replication_configuration, "role", null)
 
@@ -511,15 +517,18 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 }
 
 resource "aws_s3_bucket_request_payment_configuration" "this" {
+  count = var.request_payer == null ? 0 : 1
+
   bucket = aws_s3_bucket.this[0].id
   payer  = var.request_payer
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
+  count  = length(keys(var.server_side_encryption_configuration)) == 0 ? 0 : 1
   bucket = aws_s3_bucket.this[0].id
 
   dynamic "rule" {
-    for_each = length(keys(var.server_side_encryption_configuration)) == 0 ? [] : [var.server_side_encryption_configuration]
+    for_each = [lookup(var.server_side_encryption_configuration, "rule")]
 
     content {
       bucket_key_enabled = lookup(rule.value, "bucket_key_enabled", null)
@@ -552,21 +561,21 @@ resource "aws_s3_bucket_website_configuration" "this" {
   bucket = aws_s3_bucket.this[0].id
 
   dynamic "index_document" {
-    for_each = length(keys(lookup(var.website, "index_document", ""))) == 0 ? [] : [lookup(var.website, "index_document")]
+    for_each = lookup(var.website, "index_document", "") == "" ? [] : [lookup(var.website, "index_document")]
     content {
       suffix = index_document.value
     }
   }
 
   dynamic "error_document" {
-    for_each = length(keys(lookup(var.website, "error_document", ""))) == 0 ? [] : [lookup(var.website, "error_document")]
+    for_each = lookup(var.website, "error_document", "") == "" ? [] : [lookup(var.website, "error_document")]
     content {
       key = error_document.value
     }
   }
 
   dynamic "redirect_all_requests_to" {
-    for_each = length(keys(lookup(var.website, "redirect_all_requests_to", {}))) == 0 ? [] : [lookup(var.website, "redirect_all_requests_to", {})]
+    for_each = length(try(jsondecode(lookup(var.website, "redirect_all_requests_to", "")), [])) > 0 ? try(jsondecode(lookup(var.website, "redirect_all_requests_to", "")), []) : []
     content {
       host_name = lookup(redirect_all_requests_to.value, "host_name", null)
       protocol  = lookup(redirect_all_requests_to.value, "protocol", null)
@@ -574,9 +583,9 @@ resource "aws_s3_bucket_website_configuration" "this" {
   }
 
   dynamic "routing_rule" {
-    for_each = lookup(var.website, "routing_rules", [])
-    content {
+    for_each = length(try(jsondecode(lookup(var.website, "routing_rules", "")), [])) > 0 ? try(jsondecode(lookup(var.website, "routing_rules", "")), []) : []
 
+    content {
       dynamic "condition" {
         for_each = length(keys(lookup(routing_rule.value, "condition", {}))) == 0 ? [] : [lookup(routing_rule.value, "condition")]
 
@@ -587,7 +596,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
       }
 
       dynamic "redirect" {
-        for_each = length(keys(lookup(routing_rule.value, "redirect", {}))) == 0 ? [] : [lookup(routing_rule.value, "redirect")]
+        for_each = [lookup(routing_rule.value, "redirect")]
 
         content {
           host_name               = lookup(redirect.value, "host_name", null)
