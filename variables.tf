@@ -55,8 +55,14 @@ variable "bucket_prefix" {
 variable "acl" {
   description = "(Optional) The canned ACL to apply. Defaults to 'private'. Conflicts with `grant`"
   type        = string
-  default     = "private"
+  default     = null
 }
+
+#variable "acl" {
+#  description = "(Optional) The canned ACL to apply. Defaults to 'private'. Conflicts with `grant`"
+#  type        = string
+#  default     = "private"
+#}
 
 variable "policy" {
   description = "(Optional) A valid bucket policy JSON document. Note that if the policy document is not specific enough (but still valid), Terraform may view the policy as constantly changing in a terraform plan. In this case, please make sure you use the verbose/specific version of the policy. For more information about building AWS IAM policy documents with Terraform, see the AWS IAM Policy Document Guide."
@@ -90,7 +96,7 @@ variable "request_payer" {
 
 variable "website" {
   description = "Map containing static web-site hosting or redirect configuration."
-  type        = map(string)
+  type        = any # map(string)
   default     = {}
 }
 
@@ -116,6 +122,18 @@ variable "grant" {
   description = "An ACL policy grant. Conflicts with `acl`"
   type        = any
   default     = []
+}
+
+variable "owner" {
+  description = "Bucket owner's display name and ID. Conflicts with `acl`"
+  type        = map(string)
+  default     = {}
+}
+
+variable "expected_bucket_owner" {
+  description = "The account ID of the expected bucket owner"
+  type        = string
+  default     = null
 }
 
 variable "lifecycle_rule" {
