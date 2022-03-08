@@ -216,8 +216,10 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
 }
 
 resource "aws_s3_bucket_acl" "this" {
+  count = var.acl == "" && length(keys(try(jsondecode(var.access_control_policy), var.access_control_policy))) == 0 ? 0 : 1
+
   bucket = aws_s3_bucket.this.id
-  acl    = var.acl != "null" ? var.acl : null
+  acl    = var.acl
 
   dynamic "access_control_policy" {
     for_each = length(try(jsondecode(var.access_control_policy), var.access_control_policy)) == 0 ? [] : [try(jsondecode(var.access_control_policy), var.access_control_policy)]
