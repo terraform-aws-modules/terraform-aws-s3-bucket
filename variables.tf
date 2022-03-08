@@ -1,9 +1,3 @@
-variable "create_bucket" {
-  description = "Controls if S3 bucket should be created"
-  type        = bool
-  default     = true
-}
-
 variable "attach_elb_log_delivery_policy" {
   description = "Controls if S3 bucket should have ELB log delivery policy attached"
   type        = bool

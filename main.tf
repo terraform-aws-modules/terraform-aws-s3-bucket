@@ -3,8 +3,6 @@ locals {
 }
 
 resource "aws_s3_bucket" "this" {
-  count = var.create_bucket ? 1 : 0
-
   bucket        = var.bucket
   bucket_prefix = var.bucket_prefix
 
@@ -20,14 +18,14 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_bucket_policy" "this" {
-  count = var.create_bucket && local.attach_policy ? 1 : 0
+  count = local.attach_policy ? 1 : 0
 
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
   policy = data.aws_iam_policy_document.combined[0].json
 }
 
 data "aws_iam_policy_document" "combined" {
-  count = var.create_bucket && local.attach_policy ? 1 : 0
+  count = local.attach_policy ? 1 : 0
 
   source_policy_documents = compact([
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
@@ -40,11 +38,11 @@ data "aws_iam_policy_document" "combined" {
 
 # AWS Load Balancer access log delivery policy
 data "aws_elb_service_account" "this" {
-  count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
+  count = var.attach_elb_log_delivery_policy ? 1 : 0
 }
 
 data "aws_iam_policy_document" "elb_log_delivery" {
-  count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
+  count = var.attach_elb_log_delivery_policy ? 1 : 0
 
   statement {
     sid = ""
@@ -61,7 +59,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*",
+      "${aws_s3_bucket.this.arn}/*",
     ]
   }
 }
@@ -69,7 +67,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 # ALB/NLB
 
 data "aws_iam_policy_document" "lb_log_delivery" {
-  count = var.create_bucket && var.attach_lb_log_delivery_policy ? 1 : 0
+  count = var.attach_lb_log_delivery_policy ? 1 : 0
 
   statement {
     sid = "AWSLogDeliveryWrite"
@@ -86,7 +84,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*",
+      "${aws_s3_bucket.this.arn}/*",
     ]
 
     condition {
@@ -111,14 +109,14 @@ data "aws_iam_policy_document" "lb_log_delivery" {
     ]
 
     resources = [
-      aws_s3_bucket.this[0].arn,
+      aws_s3_bucket.this.arn,
     ]
 
   }
 }
 
 data "aws_iam_policy_document" "deny_insecure_transport" {
-  count = var.create_bucket && var.attach_deny_insecure_transport_policy ? 1 : 0
+  count = var.attach_deny_insecure_transport_policy ? 1 : 0
 
   statement {
     sid    = "denyInsecureTransport"
@@ -129,8 +127,8 @@ data "aws_iam_policy_document" "deny_insecure_transport" {
     ]
 
     resources = [
-      aws_s3_bucket.this[0].arn,
-      "${aws_s3_bucket.this[0].arn}/*",
+      aws_s3_bucket.this.arn,
+      "${aws_s3_bucket.this.arn}/*",
     ]
 
     principals {
@@ -149,7 +147,7 @@ data "aws_iam_policy_document" "deny_insecure_transport" {
 }
 
 data "aws_iam_policy_document" "require_latest_tls" {
-  count = var.create_bucket && var.attach_require_latest_tls_policy ? 1 : 0
+  count = var.attach_require_latest_tls_policy ? 1 : 0
 
   statement {
     sid    = "denyOutdatedTLS"
@@ -160,8 +158,8 @@ data "aws_iam_policy_document" "require_latest_tls" {
     ]
 
     resources = [
-      aws_s3_bucket.this[0].arn,
-      "${aws_s3_bucket.this[0].arn}/*",
+      aws_s3_bucket.this.arn,
+      "${aws_s3_bucket.this.arn}/*",
     ]
 
     principals {
@@ -180,13 +178,13 @@ data "aws_iam_policy_document" "require_latest_tls" {
 }
 
 resource "aws_s3_bucket_public_access_block" "this" {
-  count = var.create_bucket && var.attach_public_policy ? 1 : 0
+  count = var.attach_public_policy ? 1 : 0
 
   # Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
   # to prevent "A conflicting conditional operation is currently in progress against this resource."
   # Ref: https://github.com/hashicorp/terraform-provider-aws/issues/7628
 
-  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
+  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this.id
 
   block_public_acls       = var.block_public_acls
   block_public_policy     = var.block_public_policy
@@ -195,9 +193,9 @@ resource "aws_s3_bucket_public_access_block" "this" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "this" {
-  count = var.create_bucket && var.control_object_ownership ? 1 : 0
+  count = var.control_object_ownership ? 1 : 0
 
-  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
+  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this.id
 
   rule {
     object_ownership = var.object_ownership
@@ -213,12 +211,12 @@ resource "aws_s3_bucket_ownership_controls" "this" {
 
 resource "aws_s3_bucket_accelerate_configuration" "this" {
   count  = var.acceleration_status != null ? 1 : 0
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
   status = var.acceleration_status
 }
 
 resource "aws_s3_bucket_acl" "this" {
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
   acl    = var.acl != "null" ? var.acl : null
 
   dynamic "access_control_policy" {
@@ -250,7 +248,7 @@ resource "aws_s3_bucket_acl" "this" {
 
 resource "aws_s3_bucket_cors_configuration" "this" {
   count  = length(try(jsondecode(var.cors_rule), var.cors_rule)) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
 
   dynamic "cors_rule" {
     for_each = try(jsondecode(var.cors_rule), var.cors_rule)
@@ -269,14 +267,14 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
   count  = length(try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)) > 0 ? 1 : 0
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
 
   dynamic "rule" {
     for_each = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
 
     content {
       id     = lookup(rule.value, "id", null)
-      status = lookup(rule.value, "status", null)
+      status = lookup(rule.value, "enabled", true) ? "Enabled" : "Disabled"
 
       dynamic "abort_incomplete_multipart_upload" {
         for_each = lookup(rule.value, "abort_incomplete_multipart_upload_days", null) == null ? [] : [lookup(rule.value, "abort_incomplete_multipart_upload_days")]
@@ -375,14 +373,14 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 resource "aws_s3_bucket_logging" "this" {
   count = length(keys(var.logging)) == 0 ? 0 : 1
 
-  bucket        = aws_s3_bucket.this[0].id
+  bucket        = aws_s3_bucket.this.id
   target_bucket = lookup(var.logging, "target_bucket")
   target_prefix = lookup(var.logging, "target_prefix", null)
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "this" {
   count  = length(keys(var.object_lock_configuration)) == 0 ? 0 : 1
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
 
   object_lock_enabled = lookup(var.object_lock_configuration, "object_lock_enabled")
 
@@ -403,7 +401,7 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 resource "aws_s3_bucket_replication_configuration" "this" {
   count = length(keys(var.replication_configuration)) == 0 ? 0 : 1
 
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
   role   = lookup(var.replication_configuration, "role", null)
 
   dynamic "rule" {
@@ -413,7 +411,7 @@ resource "aws_s3_bucket_replication_configuration" "this" {
       id       = lookup(rule.value, "id", null)
       priority = lookup(rule.value, "priority", null)
       prefix   = lookup(rule.value, "prefix", null)
-      status   = rule.value.status
+      status   = lookup(rule.value, "enabled", true) ? "Enabled" : "Disabled"
 
       dynamic "delete_marker_replication" {
         for_each = length(keys(lookup(rule.value, "delete_marker_replication", {}))) == 0 ? [] : [lookup(rule.value, "delete_marker_replication", {})]
@@ -519,13 +517,13 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 resource "aws_s3_bucket_request_payment_configuration" "this" {
   count = var.request_payer == null ? 0 : 1
 
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
   payer  = var.request_payer
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
   count  = length(keys(var.server_side_encryption_configuration)) == 0 ? 0 : 1
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
 
   dynamic "rule" {
     for_each = [lookup(var.server_side_encryption_configuration, "rule")]
@@ -548,17 +546,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 
 resource "aws_s3_bucket_versioning" "this" {
   count  = length(keys(var.versioning)) == 0 ? 0 : 1
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
 
   versioning_configuration {
-    status     = lookup(var.versioning, "status", null)
+    status     = lookup(var.versioning, "enabled", true) ? "Enabled" : "Suspended"
     mfa_delete = lookup(var.versioning, "mfa_delete", null)
   }
 }
 
 resource "aws_s3_bucket_website_configuration" "this" {
   count  = length(keys(var.website)) == 0 ? 0 : 1
-  bucket = aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this.id
 
   dynamic "index_document" {
     for_each = lookup(var.website, "index_document", "") == "" ? [] : [lookup(var.website, "index_document")]

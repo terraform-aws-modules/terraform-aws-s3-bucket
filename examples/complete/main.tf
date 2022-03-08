@@ -113,7 +113,7 @@ module "s3_bucket" {
   }
 
   versioning = {
-    status = "Enabled"
+    enabled = true
   }
 
   website = {
@@ -153,9 +153,9 @@ module "s3_bucket" {
 
   lifecycle_rule = [
     {
-      id     = "log"
-      status = "Enabled"
-      prefix = "log/"
+      id      = "log"
+      enabled = true
+      prefix  = "log/"
 
       tags = {
         rule      = "log"
@@ -182,7 +182,7 @@ module "s3_bucket" {
     },
     {
       id                                     = "log1"
-      status                                 = "Enabled"
+      enabled                                = true
       prefix                                 = "log1/"
       abort_incomplete_multipart_upload_days = 7
 
