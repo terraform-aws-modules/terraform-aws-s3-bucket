@@ -109,7 +109,7 @@ variable "logging" {
 variable "access_control_policy" {
   description = "An ACL policy grant. Conflicts with `acl`"
   type        = any
-  default     = []
+  default     = ""
 }
 
 variable "lifecycle_rule" {

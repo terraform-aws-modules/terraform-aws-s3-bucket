@@ -151,7 +151,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_acceleration_status"></a> [acceleration\_status](#input\_acceleration\_status) | (Optional) Sets the accelerate configuration of an existing bucket. Can be Enabled or Suspended. | `string` | `null` | no |
-| <a name="input_access_control_policy"></a> [access\_control\_policy](#input\_access\_control\_policy) | An ACL policy grant. Conflicts with `acl` | `any` | `[]` | no |
+| <a name="input_access_control_policy"></a> [access\_control\_policy](#input\_access\_control\_policy) | An ACL policy grant. Conflicts with `acl` | `any` | `""` | no |
 | <a name="input_acl"></a> [acl](#input\_acl) | (Optional) The canned ACL to apply. Defaults to 'private'. Conflicts with `access_control_policy` | `string` | `"private"` | no |
 | <a name="input_attach_deny_insecure_transport_policy"></a> [attach\_deny\_insecure\_transport\_policy](#input\_attach\_deny\_insecure\_transport\_policy) | Controls if S3 bucket should have deny non-SSL transport policy attached | `bool` | `false` | no |
 | <a name="input_attach_elb_log_delivery_policy"></a> [attach\_elb\_log\_delivery\_policy](#input\_attach\_elb\_log\_delivery\_policy) | Controls if S3 bucket should have ELB log delivery policy attached | `bool` | `false` | no |
