@@ -328,7 +328,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - expiration
       dynamic "expiration" {
-        for_each = length(keys(lookup(rule.value, "expiration", {}))) == 0 ? [] : [lookup(rule, "expiration", {})]
+        for_each = length(keys(lookup(rule.value, "expiration", {}))) == 0 ? [] : [lookup(rule.value, "expiration", {})]
 
         content {
           date                         = lookup(expiration.value, "date", null)
