@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.15.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.14.1...v2.15.0) (2022-03-12)
+
+
+### Features
+
+* Made it clear that we stand with Ukraine ([cad9118](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/cad911829d74bab4b594d7ad7944f93f8aef1f34))
+
 ### [2.14.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.14.0...v2.14.1) (2022-02-10)
 
 
