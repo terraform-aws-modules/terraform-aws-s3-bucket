@@ -1,6 +1,22 @@
+provider "aws" {
+  region = local.region
+
+  # Make it faster by skipping something
+  skip_get_ec2_platforms      = true
+  skip_metadata_api_check     = true
+  skip_region_validation      = true
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+}
+
 locals {
   bucket_name = "s3-bucket-${random_pet.this.id}"
+  region      = "eu-west-1"
 }
+
+data "aws_canonical_user_id" "current" {}
+
+data "aws_cloudfront_log_delivery_canonical_user_id" "cloudfront" {}
 
 resource "random_pet" "this" {
   length = 2
@@ -49,10 +65,31 @@ data "aws_iam_policy_document" "bucket_policy" {
 module "log_bucket" {
   source = "../../"
 
-  bucket                         = "logs-${random_pet.this.id}"
-  acl                            = "log-delivery-write"
-  force_destroy                  = true
-  attach_elb_log_delivery_policy = true
+  bucket                                = "logs-${random_pet.this.id}"
+  acl                                   = "log-delivery-write"
+  force_destroy                         = true
+  attach_elb_log_delivery_policy        = true
+  attach_lb_log_delivery_policy         = true
+  attach_deny_insecure_transport_policy = true
+  attach_require_latest_tls_policy      = true
+}
+
+module "cloudfront_log_bucket" {
+  source = "../../"
+
+  bucket = "cloudfront-logs-${random_pet.this.id}"
+  acl    = null # conflicts with default of `acl = "private"` so set to null to use grants
+  grant = [{
+    type        = "CanonicalUser"
+    permissions = ["FULL_CONTROL"]
+    id          = data.aws_canonical_user_id.current.id
+    }, {
+    type        = "CanonicalUser"
+    permissions = ["FULL_CONTROL"]
+    id          = data.aws_cloudfront_log_delivery_canonical_user_id.cloudfront.id
+    # Ref. https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
+  }]
+  force_destroy = true
 }
 
 module "s3_bucket" {
@@ -64,6 +101,9 @@ module "s3_bucket" {
 
   attach_policy = true
   policy        = data.aws_iam_policy_document.bucket_policy.json
+
+  attach_deny_insecure_transport_policy = true
+  attach_require_latest_tls_policy      = true
 
   tags = {
     Owner = "Anton"
@@ -88,17 +128,25 @@ module "s3_bucket" {
   }
 
   logging = {
-    target_bucket = module.log_bucket.this_s3_bucket_id
+    target_bucket = module.log_bucket.s3_bucket_id
     target_prefix = "log/"
   }
 
-  cors_rule = {
-    allowed_methods = ["PUT", "POST"]
-    allowed_origins = ["https://modules.tf", "https://terraform-aws-modules.modules.tf"]
-    allowed_headers = ["*"]
-    expose_headers  = ["ETag"]
-    max_age_seconds = 3000
-  }
+  cors_rule = [
+    {
+      allowed_methods = ["PUT", "POST"]
+      allowed_origins = ["https://modules.tf", "https://terraform-aws-modules.modules.tf"]
+      allowed_headers = ["*"]
+      expose_headers  = ["ETag"]
+      max_age_seconds = 3000
+      }, {
+      allowed_methods = ["PUT"]
+      allowed_origins = ["https://example.com"]
+      allowed_headers = ["*"]
+      expose_headers  = ["ETag"]
+      max_age_seconds = 3000
+    }
+  ]
 
   lifecycle_rule = [
     {
@@ -169,15 +217,19 @@ module "s3_bucket" {
     object_lock_enabled = "Enabled"
     rule = {
       default_retention = {
-        mode  = "COMPLIANCE"
-        years = 5
+        mode = "GOVERNANCE"
+        days = 1
       }
     }
   }
 
-  // S3 bucket-level Public Access Block configuration
+  # S3 bucket-level Public Access Block configuration
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+
+  # S3 Bucket Ownership Controls
+  control_object_ownership = true
+  object_ownership         = "BucketOwnerPreferred"
 }

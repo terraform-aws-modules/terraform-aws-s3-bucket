@@ -1,18 +1,32 @@
-locals {
-  bucket_name             = "origin-s3-bucket-${random_pet.this.id}"
-  destination_bucket_name = "replica-s3-bucket-${random_pet.this.id}"
-  origin_region           = "eu-west-1"
-  replica_region          = "eu-central-1"
-}
-
 provider "aws" {
   region = local.origin_region
+
+  # Make it faster by skipping something
+  skip_get_ec2_platforms      = true
+  skip_metadata_api_check     = true
+  skip_region_validation      = true
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
 }
 
 provider "aws" {
   region = local.replica_region
 
   alias = "replica"
+
+  # Make it faster by skipping something
+  skip_get_ec2_platforms      = true
+  skip_metadata_api_check     = true
+  skip_region_validation      = true
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+}
+
+locals {
+  bucket_name             = "origin-s3-bucket-${random_pet.this.id}"
+  destination_bucket_name = "replica-s3-bucket-${random_pet.this.id}"
+  origin_region           = "eu-west-1"
+  replica_region          = "eu-central-1"
 }
 
 data "aws_caller_identity" "current" {}
@@ -22,7 +36,7 @@ resource "random_pet" "this" {
 }
 
 resource "aws_kms_key" "replica" {
-  provider = "aws.replica"
+  provider = aws.replica
 
   description             = "S3 bucket replication KMS key"
   deletion_window_in_days = 7
@@ -32,11 +46,10 @@ module "replica_bucket" {
   source = "../../"
 
   providers = {
-    aws = "aws.replica"
+    aws = aws.replica
   }
 
   bucket = local.destination_bucket_name
-  region = local.replica_region
   acl    = "private"
 
   versioning = {
@@ -48,7 +61,6 @@ module "s3_bucket" {
   source = "../../"
 
   bucket = local.bucket_name
-  region = local.origin_region
   acl    = "private"
 
   versioning = {
@@ -60,7 +72,7 @@ module "s3_bucket" {
 
     rules = [
       {
-        id       = "foo"
+        id       = "something-with-kms-and-filter"
         status   = "Enabled"
         priority = 10
 
@@ -85,18 +97,20 @@ module "s3_bucket" {
           access_control_translation = {
             owner = "Destination"
           }
+          replication_time = {
+            status  = "Enabled"
+            minutes = 15
+          }
+          metrics = {
+            status  = "Enabled"
+            minutes = 15
+          }
         }
       },
       {
-        id       = "bar"
+        id       = "something-with-filter"
         status   = "Enabled"
         priority = 20
-
-        destination = {
-          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
-          storage_class = "STANDARD"
-        }
-
 
         filter = {
           prefix = "two"
@@ -105,8 +119,34 @@ module "s3_bucket" {
           }
         }
 
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
       },
+      {
+        id       = "everything-with-filter"
+        status   = "Enabled"
+        priority = 30
 
+        filter = {
+          prefix = ""
+        }
+
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
+      },
+      {
+        id     = "everything-without-filters"
+        status = "Enabled"
+
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
+      },
     ]
   }
 

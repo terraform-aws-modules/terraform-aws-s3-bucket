@@ -1,16 +1,6 @@
-# Complete S3 bucket with most of supported features enabled
+# S3 bucket notifications to Lambda functions, SQS queues, and SNS topics
 
-Configuration in this directory creates S3 bucket which demos such capabilities:
-- static web-site hosting
-- access logging (for S3, ELB and ALB/NLB)
-- versioning
-- CORS
-- lifecycle rules
-- server-side encryption
-- object locking
-- grants (required for CloudFront logs)
-
-Please check [S3 replication example](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-replication) to see Cross-Region Replication (CRR) supported by this module.
+Configuration in this directory creates S3 bucket notifications to all supported destinations.
 
 ## Usage
 
@@ -31,6 +21,7 @@ Note that this example may create resources which cost money. Run `terraform des
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 3.69 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | >= 2.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 
 ## Providers
@@ -38,26 +29,29 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 3.69 |
+| <a name="provider_null"></a> [null](#provider\_null) | >= 2.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cloudfront_log_bucket"></a> [cloudfront\_log\_bucket](#module\_cloudfront\_log\_bucket) | ../../ | n/a |
-| <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | ../../ | n/a |
+| <a name="module_all_notifications"></a> [all\_notifications](#module\_all\_notifications) | ../../modules/notification | n/a |
+| <a name="module_lambda_function1"></a> [lambda\_function1](#module\_lambda\_function1) | terraform-aws-modules/lambda/aws | ~> 2.0 |
+| <a name="module_lambda_function2"></a> [lambda\_function2](#module\_lambda\_function2) | terraform-aws-modules/lambda/aws | ~> 2.0 |
 | <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
+| <a name="module_sns_topic1"></a> [sns\_topic1](#module\_sns\_topic1) | terraform-aws-modules/sns/aws | ~> 3.0 |
+| <a name="module_sns_topic2"></a> [sns\_topic2](#module\_sns\_topic2) | terraform-aws-modules/sns/aws | ~> 3.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_kms_key.objects](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
+| [aws_sqs_queue.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
+| [aws_sqs_queue_policy.allow_external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue_policy) | resource |
+| [null_resource.download_package](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
-| [aws_canonical_user_id.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/canonical_user_id) | data source |
-| [aws_cloudfront_log_delivery_canonical_user_id.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/cloudfront_log_delivery_canonical_user_id) | data source |
-| [aws_iam_policy_document.bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.sqs_external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 

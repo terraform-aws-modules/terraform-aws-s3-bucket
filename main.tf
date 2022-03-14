@@ -1,13 +1,21 @@
-resource "aws_s3_bucket" "this" {
-  count = var.create_bucket ? 1 : 0
+locals {
+  create_bucket = var.create_bucket && var.putin_khuylo
 
-  bucket              = var.bucket
-  bucket_prefix       = var.bucket_prefix
-  acl                 = var.acl
+  attach_policy = var.attach_require_latest_tls_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
+}
+
+resource "aws_s3_bucket" "this" {
+  count = local.create_bucket ? 1 : 0
+
+  bucket        = var.bucket
+  bucket_prefix = var.bucket_prefix
+
+  # hack when `null` value can't be used (eg, from terragrunt, https://github.com/gruntwork-io/terragrunt/pull/1367)
+  acl = var.acl != "null" ? var.acl : null
+
   tags                = var.tags
   force_destroy       = var.force_destroy
   acceleration_status = var.acceleration_status
-  region              = var.region
   request_payer       = var.request_payer
 
   dynamic "website" {
@@ -22,7 +30,7 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "cors_rule" {
-    for_each = length(keys(var.cors_rule)) == 0 ? [] : [var.cors_rule]
+    for_each = try(jsondecode(var.cors_rule), var.cors_rule)
 
     content {
       allowed_methods = cors_rule.value.allowed_methods
@@ -51,8 +59,19 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  dynamic "grant" {
+    for_each = try(jsondecode(var.grant), var.grant)
+
+    content {
+      id          = lookup(grant.value, "id", null)
+      type        = grant.value.type
+      permissions = grant.value.permissions
+      uri         = lookup(grant.value, "uri", null)
+    }
+  }
+
   dynamic "lifecycle_rule" {
-    for_each = var.lifecycle_rule
+    for_each = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
 
     content {
       id                                     = lookup(lifecycle_rule.value, "id", null)
@@ -115,16 +134,17 @@ resource "aws_s3_bucket" "this" {
         for_each = replication_configuration.value.rules
 
         content {
-          id       = lookup(rules.value, "id", null)
-          priority = lookup(rules.value, "priority", null)
-          prefix   = lookup(rules.value, "prefix", null)
-          status   = lookup(rules.value, "status", null)
+          id                               = lookup(rules.value, "id", null)
+          priority                         = lookup(rules.value, "priority", null)
+          prefix                           = lookup(rules.value, "prefix", null)
+          delete_marker_replication_status = lookup(rules.value, "delete_marker_replication_status", null)
+          status                           = rules.value.status
 
           dynamic "destination" {
             for_each = length(keys(lookup(rules.value, "destination", {}))) == 0 ? [] : [lookup(rules.value, "destination", {})]
 
             content {
-              bucket             = lookup(destination.value, "bucket", null)
+              bucket             = destination.value.bucket
               storage_class      = lookup(destination.value, "storage_class", null)
               replica_kms_key_id = lookup(destination.value, "replica_kms_key_id", null)
               account_id         = lookup(destination.value, "account_id", null)
@@ -134,6 +154,24 @@ resource "aws_s3_bucket" "this" {
 
                 content {
                   owner = access_control_translation.value.owner
+                }
+              }
+
+              dynamic "replication_time" {
+                for_each = length(keys(lookup(destination.value, "replication_time", {}))) == 0 ? [] : [lookup(destination.value, "replication_time", {})]
+
+                content {
+                  status  = replication_time.value.status
+                  minutes = replication_time.value.minutes
+                }
+              }
+
+              dynamic "metrics" {
+                for_each = length(keys(lookup(destination.value, "metrics", {}))) == 0 ? [] : [lookup(destination.value, "metrics", {})]
+
+                content {
+                  status  = metrics.value.status
+                  minutes = metrics.value.minutes
                 }
               }
             }
@@ -155,8 +193,16 @@ resource "aws_s3_bucket" "this" {
             }
           }
 
+          # Send empty map if `filter` is an empty map or absent entirely
           dynamic "filter" {
-            for_each = length(keys(lookup(rules.value, "filter", {}))) == 0 ? [] : [lookup(rules.value, "filter", {})]
+            for_each = length(keys(lookup(rules.value, "filter", {}))) == 0 ? [{}] : []
+
+            content {}
+          }
+
+          # Send `filter` if it is present and has at least one field
+          dynamic "filter" {
+            for_each = length(keys(lookup(rules.value, "filter", {}))) != 0 ? [lookup(rules.value, "filter", {})] : []
 
             content {
               prefix = lookup(filter.value, "prefix", null)
@@ -179,6 +225,7 @@ resource "aws_s3_bucket" "this" {
         for_each = length(keys(lookup(server_side_encryption_configuration.value, "rule", {}))) == 0 ? [] : [lookup(server_side_encryption_configuration.value, "rule", {})]
 
         content {
+          bucket_key_enabled = lookup(rule.value, "bucket_key_enabled", null)
 
           dynamic "apply_server_side_encryption_by_default" {
             for_each = length(keys(lookup(rule.value, "apply_server_side_encryption_by_default", {}))) == 0 ? [] : [
@@ -218,19 +265,31 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_bucket_policy" "this" {
-  count = var.create_bucket && (var.attach_elb_log_delivery_policy || var.attach_policy) ? 1 : 0
+  count = local.create_bucket && local.attach_policy ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
-  policy = var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : var.policy
+  policy = data.aws_iam_policy_document.combined[0].json
+}
+
+data "aws_iam_policy_document" "combined" {
+  count = local.create_bucket && local.attach_policy ? 1 : 0
+
+  source_policy_documents = compact([
+    var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
+    var.attach_lb_log_delivery_policy ? data.aws_iam_policy_document.lb_log_delivery[0].json : "",
+    var.attach_require_latest_tls_policy ? data.aws_iam_policy_document.require_latest_tls[0].json : "",
+    var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
+    var.attach_policy ? var.policy : ""
+  ])
 }
 
 # AWS Load Balancer access log delivery policy
 data "aws_elb_service_account" "this" {
-  count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
+  count = local.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
 }
 
 data "aws_iam_policy_document" "elb_log_delivery" {
-  count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
+  count = local.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
 
   statement {
     sid = ""
@@ -247,20 +306,152 @@ data "aws_iam_policy_document" "elb_log_delivery" {
     ]
 
     resources = [
-      "arn:aws:s3:::${aws_s3_bucket.this[0].id}/*",
+      "${aws_s3_bucket.this[0].arn}/*",
     ]
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "this" {
-  count = var.create_bucket ? 1 : 0
+# ALB/NLB
 
-  // Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
-  // to prevent "A conflicting conditional operation is currently in progress against this resource."
-  bucket = (var.attach_elb_log_delivery_policy || var.attach_policy) ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
+data "aws_iam_policy_document" "lb_log_delivery" {
+  count = local.create_bucket && var.attach_lb_log_delivery_policy ? 1 : 0
+
+  statement {
+    sid = "AWSLogDeliveryWrite"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.this[0].arn}/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryAclCheck"
+
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:GetBucketAcl",
+    ]
+
+    resources = [
+      aws_s3_bucket.this[0].arn,
+    ]
+
+  }
+}
+
+data "aws_iam_policy_document" "deny_insecure_transport" {
+  count = local.create_bucket && var.attach_deny_insecure_transport_policy ? 1 : 0
+
+  statement {
+    sid    = "denyInsecureTransport"
+    effect = "Deny"
+
+    actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      aws_s3_bucket.this[0].arn,
+      "${aws_s3_bucket.this[0].arn}/*",
+    ]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "require_latest_tls" {
+  count = local.create_bucket && var.attach_require_latest_tls_policy ? 1 : 0
+
+  statement {
+    sid    = "denyOutdatedTLS"
+    effect = "Deny"
+
+    actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      aws_s3_bucket.this[0].arn,
+      "${aws_s3_bucket.this[0].arn}/*",
+    ]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values = [
+        "1.2"
+      ]
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "this" {
+  count = local.create_bucket && var.attach_public_policy ? 1 : 0
+
+  # Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
+  # to prevent "A conflicting conditional operation is currently in progress against this resource."
+  # Ref: https://github.com/hashicorp/terraform-provider-aws/issues/7628
+
+  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
 
   block_public_acls       = var.block_public_acls
   block_public_policy     = var.block_public_policy
   ignore_public_acls      = var.ignore_public_acls
   restrict_public_buckets = var.restrict_public_buckets
+}
+
+resource "aws_s3_bucket_ownership_controls" "this" {
+  count = local.create_bucket && var.control_object_ownership ? 1 : 0
+
+  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
+
+  rule {
+    object_ownership = var.object_ownership
+  }
+
+  # This `depends_on` is to prevent "A conflicting conditional operation is currently in progress against this resource."
+  depends_on = [
+    aws_s3_bucket_policy.this,
+    aws_s3_bucket_public_access_block.this,
+    aws_s3_bucket.this
+  ]
 }
