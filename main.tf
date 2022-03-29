@@ -28,7 +28,6 @@ resource "aws_s3_bucket" "this" {
       object_lock_enabled = "Enabled"
     }
   }
-
 }
 
 resource "aws_s3_bucket_logging" "this" {

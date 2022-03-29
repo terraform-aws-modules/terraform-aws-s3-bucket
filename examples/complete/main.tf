@@ -17,9 +17,9 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
-#data "aws_canonical_user_id" "current" {}
+data "aws_canonical_user_id" "current" {}
 
-#data "aws_cloudfront_log_delivery_canonical_user_id" "cloudfront" {}
+data "aws_cloudfront_log_delivery_canonical_user_id" "cloudfront" {}
 
 resource "random_pet" "this" {
   length = 2
@@ -78,6 +78,29 @@ module "log_bucket" {
   attach_require_latest_tls_policy      = true
 }
 
+module "cloudfront_log_bucket" {
+  source = "../../"
+
+  bucket = "cloudfront-logs-${random_pet.this.id}"
+
+  grant = [{
+    type       = "CanonicalUser"
+    permission = "FULL_CONTROL"
+    id         = data.aws_canonical_user_id.current.id
+    }, {
+    type       = "CanonicalUser"
+    permission = "FULL_CONTROL"
+    id         = data.aws_cloudfront_log_delivery_canonical_user_id.cloudfront.id # Ref. https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
+    }
+  ]
+
+  owner = {
+    id = "457414f555e45c2e6fe1069d1a527a90d6337e1acb012ba99f3833859b23d338"
+  }
+
+  force_destroy = true
+}
+
 module "s3_bucket" {
   source = "../../"
 
@@ -123,21 +146,6 @@ module "s3_bucket" {
   expected_bucket_owner = data.aws_caller_identity.current.account_id
 
   acl = "private" # "acl" conflicts with "grant" and "owner"
-
-  #  grant = [{
-  #    type       = "CanonicalUser"
-  #    permission = "FULL_CONTROL"
-  #    id         = data.aws_canonical_user_id.current.id
-  #    }, {
-  #    type       = "CanonicalUser"
-  #    permission = "FULL_CONTROL"
-  #    id         = data.aws_cloudfront_log_delivery_canonical_user_id.cloudfront.id # Ref. https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
-  #    }
-  #  ]
-  #
-  #  owner = {
-  #    id = "457414f555e45c2e6fe1069d1a527a90d6337e1acb012ba99f3833859b23d338"
-  #  }
 
   logging = {
     target_bucket = module.log_bucket.s3_bucket_id
@@ -286,147 +294,3 @@ module "s3_bucket" {
     },
   ]
 }
-
-# Sample which was used in this module with AWS provider before version 3.75 and 4.0
-#module "old_s3_bucket" {
-#  source = "../../"
-#
-#  bucket        = local.bucket_name
-#  acl           = "private"
-#  force_destroy = true
-#  acceleration_status = "Suspended"
-#
-#  attach_policy = true
-#  policy        = data.aws_iam_policy_document.bucket_policy.json
-#
-#  attach_deny_insecure_transport_policy = true
-#  attach_require_latest_tls_policy      = true
-#
-#  tags = {
-#    Owner = "Anton"
-#  }
-#
-#  versioning = {
-#    enabled = true
-#  }
-#
-#  website = {
-#    index_document = "index.html"
-#    error_document = "error.html"
-#    routing_rules = jsonencode([{
-#      Condition : {
-#        KeyPrefixEquals : "docs/"
-#      },
-#      Redirect : {
-#        ReplaceKeyPrefixWith : "documents/"
-#      }
-#    }])
-#
-#  }
-#
-#  logging = {
-#    target_bucket = module.log_bucket.s3_bucket_id
-#    target_prefix = "log/"
-#  }
-#
-#  cors_rule = [
-#    {
-#      allowed_methods = ["PUT", "POST"]
-#      allowed_origins = ["https://modules.tf", "https://terraform-aws-modules.modules.tf"]
-#      allowed_headers = ["*"]
-#      expose_headers  = ["ETag"]
-#      max_age_seconds = 3000
-#      }, {
-#      allowed_methods = ["PUT"]
-#      allowed_origins = ["https://example.com"]
-#      allowed_headers = ["*"]
-#      expose_headers  = ["ETag"]
-#      max_age_seconds = 3000
-#    }
-#  ]
-#
-#  lifecycle_rule = [
-#    {
-#      id      = "log"
-#      enabled = true
-#      prefix  = "log/"
-#
-#      tags = {
-#        rule      = "log"
-#        autoclean = "true"
-#      }
-#
-#      transition = [
-#        {
-#          days          = 30
-#          storage_class = "ONEZONE_IA"
-#          }, {
-#          days          = 60
-#          storage_class = "GLACIER"
-#        }
-#      ]
-#
-#      expiration = {
-#        days = 90
-#      }
-#
-#      noncurrent_version_expiration = {
-#        days = 30
-#      }
-#    },
-#    {
-#      id                                     = "log1"
-#      enabled                                = true
-#      prefix                                 = "log1/"
-#      abort_incomplete_multipart_upload_days = 7
-#
-#      noncurrent_version_transition = [
-#        {
-#          days          = 30
-#          storage_class = "STANDARD_IA"
-#        },
-#        {
-#          days          = 60
-#          storage_class = "ONEZONE_IA"
-#        },
-#        {
-#          days          = 90
-#          storage_class = "GLACIER"
-#        },
-#      ]
-#
-#      noncurrent_version_expiration = {
-#        days = 300
-#      }
-#    },
-#  ]
-#
-#  server_side_encryption_configuration = {
-#    rule = {
-#      apply_server_side_encryption_by_default = {
-#        kms_master_key_id = aws_kms_key.objects.arn
-#        sse_algorithm     = "aws:kms"
-#      }
-#    }
-#  }
-#
-#  object_lock_configuration = {
-#    object_lock_enabled = "Enabled"
-#    rule = {
-#      default_retention = {
-#        mode = "GOVERNANCE"
-#        days = 1
-#      }
-#    }
-#  }
-#
-#  # S3 bucket-level Public Access Block configuration
-#  block_public_acls       = true
-#  block_public_policy     = true
-#  ignore_public_acls      = true
-#  restrict_public_buckets = true
-#
-#  # S3 Bucket Ownership Controls
-#  control_object_ownership = true
-#  object_ownership         = "BucketOwnerPreferred"
-#}
