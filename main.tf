@@ -32,7 +32,7 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_bucket_logging" "this" {
-  count = var.create_bucket && length(keys(var.logging)) > 0 ? 1 : 0
+  count = local.create_bucket && length(keys(var.logging)) > 0 ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
 
@@ -41,10 +41,10 @@ resource "aws_s3_bucket_logging" "this" {
 }
 
 resource "aws_s3_bucket_acl" "this" {
-  count = var.create_bucket && ((var.acl != null && var.acl != "null") || length(local.grants) > 0) ? 1 : 0
+  count = local.create_bucket && ((var.acl != null && var.acl != "null") || length(local.grants) > 0) ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner # @todo: add check for expected_bucket_owner value
+  expected_bucket_owner = var.expected_bucket_owner
 
   # hack when `null` value can't be used (eg, from terragrunt, https://github.com/gruntwork-io/terragrunt/pull/1367)
   acl = var.acl == "null" ? null : var.acl
@@ -77,10 +77,10 @@ resource "aws_s3_bucket_acl" "this" {
 }
 
 resource "aws_s3_bucket_website_configuration" "this" {
-  count = var.create_bucket && length(keys(var.website)) > 0 ? 1 : 0
+  count = local.create_bucket && length(keys(var.website)) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner # @todo: add check for expected_bucket_owner value
+  expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "index_document" {
     for_each = try([var.website["index_document"]], [])
@@ -132,10 +132,10 @@ resource "aws_s3_bucket_website_configuration" "this" {
 }
 
 resource "aws_s3_bucket_versioning" "this" {
-  count = var.create_bucket && length(keys(var.versioning)) > 0 ? 1 : 0
+  count = local.create_bucket && length(keys(var.versioning)) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner # @todo: add check for expected_bucket_owner value
+  expected_bucket_owner = var.expected_bucket_owner
   mfa                   = try(var.versioning["mfa"], null)
 
   versioning_configuration {
@@ -148,10 +148,10 @@ resource "aws_s3_bucket_versioning" "this" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
-  count = var.create_bucket && length(keys(var.server_side_encryption_configuration)) > 0 ? 1 : 0
+  count = local.create_bucket && length(keys(var.server_side_encryption_configuration)) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner # @todo: add check for expected_bucket_owner value
+  expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "rule" {
     for_each = try(flatten([var.server_side_encryption_configuration["rule"]]), [])
@@ -172,30 +172,30 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 }
 
 resource "aws_s3_bucket_accelerate_configuration" "this" {
-  count = var.create_bucket && var.acceleration_status != null ? 1 : 0
+  count = local.create_bucket && var.acceleration_status != null ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner # @todo: add check for expected_bucket_owner value
+  expected_bucket_owner = var.expected_bucket_owner
 
   # Valid values: "Enabled" or "Suspended"
   status = title(lower(var.acceleration_status))
 }
 
 resource "aws_s3_bucket_request_payment_configuration" "this" {
-  count = var.create_bucket && var.request_payer != null ? 1 : 0
+  count = local.create_bucket && var.request_payer != null ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner # @todo: add check for expected_bucket_owner value
+  expected_bucket_owner = var.expected_bucket_owner
 
   # Valid values: "BucketOwner" or "Requester"
   payer = lower(var.request_payer) == "requester" ? "Requester" : "BucketOwner"
 }
 
 resource "aws_s3_bucket_cors_configuration" "this" {
-  count = var.create_bucket && length(local.cors_rules) > 0 ? 1 : 0
+  count = local.create_bucket && length(local.cors_rules) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner # @todo: add check for expected_bucket_owner value
+  expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "cors_rule" {
     for_each = local.cors_rules
@@ -212,10 +212,10 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
-  count = var.create_bucket && length(local.lifecycle_rules) > 0 ? 1 : 0
+  count = local.create_bucket && length(local.lifecycle_rules) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner # @todo: add check for expected_bucket_owner value
+  expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "rule" {
     for_each = local.lifecycle_rules
@@ -327,10 +327,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "this" {
-  count = var.create_bucket && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
+  count = local.create_bucket && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner # @todo: add check for expected_bucket_owner value
+  expected_bucket_owner = var.expected_bucket_owner
   token                 = try(var.object_lock_configuration.token, null)
 
   rule {
@@ -343,7 +343,7 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 }
 
 resource "aws_s3_bucket_replication_configuration" "this" {
-  count = var.create_bucket && length(keys(var.replication_configuration)) > 0 ? 1 : 0
+  count = local.create_bucket && length(keys(var.replication_configuration)) > 0 ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
   role   = var.replication_configuration["role"]
@@ -460,21 +460,6 @@ resource "aws_s3_bucket_replication_configuration" "this" {
         }
       }
 
-      #      dynamic "source_selection_criteria" {
-      #        for_each = length(keys(lookup(rule.value, "source_selection_criteria", {}))) == 0 ? [] : [lookup(rule.value, "source_selection_criteria", {})]
-      #
-      #        content {
-      #
-      #          dynamic "sse_kms_encrypted_objects" {
-      #            for_each = length(keys(lookup(source_selection_criteria.value, "sse_kms_encrypted_objects", {}))) == 0 ? [] : [lookup(source_selection_criteria.value, "sse_kms_encrypted_objects", {})]
-      #
-      #            content {
-      #              enabled = sse_kms_encrypted_objects.value.enabled
-      #            }
-      #          }
-      #        }
-      #      }
-
       # Max 1 block - filter - without any key arguments or tags
       dynamic "filter" {
         for_each = length(try(flatten([rule.value.filter]), [])) == 0 ? [true] : []
@@ -518,23 +503,6 @@ resource "aws_s3_bucket_replication_configuration" "this" {
   # Must have bucket versioning enabled first
   depends_on = [aws_s3_bucket_versioning.this]
 }
-
-
-/*
-#acceleration_status Argument
-#acl Argument
-#cors_rule Argument
-#grant Argument
-#lifecycle_rule Argument
-#logging Argument
-#object_lock_configuration rule Argument
-#policy Argument
-replication_configuration Argument
-#request_payer Argument
-#server_side_encryption_configuration Argument
-#versioning Argument
-#website, website_domain, and website_endpoint Arguments
-*/
 
 resource "aws_s3_bucket_policy" "this" {
   count = local.create_bucket && local.attach_policy ? 1 : 0
