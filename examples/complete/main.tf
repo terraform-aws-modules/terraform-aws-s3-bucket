@@ -10,7 +10,7 @@ provider "aws" {
 }
 
 locals {
-  bucket_name = "s3-bucket-known-ibex" #"${random_pet.this.id}"
+  bucket_name = "s3-bucket-${random_pet.this.id}"
   region      = "eu-west-1"
 }
 
@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 module "log_bucket" {
   source = "../../"
 
-  bucket        = "logs-known-ibex" #"${random_pet.this.id}"
+  bucket        = "logs-${random_pet.this.id}"
   acl           = "log-delivery-write"
   force_destroy = true
 
