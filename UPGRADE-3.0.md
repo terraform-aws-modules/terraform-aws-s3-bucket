@@ -65,7 +65,14 @@ module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 2.0"
 
-  # omitted...
+  bucket = "my-awesome-bucket"
+  acl    = "log-delivery-write"
+}
+
+terraform {
+  required_providers {
+    aws = "~> 3.69.0" # or anything lower than 3.75.0
+  }
 }
 ```
 
@@ -78,9 +85,24 @@ module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 3.0"
 
-  # omitted...
+  bucket = "my-awesome-bucket"
+  acl    = "log-delivery-write"
+}
+
+terraform {
+  required_providers {
+    aws = ">= 3.75" # or anything higher than 3.75.0
+  }
 }
 ```
+
+After the code is updated, you need run `terraform init -upgrade` to download newer AWS provider, and then import S3 bucket ACL using such command:
+
+```
+terraform import "module.s3_bucket.aws_s3_bucket_acl.this[0]" my-awesome-bucket,log-delivery-write
+```
+
+Where `log-delivery-write` is the value of `acl` argument in the module block above.
 
 #### Import existing resources (required during the migration from v2.x of this module)
 
@@ -88,8 +110,8 @@ During the migration to v3.x of this module, several S3 resources will be create
 
 ```bash
 terraform import "module.s3_bucket.aws_s3_bucket.this[0]" <bucket-name>
+terraform import "module.s3_bucket.aws_s3_bucket_acl.this[0]" <bucket-name>,<acl>
 terraform import "module.s3_bucket.aws_s3_bucket_logging.this[0]" <bucket-name>
-terraform import "module.s3_bucket.aws_s3_bucket_acl.this[0]" <bucket-name>,<account-id>,private
 terraform import "module.s3_bucket.aws_s3_bucket_website_configuration.this[0]" <bucket-name>,<account-id>
 terraform import "module.s3_bucket.aws_s3_bucket_versioning.this[0]" <bucket-name>,<account-id>
 terraform import "module.s3_bucket.aws_s3_bucket_server_side_encryption_configuration.this[0]" <bucket-name>,<account-id>
@@ -104,4 +126,4 @@ terraform import "module.s3_bucket.aws_s3_bucket_lifecycle_configuration.this[0]
 terraform import "module.s3_bucket.aws_s3_bucket_replication_configuration.this[0]" <bucket-name>
 ```
 
-Where `<module-name>` is the name of your module definition, `<account-id>` is your AWS account number.
+Where `s3_bucket` is the name of your module definition, `bucket-name` is the name of the bucket, `acl` is the bucket ACL (e.g. `private`, `log-delivery-write`, etc), `<account-id>` is your AWS account number (required only if `expected_bucket_owner` is set in the code).
