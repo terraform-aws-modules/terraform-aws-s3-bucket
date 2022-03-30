@@ -3,13 +3,15 @@ locals {
 
   # Convert from "arn:aws:sqs:eu-west-1:835367859851:bold-starling-0" into "https://sqs.eu-west-1.amazonaws.com/835367859851/bold-starling-0" if queue_id was not specified
   # queue_url used in aws_sqs_queue_policy is not the same as arn which is used in all other places
-  queue_ids = { for k, v in var.sqs_notifications : k => format("https://%s.%s.amazonaws.com/%s/%s", data.aws_arn.queue[k].service, data.aws_arn.queue[k].region, data.aws_arn.queue[k].account, data.aws_arn.queue[k].resource) if lookup(v, "queue_id", "") == "" }
+  queue_ids = { for k, v in var.sqs_notifications : k => format("https://%s.%s.amazonaws.com/%s/%s", data.aws_arn.queue[k].service, data.aws_arn.queue[k].region, data.aws_arn.queue[k].account, data.aws_arn.queue[k].resource) if try(v.queue_id, "") == "" }
 }
 
 resource "aws_s3_bucket_notification" "this" {
   count = var.create && (length(var.lambda_notifications) > 0 || length(var.sqs_notifications) > 0 || length(var.sns_notifications) > 0) ? 1 : 0
 
   bucket = var.bucket
+
+  eventbridge = var.eventbridge
 
   dynamic "lambda_function" {
     for_each = var.lambda_notifications
@@ -18,8 +20,8 @@ resource "aws_s3_bucket_notification" "this" {
       id                  = lambda_function.key
       lambda_function_arn = lambda_function.value.function_arn
       events              = lambda_function.value.events
-      filter_prefix       = lookup(lambda_function.value, "filter_prefix", null)
-      filter_suffix       = lookup(lambda_function.value, "filter_suffix", null)
+      filter_prefix       = try(lambda_function.value.filter_prefix, null)
+      filter_suffix       = try(lambda_function.value.filter_suffix, null)
     }
   }
 
@@ -30,8 +32,8 @@ resource "aws_s3_bucket_notification" "this" {
       id            = queue.key
       queue_arn     = queue.value.queue_arn
       events        = queue.value.events
-      filter_prefix = lookup(queue.value, "filter_prefix", null)
-      filter_suffix = lookup(queue.value, "filter_suffix", null)
+      filter_prefix = try(queue.value.filter_prefix, null)
+      filter_suffix = try(queue.value.filter_suffix, null)
     }
   }
 
@@ -42,8 +44,8 @@ resource "aws_s3_bucket_notification" "this" {
       id            = topic.key
       topic_arn     = topic.value.topic_arn
       events        = topic.value.events
-      filter_prefix = lookup(topic.value, "filter_prefix", null)
-      filter_suffix = lookup(topic.value, "filter_suffix", null)
+      filter_prefix = try(topic.value.filter_prefix, null)
+      filter_suffix = try(topic.value.filter_suffix, null)
     }
   }
 
@@ -61,10 +63,10 @@ resource "aws_lambda_permission" "allow" {
   statement_id_prefix = "AllowLambdaS3BucketNotification-"
   action              = "lambda:InvokeFunction"
   function_name       = each.value.function_name
-  qualifier           = lookup(each.value, "qualifier", null)
+  qualifier           = try(each.value.qualifier, null)
   principal           = "s3.amazonaws.com"
   source_arn          = local.bucket_arn
-  source_account      = lookup(each.value, "source_account", null)
+  source_account      = try(each.value.source_account, null)
 }
 
 # SQS Queue
@@ -104,7 +106,7 @@ data "aws_iam_policy_document" "sqs" {
 resource "aws_sqs_queue_policy" "allow" {
   for_each = { for k, v in var.sqs_notifications : k => v if var.create_sqs_policy }
 
-  queue_url = lookup(each.value, "queue_id", lookup(local.queue_ids, each.key, null))
+  queue_url = try(each.value.queue_id, local.queue_ids[each.key], null)
   policy    = data.aws_iam_policy_document.sqs[each.key].json
 }
 

@@ -1,28 +1,12 @@
-# Complete S3 bucket with most of supported features enabled
+# Legacy - Complete S3 bucket with most of supported features enabled
 
-Configuration in this directory creates S3 bucket which demos such capabilities:
-- static web-site hosting
-- access logging (for S3, ELB and ALB/NLB)
-- versioning
-- CORS
-- lifecycle rules
-- server-side encryption
-- object locking
-- grants (required for CloudFront logs)
+Configuration in this directory creates S3 bucket using previous (2.x) version of this module to test upgrade process.
 
-Please check [S3 replication example](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-replication) to see Cross-Region Replication (CRR) supported by this module.
+This configuration is similar to the code in [examples/complete](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete) but not identical.
 
 ## Usage
 
-To run this example you need to execute:
-
-```bash
-$ terraform init
-$ terraform plan
-$ terraform apply
-```
-
-Note that this example may create resources which cost money. Run `terraform destroy` when you don't need these resources.
+Once this configuration is created, you need to use the newer version of this module (e.g. `~> 3.0`), review/update arguments (see code in [examples/complete](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete)) and import existing resources (see [UPGRADE-3.0.md](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/master/UPGRADE-3.0.md) for more precise commands).
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -30,23 +14,22 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.75 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 3.69.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.75 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 3.69.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cloudfront_log_bucket"></a> [cloudfront\_log\_bucket](#module\_cloudfront\_log\_bucket) | ../../ | n/a |
-| <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | ../../ | n/a |
-| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
+| <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | terraform-aws-modules/s3-bucket/aws | ~> 2.0 |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | terraform-aws-modules/s3-bucket/aws | ~> 2.0 |
 
 ## Resources
 
@@ -55,9 +38,6 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_kms_key.objects](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
-| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
-| [aws_canonical_user_id.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/canonical_user_id) | data source |
-| [aws_cloudfront_log_delivery_canonical_user_id.cloudfront](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/cloudfront_log_delivery_canonical_user_id) | data source |
 | [aws_iam_policy_document.bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs

@@ -53,9 +53,9 @@ variable "bucket_prefix" {
 }
 
 variable "acl" {
-  description = "(Optional) The canned ACL to apply. Defaults to 'private'. Conflicts with `grant`"
+  description = "(Optional) The canned ACL to apply. Conflicts with `grant`"
   type        = string
-  default     = "private"
+  default     = null
 }
 
 variable "policy" {
@@ -90,7 +90,7 @@ variable "request_payer" {
 
 variable "website" {
   description = "Map containing static web-site hosting or redirect configuration."
-  type        = map(string)
+  type        = any # map(string)
   default     = {}
 }
 
@@ -116,6 +116,18 @@ variable "grant" {
   description = "An ACL policy grant. Conflicts with `acl`"
   type        = any
   default     = []
+}
+
+variable "owner" {
+  description = "Bucket owner's display name and ID. Conflicts with `acl`"
+  type        = map(string)
+  default     = {}
+}
+
+variable "expected_bucket_owner" {
+  description = "The account ID of the expected bucket owner"
+  type        = string
+  default     = null
 }
 
 variable "lifecycle_rule" {
