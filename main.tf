@@ -354,7 +354,7 @@ resource "aws_s3_bucket_replication_configuration" "this" {
       id       = try(rule.value.id, null)
       priority = try(rule.value.priority, null)
       prefix   = try(rule.value.prefix, null)
-      status   = rule.value.status
+      status   = try(tobool(rule.value.status) ? "Enabled" : "Disabled", title(lower(rule.value.status)), "Enabled")
 
       dynamic "delete_marker_replication" {
         for_each = flatten(try([rule.value.delete_marker_replication_status], [rule.value.delete_marker_replication], []))
@@ -365,6 +365,10 @@ resource "aws_s3_bucket_replication_configuration" "this" {
         }
       }
 
+      # Amazon S3 does not support this argument according to:
+      # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_replication_configuration
+      # More infor about what does Amazon S3 replicate?
+      # https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication-what-is-isnot-replicated.html
       dynamic "existing_object_replication" {
         for_each = flatten(try([rule.value.existing_object_replication_status], [rule.value.existing_object_replication], []))
 

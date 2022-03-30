@@ -72,18 +72,18 @@ module "s3_bucket" {
 
     rules = [
       {
-        id                          = "something-with-kms-and-filter"
-        status                      = "Enabled"
-        priority                    = 10
-        delete_marker_replication   = true
-        existing_object_replication = true
+        id       = "something-with-kms-and-filter"
+        status   = true
+        priority = 10
+
+        delete_marker_replication = false
 
         source_selection_criteria = {
           replica_modifications = {
             status = "Enabled"
-          },
+          }
           sse_kms_encrypted_objects = {
-            enabled = false #true
+            enabled = true
           }
         }
 
@@ -95,66 +95,72 @@ module "s3_bucket" {
         }
 
         destination = {
-          bucket             = "arn:aws:s3:::${local.destination_bucket_name}"
-          storage_class      = "STANDARD"
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+
           replica_kms_key_id = aws_kms_key.replica.arn
           account_id         = data.aws_caller_identity.current.account_id
+
           access_control_translation = {
             owner = "Destination"
           }
+
           replication_time = {
             status  = "Enabled"
             minutes = 15
           }
+
           metrics = {
             status  = "Enabled"
             minutes = 15
           }
         }
       },
-      #      {
-      #        id       = "something-with-filter"
-      #        status   = "Enabled"
-      #        priority = 20
-      #
-      #        filter = {
-      #          prefix = "two"
-      #          tags = {
-      #            ReplicateMe = "Yes"
-      #          }
-      #        }
-      #
-      #        destination = {
-      #          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
-      #          storage_class = "STANDARD"
-      #        }
-      #      },
-      #      {
-      #        id       = "everything-with-filter"
-      #        status   = "Enabled"
-      #        priority = 30
-      #
-      #        filter = {
-      #          prefix = ""
-      #        }
-      #
-      #        destination = {
-      #          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
-      #          storage_class = "STANDARD"
-      #        }
-      #      },
-      #      {
-      #        id     = "everything-without-filters"
-      #        status = "Enabled"
-      #
-      #        delete_marker_replication = true
-      #        existing_object_replication = false
-      #
-      #        destination = {
-      #          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
-      #          storage_class = "STANDARD"
-      #        }
-      #      },
+      {
+        id       = "something-with-filter"
+        priority = 20
+
+        delete_marker_replication = false
+
+        filter = {
+          prefix = "two"
+          tags = {
+            ReplicateMe = "Yes"
+          }
+        }
+
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
+      },
+      {
+        id       = "everything-with-filter"
+        status   = "Enabled"
+        priority = 30
+
+        delete_marker_replication = true
+
+        filter = {
+          prefix = ""
+        }
+
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
+      },
+      {
+        id     = "everything-without-filters"
+        status = "Enabled"
+
+        delete_marker_replication = true
+
+        destination = {
+          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          storage_class = "STANDARD"
+        }
+      },
     ]
   }
 
