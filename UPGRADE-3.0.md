@@ -104,6 +104,8 @@ terraform import "module.s3_bucket.aws_s3_bucket_acl.this[0]" my-awesome-bucket,
 
 Where `log-delivery-write` is the value of `acl` argument in the module block above.
 
+Read more about [import in the official documentation for `aws_s3_bucket_acl`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl#import).
+
 #### Import existing resources (required during the migration from v2.x of this module)
 
 During the migration to v3.x of this module, several S3 resources will be created by this module. In order to guarantee the best experience and prevent data loss, you will need to import them into terraform state using commands like these:
