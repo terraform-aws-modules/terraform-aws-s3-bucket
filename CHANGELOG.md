@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.15.0...v3.0.0) (2022-03-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* Update to support AWS provider v3.75 and newer (including v4.x) (#139)
+
+### Features
+
+* Update to support AWS provider v3.75 and newer (including v4.x) ([#139](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/139)) ([e0de434](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/e0de434f2213518d6c2c9c710dd1bb3fd0eaf46d))
+
 ## [2.15.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.14.1...v2.15.0) (2022-03-12)
 
 
