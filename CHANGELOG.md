@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.0.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.0.0...v3.0.1) (2022-04-02)
+
+
+### Bug Fixes
+
+* Add lifecycle ignore changes on s3_bucket resource to prevent configuration loop ([#145](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/145)) ([895cfa5](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/895cfa529ed0162f4f12f1e99f2f2b14bb262072))
+
 ## [3.0.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v2.15.0...v3.0.0) (2022-03-30)
 
 
