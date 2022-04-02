@@ -32,6 +32,7 @@ resource "aws_s3_bucket" "this" {
   lifecycle {
     ignore_changes = [
       acceleration_status,
+      acl,
       grant,
       cors_rule,
       lifecycle_rule,
@@ -40,6 +41,7 @@ resource "aws_s3_bucket" "this" {
       replication_configuration,
       request_payer,
       server_side_encryption_configuration,
+      versioning,
       website
     ]
   }
