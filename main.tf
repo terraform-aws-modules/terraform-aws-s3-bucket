@@ -28,6 +28,21 @@ resource "aws_s3_bucket" "this" {
       object_lock_enabled = "Enabled"
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      acceleration_status,
+      grant,
+      cors_rule,
+      lifecycle_rule,
+      logging,
+      object_lock_configuration[0].rule,
+      replication_configuration,
+      request_payer,
+      server_side_encryption_configuration,
+      website
+    ]
+  }
 }
 
 resource "aws_s3_bucket_logging" "this" {
