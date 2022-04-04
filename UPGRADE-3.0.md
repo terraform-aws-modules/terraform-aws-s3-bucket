@@ -111,7 +111,6 @@ Read more about [import in the official documentation for `aws_s3_bucket_acl`](h
 During the migration to v3.x of this module, several S3 resources will be created by this module. In order to guarantee the best experience and prevent data loss, you will need to import them into terraform state using commands like these:
 
 ```bash
-terraform import "module.s3_bucket.aws_s3_bucket.this[0]" <bucket-name>
 terraform import "module.s3_bucket.aws_s3_bucket_acl.this[0]" <bucket-name>,<acl>
 terraform import "module.s3_bucket.aws_s3_bucket_logging.this[0]" <bucket-name>
 terraform import "module.s3_bucket.aws_s3_bucket_website_configuration.this[0]" <bucket-name>,<account-id>
