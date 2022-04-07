@@ -46,7 +46,7 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_bucket_logging" "this" {
-  count = local.create_bucket && length(keys(var.logging)) > 0 ? 1 : 0
+  count = var.create_bucket && length(keys(var.logging)) > 0 ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
 
@@ -55,7 +55,7 @@ resource "aws_s3_bucket_logging" "this" {
 }
 
 resource "aws_s3_bucket_acl" "this" {
-  count = local.create_bucket && ((var.acl != null && var.acl != "null") || length(local.grants) > 0) ? 1 : 0
+  count = var.create_bucket && ((var.acl != null && var.acl != "null") || length(local.grants) > 0) ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -91,7 +91,7 @@ resource "aws_s3_bucket_acl" "this" {
 }
 
 resource "aws_s3_bucket_website_configuration" "this" {
-  count = local.create_bucket && length(keys(var.website)) > 0 ? 1 : 0
+  count = var.create_bucket && length(keys(var.website)) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -146,7 +146,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
 }
 
 resource "aws_s3_bucket_versioning" "this" {
-  count = local.create_bucket && length(keys(var.versioning)) > 0 ? 1 : 0
+  count = var.create_bucket && length(keys(var.versioning)) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -162,7 +162,7 @@ resource "aws_s3_bucket_versioning" "this" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
-  count = local.create_bucket && length(keys(var.server_side_encryption_configuration)) > 0 ? 1 : 0
+  count = var.create_bucket && length(keys(var.server_side_encryption_configuration)) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -186,7 +186,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 }
 
 resource "aws_s3_bucket_accelerate_configuration" "this" {
-  count = local.create_bucket && var.acceleration_status != null ? 1 : 0
+  count = var.create_bucket && var.acceleration_status != null ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -196,7 +196,7 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
 }
 
 resource "aws_s3_bucket_request_payment_configuration" "this" {
-  count = local.create_bucket && var.request_payer != null ? 1 : 0
+  count = var.create_bucket && var.request_payer != null ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -206,7 +206,7 @@ resource "aws_s3_bucket_request_payment_configuration" "this" {
 }
 
 resource "aws_s3_bucket_cors_configuration" "this" {
-  count = local.create_bucket && length(local.cors_rules) > 0 ? 1 : 0
+  count = var.create_bucket && length(local.cors_rules) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -226,7 +226,7 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
-  count = local.create_bucket && length(local.lifecycle_rules) > 0 ? 1 : 0
+  count = var.create_bucket && length(local.lifecycle_rules) > 0 ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -341,7 +341,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "this" {
-  count = local.create_bucket && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
+  count = var.create_bucket && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -357,7 +357,7 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 }
 
 resource "aws_s3_bucket_replication_configuration" "this" {
-  count = local.create_bucket && length(keys(var.replication_configuration)) > 0 ? 1 : 0
+  count = var.create_bucket && length(keys(var.replication_configuration)) > 0 ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
   role   = var.replication_configuration["role"]
