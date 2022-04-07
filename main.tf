@@ -1,8 +1,6 @@
 data "aws_canonical_user_id" "this" {}
 
 locals {
-  create_bucket = var.create_bucket && var.putin_khuylo
-
   attach_policy = var.attach_require_latest_tls_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
 
   # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
@@ -12,7 +10,7 @@ locals {
 }
 
 resource "aws_s3_bucket" "this" {
-  count = local.create_bucket ? 1 : 0
+  count = var.create_bucket ? 1 : 0
 
   bucket        = var.bucket
   bucket_prefix = var.bucket_prefix
@@ -525,14 +523,14 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 }
 
 resource "aws_s3_bucket_policy" "this" {
-  count = local.create_bucket && local.attach_policy ? 1 : 0
+  count = var.create_bucket && local.attach_policy ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
   policy = data.aws_iam_policy_document.combined[0].json
 }
 
 data "aws_iam_policy_document" "combined" {
-  count = local.create_bucket && local.attach_policy ? 1 : 0
+  count = var.create_bucket && local.attach_policy ? 1 : 0
 
   source_policy_documents = compact([
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
@@ -545,11 +543,11 @@ data "aws_iam_policy_document" "combined" {
 
 # AWS Load Balancer access log delivery policy
 data "aws_elb_service_account" "this" {
-  count = local.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
+  count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
 }
 
 data "aws_iam_policy_document" "elb_log_delivery" {
-  count = local.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
+  count = var.create_bucket && var.attach_elb_log_delivery_policy ? 1 : 0
 
   statement {
     sid = ""
@@ -574,7 +572,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 # ALB/NLB
 
 data "aws_iam_policy_document" "lb_log_delivery" {
-  count = local.create_bucket && var.attach_lb_log_delivery_policy ? 1 : 0
+  count = var.create_bucket && var.attach_lb_log_delivery_policy ? 1 : 0
 
   statement {
     sid = "AWSLogDeliveryWrite"
@@ -623,7 +621,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
 }
 
 data "aws_iam_policy_document" "deny_insecure_transport" {
-  count = local.create_bucket && var.attach_deny_insecure_transport_policy ? 1 : 0
+  count = var.create_bucket && var.attach_deny_insecure_transport_policy ? 1 : 0
 
   statement {
     sid    = "denyInsecureTransport"
@@ -654,7 +652,7 @@ data "aws_iam_policy_document" "deny_insecure_transport" {
 }
 
 data "aws_iam_policy_document" "require_latest_tls" {
-  count = local.create_bucket && var.attach_require_latest_tls_policy ? 1 : 0
+  count = var.create_bucket && var.attach_require_latest_tls_policy ? 1 : 0
 
   statement {
     sid    = "denyOutdatedTLS"
@@ -685,7 +683,7 @@ data "aws_iam_policy_document" "require_latest_tls" {
 }
 
 resource "aws_s3_bucket_public_access_block" "this" {
-  count = local.create_bucket && var.attach_public_policy ? 1 : 0
+  count = var.create_bucket && var.attach_public_policy ? 1 : 0
 
   # Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
   # to prevent "A conflicting conditional operation is currently in progress against this resource."
@@ -700,7 +698,7 @@ resource "aws_s3_bucket_public_access_block" "this" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "this" {
-  count = local.create_bucket && var.control_object_ownership ? 1 : 0
+  count = var.create_bucket && var.control_object_ownership ? 1 : 0
 
   bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
 
