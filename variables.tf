@@ -154,6 +154,12 @@ variable "object_lock_configuration" {
   default     = {}
 }
 
+variable "object_lock_enabled" {
+  description = "Whether S3 bucket should have an Object Lock configuration enabled."
+  type        = bool
+  default     = false
+}
+
 variable "block_public_acls" {
   description = "Whether Amazon S3 should block public ACLs for this bucket."
   type        = bool
