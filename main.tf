@@ -17,17 +17,9 @@ resource "aws_s3_bucket" "this" {
   bucket        = var.bucket
   bucket_prefix = var.bucket_prefix
 
-  tags          = var.tags
-  force_destroy = var.force_destroy
-
-  # Max 1 block - object_lock_configuration
-  dynamic "object_lock_configuration" {
-    for_each = compact([try(var.object_lock_configuration["object_lock_enabled"] ? "Enabled" : null, tobool(var.object_lock_configuration["object_lock_enabled"]) ? "Enabled" : null, title(lower(var.object_lock_configuration["object_lock_enabled"])), null)])
-
-    content {
-      object_lock_enabled = "Enabled"
-    }
-  }
+  force_destroy       = var.force_destroy
+  object_lock_enabled = var.object_lock_enabled
+  tags                = var.tags
 
   lifecycle {
     ignore_changes = [
@@ -37,7 +29,7 @@ resource "aws_s3_bucket" "this" {
       cors_rule,
       lifecycle_rule,
       logging,
-      object_lock_configuration[0].rule,
+      object_lock_configuration,
       replication_configuration,
       request_payer,
       server_side_encryption_configuration,
@@ -343,7 +335,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "this" {
-  count = local.create_bucket && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
+  count = local.create_bucket && var.object_lock_enabled && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
