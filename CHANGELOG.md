@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.0.1...v3.1.0) (2022-04-15)
+
+
+### Features
+
+* Upgraded AWS provider to 4.5, fixed object_lock_enabled ([#149](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/149)) ([70d08fd](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/70d08fd4e6d0c1977ffe423e2b9e675c8fb38235))
+
 ### [3.0.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.0.0...v3.0.1) (2022-04-02)
 
 
