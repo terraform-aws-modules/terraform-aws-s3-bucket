@@ -334,7 +334,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
 resource "aws_s3_bucket_object_lock_configuration" "this" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   count = var.create_bucket && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
+=======
+  count = local.create_bucket && var.object_lock_enabled && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
+>>>>>>> 70d08fd (feat: Upgraded AWS provider to 4.5, fixed object_lock_enabled (#149))
 =======
   count = local.create_bucket && var.object_lock_enabled && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
 >>>>>>> 70d08fd (feat: Upgraded AWS provider to 4.5, fixed object_lock_enabled (#149))
