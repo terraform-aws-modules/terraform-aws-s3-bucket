@@ -129,7 +129,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
       }
 
       redirect {
-        host_name               = try(routing_rule.value.redirect["hostname"], null)
+        host_name               = try(routing_rule.value.redirect["host_name"], null)
         http_redirect_code      = try(routing_rule.value.redirect["http_redirect_code"], null)
         protocol                = try(routing_rule.value.redirect["protocol"], null)
         replace_key_prefix_with = try(routing_rule.value.redirect["replace_key_prefix_with"], null)
