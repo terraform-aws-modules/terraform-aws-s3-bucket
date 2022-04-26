@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.1.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.1.0...v3.1.1) (2022-04-26)
+
+
+### Bug Fixes
+
+* Key `host_name` on website routing rules redirect ([#152](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/152)) ([3ca8327](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/3ca83273992c7083a91a2d5c74b4b91e5c9add79))
+
 ## [3.1.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.0.1...v3.1.0) (2022-04-15)
 
 
