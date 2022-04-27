@@ -147,6 +147,8 @@ module "s3_bucket" {
 
   acl = "private" # "acl" conflicts with "grant" and "owner"
 
+  # S3 Bucket Logging controls
+  # Optional: Set "enabled = false" when using module in a loop if some buckets do not require logging
   logging = {
     target_bucket = module.log_bucket.s3_bucket_id
     target_prefix = "log/"

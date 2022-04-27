@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.1.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.1.1...v3.1.2) (2022-04-27)
+
+
+### Features
+
+* Add 'enabled' flag to module logging map input to selectively disable logging when using a loop ([#153](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/153)) 
+
+
 ### [3.1.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.1.0...v3.1.1) (2022-04-26)
 
 

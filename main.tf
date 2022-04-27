@@ -5,6 +5,8 @@ locals {
 
   attach_policy = var.attach_require_latest_tls_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
 
+  enable_logging = local.create_bucket && try(var.logging["enabled"], true)
+
   # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
   grants          = try(jsondecode(var.grant), var.grant)
   cors_rules      = try(jsondecode(var.cors_rule), var.cors_rule)
@@ -40,7 +42,7 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_bucket_logging" "this" {
-  count = local.create_bucket && length(keys(var.logging)) > 0 ? 1 : 0
+  count = local.enable_logging && length(keys(var.logging)) > 0 ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
 
