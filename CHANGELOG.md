@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.1.1...v3.2.0) (2022-05-04)
+
+
+### Features
+
+* Added wrappers automatically generated via hook ([#156](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/156)) ([3634462](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/363446280bfd0a4ed56d07c6538bf9e3e92c6c0e))
+
 ### [3.1.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.1.0...v3.1.1) (2022-04-26)
 
 
