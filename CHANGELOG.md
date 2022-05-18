@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.2.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.2.0...v3.2.1) (2022-05-18)
+
+
+### Bug Fixes
+
+* Allow setup eventbridge without notifications ([#160](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/160)) ([31b8e9d](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/31b8e9dcd1793e77b1cd0242a42d7b0abee66b4e))
+
 ## [3.2.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.1.1...v3.2.0) (2022-05-04)
 
 
