@@ -7,7 +7,7 @@ locals {
 }
 
 resource "aws_s3_bucket_notification" "this" {
-  count = var.create && (length(var.lambda_notifications) > 0 || length(var.sqs_notifications) > 0 || length(var.sns_notifications) > 0) ? 1 : 0
+  count = var.create ? 1 : 0
 
   bucket = var.bucket
 
