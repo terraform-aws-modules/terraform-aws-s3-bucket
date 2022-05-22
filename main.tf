@@ -679,11 +679,7 @@ data "aws_iam_policy_document" "require_latest_tls" {
 resource "aws_s3_bucket_public_access_block" "this" {
   count = local.create_bucket && var.attach_public_policy ? 1 : 0
 
-  # Chain resources (s3_bucket -> s3_bucket_policy -> s3_bucket_public_access_block)
-  # to prevent "A conflicting conditional operation is currently in progress against this resource."
-  # Ref: https://github.com/hashicorp/terraform-provider-aws/issues/7628
-
-  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this[0].id
 
   block_public_acls       = var.block_public_acls
   block_public_policy     = var.block_public_policy
