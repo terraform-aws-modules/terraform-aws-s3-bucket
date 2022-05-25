@@ -58,7 +58,7 @@ resource "aws_s3_bucket_acl" "this" {
   acl = var.acl == "null" ? null : var.acl
 
   dynamic "access_control_policy" {
-    for_each = length(local.grants) > 0 ? local.grants : []
+    for_each = length(local.grants) > 0 ? [true] : []
 
     content {
       dynamic "grant" {
