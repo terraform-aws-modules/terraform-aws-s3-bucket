@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.2.3](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.2.2...v3.2.3) (2022-05-25)
+
+
+### Bug Fixes
+
+* Revert change for grant in aws_s3_bucket_acl resource ([#164](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/164)) ([ec88013](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/ec88013616a049434aad08590bbf478f2e05c597))
+
+### [3.2.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.2.1...v3.2.2) (2022-05-25)
+
+
+### Bug Fixes
+
+* Fixed issue with multiple grants in aws_s3_bucket_acl ([#163](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/163)) ([9ed6eaa](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/9ed6eaae0c2d5786275ae4199bd5b02135125fcf))
+
 ### [3.2.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.2.0...v3.2.1) (2022-05-18)
 
 
