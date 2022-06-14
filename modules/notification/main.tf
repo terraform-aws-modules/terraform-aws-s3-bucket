@@ -1,5 +1,7 @@
+data "aws_partition" "this" {}
+
 locals {
-  bucket_arn = coalesce(var.bucket_arn, "arn:aws:s3:::${var.bucket}")
+  bucket_arn = coalesce(var.bucket_arn, "arn:${data.aws_partition.this.partition}:s3:::${var.bucket}")
 
   # Convert from "arn:aws:sqs:eu-west-1:835367859851:bold-starling-0" into "https://sqs.eu-west-1.amazonaws.com/835367859851/bold-starling-0" if queue_id was not specified
   # queue_url used in aws_sqs_queue_policy is not the same as arn which is used in all other places
