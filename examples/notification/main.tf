@@ -12,7 +12,6 @@ provider "aws" {
 locals {
   bucket_name = "s3-bucket-${random_pet.this.id}"
   region      = "eu-west-1"
-  #region      = "cn-north-1"
 }
 
 resource "random_pet" "this" {
@@ -23,15 +22,6 @@ module "s3_bucket" {
   source = "../../"
 
   bucket        = local.bucket_name
-  force_destroy = true
-}
-
-module "s3_bucket_beijing" {
-  source = "../../"
-
-  create_bucket = local.region == "cn-north-1" ? true : false
-
-  bucket        = "${local.bucket_name}-cn-north-1"
   force_destroy = true
 }
 
@@ -62,9 +52,6 @@ module "lambda_function1" {
   handler       = "index.lambda_handler"
   runtime       = "python3.8"
 
-  # ephemeral_storage not supported in China
-  ephemeral_storage_size = local.region == "cn-north-1" ? null : 512
-
   create_package         = false
   local_existing_package = local.downloaded
 }
@@ -76,9 +63,6 @@ module "lambda_function2" {
   function_name = "${random_pet.this.id}-lambda2"
   handler       = "index.lambda_handler"
   runtime       = "python3.8"
-
-  # ephemeral_storage not supported in China
-  ephemeral_storage_size = local.region == "cn-north-1" ? null : 512
 
   create_package         = false
   local_existing_package = local.downloaded
@@ -99,7 +83,7 @@ module "sns_topic2" {
 }
 
 resource "aws_sqs_queue" "this" {
-  count = local.region == "cn-north-1" ? 3 : 2
+  count = 2
   name  = "${random_pet.this.id}-${count.index}"
 }
 
@@ -175,29 +159,4 @@ module "all_notifications" {
 
   # Creation of policy is handled outside of the module
   create_sqs_policy = false
-}
-
-module "china_notifications" {
-  source = "../../modules/notification"
-
-  create = local.region == "cn-north-1" ? true : false
-
-  bucket = module.s3_bucket_beijing.s3_bucket_id
-
-  eventbridge = true
-
-  # Common error - Error putting S3 notification configuration: InvalidArgument: Configuration is ambiguously defined. Cannot have overlapping suffixes in two rules if the prefixes are overlapping for the same event type.
-  sqs_notifications = {
-    sqs1 = {
-      queue_arn     = try(aws_sqs_queue.this[2].arn, aws_sqs_queue.this[0].arn)
-      events        = ["s3:ObjectCreated:Put"]
-      filter_prefix = "prefix2/"
-      filter_suffix = ".txt"
-
-      #      queue_id =  aws_sqs_queue.this[0].id // optional
-    }
-  }
-
-  # Creation of policy is handled inside of the module
-  create_sqs_policy = local.region == "cn-north-1" ? true : false
 }
