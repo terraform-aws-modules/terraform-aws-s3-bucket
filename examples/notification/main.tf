@@ -62,6 +62,7 @@ module "lambda_function1" {
   handler       = "index.lambda_handler"
   runtime       = "python3.8"
 
+  # ephemeral_storage not supported in China
   ephemeral_storage_size = local.region == "cn-north-1" ? null : 512
 
   create_package         = false
@@ -76,6 +77,7 @@ module "lambda_function2" {
   handler       = "index.lambda_handler"
   runtime       = "python3.8"
 
+  # ephemeral_storage not supported in China
   ephemeral_storage_size = local.region == "cn-north-1" ? null : 512
 
   create_package         = false
