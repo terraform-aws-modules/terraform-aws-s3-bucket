@@ -28,6 +28,12 @@ variable "bucket_arn" {
   default     = null
 }
 
+variable "eventbridge" {
+  description = "Whether to enable Amazon EventBridge notifications"
+  type        = bool
+  default     = null
+}
+
 variable "lambda_notifications" {
   description = "Map of S3 bucket notifications to Lambda function"
   type        = any

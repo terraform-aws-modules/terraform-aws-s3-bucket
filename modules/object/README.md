@@ -8,13 +8,13 @@ Creates S3 bucket objects with different configurations.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 3.36 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.75 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 3.36 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.75 |
 
 ## Modules
 
@@ -24,7 +24,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_s3_bucket_object.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_object) | resource |
+| [aws_s3_object.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
 
 ## Inputs
 
@@ -59,7 +59,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_s3_bucket_object_etag"></a> [s3\_bucket\_object\_etag](#output\_s3\_bucket\_object\_etag) | The ETag generated for the object (an MD5 sum of the object content). |
-| <a name="output_s3_bucket_object_id"></a> [s3\_bucket\_object\_id](#output\_s3\_bucket\_object\_id) | The key of S3 object |
-| <a name="output_s3_bucket_object_version_id"></a> [s3\_bucket\_object\_version\_id](#output\_s3\_bucket\_object\_version\_id) | A unique version ID value for the object, if bucket versioning is enabled. |
+| <a name="output_s3_object_etag"></a> [s3\_object\_etag](#output\_s3\_object\_etag) | The ETag generated for the object (an MD5 sum of the object content). |
+| <a name="output_s3_object_id"></a> [s3\_object\_id](#output\_s3\_object\_id) | The key of S3 object |
+| <a name="output_s3_object_version_id"></a> [s3\_object\_version\_id](#output\_s3\_object\_version\_id) | A unique version ID value for the object, if bucket versioning is enabled. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
