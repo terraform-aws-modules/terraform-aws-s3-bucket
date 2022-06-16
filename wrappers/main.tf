@@ -37,4 +37,5 @@ module "wrapper" {
   control_object_ownership              = try(each.value.control_object_ownership, var.defaults.control_object_ownership, false)
   object_ownership                      = try(each.value.object_ownership, var.defaults.object_ownership, "ObjectWriter")
   putin_khuylo                          = try(each.value.putin_khuylo, var.defaults.putin_khuylo, true)
+  intelligent_tiering_config            = try(each.value.intelligent_tiering_config, var.defaults.intelligent_tiering_config, {})
 }

@@ -201,3 +201,9 @@ variable "putin_khuylo" {
   type        = bool
   default     = true
 }
+
+variable "intelligent_tiering_config" {
+  description = "Map containing inteligent tiering config encryption configuration."
+  type        = any
+  default     = {}
+}
