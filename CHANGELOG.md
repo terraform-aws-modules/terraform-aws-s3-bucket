@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.2.4...v3.3.0) (2022-06-17)
+
+
+### Features
+
+* Add the intelligent tiering configuration ([#167](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/167)) ([73c48d6](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/73c48d64b26f44ba13dc8113fbf084ef444f3338))
+
 ### [3.2.4](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.2.3...v3.2.4) (2022-06-14)
 
 
