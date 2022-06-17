@@ -148,6 +148,12 @@ variable "server_side_encryption_configuration" {
   default     = {}
 }
 
+variable "intelligent_tiering" {
+  description = "Map containing intelligent tiering configuration."
+  type        = any
+  default     = {}
+}
+
 variable "object_lock_configuration" {
   description = "Map containing S3 object locking configuration."
   type        = any

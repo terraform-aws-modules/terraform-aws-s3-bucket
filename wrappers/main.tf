@@ -28,6 +28,7 @@ module "wrapper" {
   lifecycle_rule                        = try(each.value.lifecycle_rule, var.defaults.lifecycle_rule, [])
   replication_configuration             = try(each.value.replication_configuration, var.defaults.replication_configuration, {})
   server_side_encryption_configuration  = try(each.value.server_side_encryption_configuration, var.defaults.server_side_encryption_configuration, {})
+  intelligent_tiering                   = try(each.value.intelligent_tiering, var.defaults.intelligent_tiering, {})
   object_lock_configuration             = try(each.value.object_lock_configuration, var.defaults.object_lock_configuration, {})
   object_lock_enabled                   = try(each.value.object_lock_enabled, var.defaults.object_lock_enabled, false)
   block_public_acls                     = try(each.value.block_public_acls, var.defaults.block_public_acls, false)
