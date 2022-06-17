@@ -114,31 +114,6 @@ module "s3_bucket" {
     Owner = "Anton"
   }
 
-  intelligent_tiering_config = {
-    general = {
-      status = "Enabled"
-      filter = {
-        prefix = "/"
-        tags   = { Environment = "dev" }
-      }
-      tiering = {
-        "ARCHIVE_ACCESS" = {
-          days = 180
-        }
-      }
-    },
-    documents = {
-      status = false
-      filter = {
-        prefix = "documents/"
-      }
-      tiering = {
-        "ARCHIVE_ACCESS" = {
-          days = 125
-        }
-      }
-    }
-  }
   # Note: Object Lock configuration can be enabled only on new buckets
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_object_lock_configuration
   object_lock_enabled = true
@@ -318,4 +293,35 @@ module "s3_bucket" {
       }
     },
   ]
+
+  intelligent_tiering = {
+    general = {
+      status = "Enabled"
+      filter = {
+        prefix = "/"
+        tags = {
+          Environment = "dev"
+        }
+      }
+      tiering = {
+        ARCHIVE_ACCESS = {
+          days = 180
+        }
+      }
+    },
+    documents = {
+      status = false
+      filter = {
+        prefix = "documents/"
+      }
+      tiering = {
+        ARCHIVE_ACCESS = {
+          days = 125
+        }
+        DEEP_ARCHIVE_ACCESS = {
+          days = 200
+        }
+      }
+    }
+  }
 }

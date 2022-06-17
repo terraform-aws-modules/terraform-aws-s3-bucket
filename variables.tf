@@ -148,6 +148,12 @@ variable "server_side_encryption_configuration" {
   default     = {}
 }
 
+variable "intelligent_tiering" {
+  description = "Map containing intelligent tiering configuration."
+  type        = any
+  default     = {}
+}
+
 variable "object_lock_configuration" {
   description = "Map containing S3 object locking configuration."
   type        = any
@@ -200,10 +206,4 @@ variable "putin_khuylo" {
   description = "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!"
   type        = bool
   default     = true
-}
-
-variable "intelligent_tiering_config" {
-  description = "Map containing inteligent tiering config encryption configuration."
-  type        = any
-  default     = {}
 }

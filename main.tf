@@ -6,10 +6,10 @@ locals {
   attach_policy = var.attach_require_latest_tls_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
 
   # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
-  grants                     = try(jsondecode(var.grant), var.grant)
-  cors_rules                 = try(jsondecode(var.cors_rule), var.cors_rule)
-  lifecycle_rules            = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
-  intelligent_tiering_config = try(jsondecode(var.intelligent_tiering_config), var.intelligent_tiering_config)
+  grants              = try(jsondecode(var.grant), var.grant)
+  cors_rules          = try(jsondecode(var.cors_rule), var.cors_rule)
+  lifecycle_rules     = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
+  intelligent_tiering = try(jsondecode(var.intelligent_tiering), var.intelligent_tiering)
 }
 
 resource "aws_s3_bucket" "this" {
@@ -710,18 +710,19 @@ resource "aws_s3_bucket_ownership_controls" "this" {
 }
 
 resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
-  for_each = local.create_bucket ? local.intelligent_tiering_config : {}
+  for_each = { for k, v in local.intelligent_tiering : k => v if local.create_bucket }
 
   name   = each.key
   bucket = aws_s3_bucket.this[0].id
-  status = each.value.status || each.value.status == "Enabled" ? "Enabled" : "Disabled"
+  status = try(tobool(each.value.status) ? "Enabled" : "Disabled", title(lower(each.value.status)), null)
 
+  # Max 1 block - filter
   dynamic "filter" {
-    for_each = length(try(flatten([each.value.filter]), [])) == 0 ? [true] : []
+    for_each = length(try(flatten([each.value.filter]), [])) == 0 ? [] : [true]
 
     content {
-      prefix = try(filter.value.prefix, null)
-      tags   = try(filter.value.tags, null)
+      prefix = try(each.value.filter.prefix, null)
+      tags   = try(each.value.filter.tags, null)
     }
   }
 
