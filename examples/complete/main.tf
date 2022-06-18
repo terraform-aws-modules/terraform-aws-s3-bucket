@@ -293,4 +293,35 @@ module "s3_bucket" {
       }
     },
   ]
+
+  intelligent_tiering = {
+    general = {
+      status = "Enabled"
+      filter = {
+        prefix = "/"
+        tags = {
+          Environment = "dev"
+        }
+      }
+      tiering = {
+        ARCHIVE_ACCESS = {
+          days = 180
+        }
+      }
+    },
+    documents = {
+      status = false
+      filter = {
+        prefix = "documents/"
+      }
+      tiering = {
+        ARCHIVE_ACCESS = {
+          days = 125
+        }
+        DEEP_ARCHIVE_ACCESS = {
+          days = 200
+        }
+      }
+    }
+  }
 }
