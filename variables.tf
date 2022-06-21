@@ -53,9 +53,9 @@ variable "bucket_prefix" {
 }
 
 variable "acl" {
-  description = "(Optional) The canned ACL to apply. Defaults to 'private'. Conflicts with `grant`"
+  description = "(Optional) The canned ACL to apply. Conflicts with `grant`"
   type        = string
-  default     = "private"
+  default     = null
 }
 
 variable "policy" {
@@ -90,7 +90,7 @@ variable "request_payer" {
 
 variable "website" {
   description = "Map containing static web-site hosting or redirect configuration."
-  type        = map(string)
+  type        = any # map(string)
   default     = {}
 }
 
@@ -118,6 +118,18 @@ variable "grant" {
   default     = []
 }
 
+variable "owner" {
+  description = "Bucket owner's display name and ID. Conflicts with `acl`"
+  type        = map(string)
+  default     = {}
+}
+
+variable "expected_bucket_owner" {
+  description = "The account ID of the expected bucket owner"
+  type        = string
+  default     = null
+}
+
 variable "lifecycle_rule" {
   description = "List of maps containing configuration of object lifecycle management."
   type        = any
@@ -136,10 +148,22 @@ variable "server_side_encryption_configuration" {
   default     = {}
 }
 
+variable "intelligent_tiering" {
+  description = "Map containing intelligent tiering configuration."
+  type        = any
+  default     = {}
+}
+
 variable "object_lock_configuration" {
   description = "Map containing S3 object locking configuration."
   type        = any
   default     = {}
+}
+
+variable "object_lock_enabled" {
+  description = "Whether S3 bucket should have an Object Lock configuration enabled."
+  type        = bool
+  default     = false
 }
 
 variable "block_public_acls" {
@@ -182,4 +206,10 @@ variable "bucket_metrics" {
   description = "(Optional) Specifies bucket metrics."
   type        = any
   default     = {}
+}
+
+variable "putin_khuylo" {
+  description = "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!"
+  type        = bool
+  default     = true
 }

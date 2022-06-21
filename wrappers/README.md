@@ -12,10 +12,20 @@ This wrapper does not implement any extra functionality.
 
 ```hcl
 terraform {
-  source = "git::git@github.com:terraform-aws-modules/terraform-aws-s3-bucket.git?ref=master//wrappers"
+  source = "tfr:///terraform-aws-modules/s3-bucket/aws//wrappers"
+  # Alternative source:
+  # source = "git::git@github.com:terraform-aws-modules/terraform-aws-s3-bucket.git?ref=master//wrappers"
 }
 
 inputs = {
+  defaults = { # Default values
+    create = true
+    tags = {
+      Terraform   = "true"
+      Environment = "dev"
+    }
+  }
+
   items = {
     my-item = {
       # omitted... can be any argument supported by the module
@@ -33,6 +43,14 @@ inputs = {
 ```hcl
 module "wrapper" {
   source = "terraform-aws-modules/s3-bucket/aws//wrappers"
+
+  defaults = { # Default values
+    create = true
+    tags = {
+      Terraform   = "true"
+      Environment = "dev"
+    }
+  }
 
   items = {
     my-item = {
@@ -52,18 +70,30 @@ module "wrapper" {
 
 ```hcl
 terraform {
-  source = "git::git@github.com:terraform-aws-modules/terraform-aws-s3-bucket.git?ref=master//wrappers"
+  source = "tfr:///terraform-aws-modules/s3-bucket/aws//wrappers"
+  # Alternative source:
+  # source = "git::git@github.com:terraform-aws-modules/terraform-aws-s3-bucket.git?ref=master//wrappers"
 }
 
 inputs = {
+  defaults = {
+    force_destroy = true
+
+    attach_elb_log_delivery_policy        = true
+    attach_lb_log_delivery_policy         = true
+    attach_deny_insecure_transport_policy = true
+    attach_require_latest_tls_policy      = true
+  }
+
   items = {
     bucket1 = {
-      bucket        = "my-random-bucket-1"
-      force_destroy = true
+      bucket = "my-random-bucket-1"
     }
     bucket2 = {
-      bucket        = "my-random-bucket-2"
-      force_destroy = true
+      bucket = "my-random-bucket-2"
+      tags = {
+        Secure = "probably"
+      }
     }
   }
 }

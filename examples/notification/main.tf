@@ -1,5 +1,17 @@
+provider "aws" {
+  region = local.region
+
+  # Make it faster by skipping something
+  skip_get_ec2_platforms      = true
+  skip_metadata_api_check     = true
+  skip_region_validation      = true
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+}
+
 locals {
   bucket_name = "s3-bucket-${random_pet.this.id}"
+  region      = "eu-west-1"
 }
 
 resource "random_pet" "this" {
@@ -34,7 +46,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function1" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2.0"
+  version = "~> 3.0"
 
   function_name = "${random_pet.this.id}-lambda1"
   handler       = "index.lambda_handler"
@@ -46,7 +58,7 @@ module "lambda_function1" {
 
 module "lambda_function2" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2.0"
+  version = "~> 3.0"
 
   function_name = "${random_pet.this.id}-lambda2"
   handler       = "index.lambda_handler"
@@ -100,6 +112,8 @@ module "all_notifications" {
 
   bucket = module.s3_bucket.s3_bucket_id
 
+  eventbridge = true
+
   # Common error - Error putting S3 notification configuration: InvalidArgument: Configuration is ambiguously defined. Cannot have overlapping suffixes in two rules if the prefixes are overlapping for the same event type.
 
   lambda_notifications = {
@@ -126,11 +140,6 @@ module "all_notifications" {
       filter_suffix = ".txt"
 
       #      queue_id =  aws_sqs_queue.this[0].id // optional
-    }
-
-    sqs2 = {
-      queue_arn = aws_sqs_queue.this[1].arn
-      events    = ["s3:ObjectCreated:Copy"]
     }
   }
 
