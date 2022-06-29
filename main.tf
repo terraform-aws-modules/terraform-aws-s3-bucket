@@ -716,11 +716,11 @@ resource "aws_s3_bucket_metric" "this" {
   name   = each.key
 
   dynamic "filter" {
-    for_each = length(keys(lookup(each.value, "filter", {}))) == 0 ? [] : [lookup(each.value, "filter", {})]
+    for_each = try([each.value.filter], [])
 
     content {
-      prefix = lookup(filter.value, "prefix", null)
-      tags   = lookup(filter.value, "tags", null)
+      prefix = try(filter.value.prefix, null)
+      tags   = try(filter.value.tags, null)
     }
   }
 }

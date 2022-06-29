@@ -204,8 +204,8 @@ variable "object_ownership" {
 
 variable "bucket_metrics" {
   description = "(Optional) Specifies bucket metrics."
-  type        = any
-  default     = {}
+  type        = list(any)
+  default     = []
 }
 
 variable "putin_khuylo" {
