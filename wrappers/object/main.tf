@@ -27,4 +27,5 @@ module "wrapper" {
   object_lock_legal_hold_status = try(each.value.object_lock_legal_hold_status, var.defaults.object_lock_legal_hold_status, null)
   object_lock_mode              = try(each.value.object_lock_mode, var.defaults.object_lock_mode, null)
   object_lock_retain_until_date = try(each.value.object_lock_retain_until_date, var.defaults.object_lock_retain_until_date, null)
+  source_hash                   = try(each.value.source_hash, var.defaults.source_hash, null)
 }
