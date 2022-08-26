@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.3.1...v3.4.0) (2022-08-26)
+
+
+### Features
+
+* Added source_hash parameter to modules/object ([#178](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/178)) ([6cf4584](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/6cf45848d014f737e5580fc1b2d9dbd8469e0529))
+
 ### [3.3.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.3.0...v3.3.1) (2022-08-26)
 
 
