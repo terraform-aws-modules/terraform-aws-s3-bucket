@@ -141,3 +141,9 @@ variable "object_lock_retain_until_date" {
   type        = string
   default     = null
 }
+
+variable "source_hash" {
+  description = "Triggers updates like etag but useful to address etag encryption limitations. Set using filemd5(\"path/to/source\") (Terraform 0.11.12 or later). (The value is only stored in state and not saved by AWS.)"
+  type        = string
+  default     = null
+}

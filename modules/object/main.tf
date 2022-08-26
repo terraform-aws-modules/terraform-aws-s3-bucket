@@ -29,6 +29,8 @@ resource "aws_s3_object" "this" {
   object_lock_mode              = try(upper(var.object_lock_mode), var.object_lock_mode)
   object_lock_retain_until_date = var.object_lock_retain_until_date
 
+  source_hash = var.source_hash
+
   tags = var.tags
 
   lifecycle {
