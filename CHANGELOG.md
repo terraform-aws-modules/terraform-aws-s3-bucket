@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.3.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.3.0...v3.3.1) (2022-08-26)
+
+
+### Bug Fixes
+
+* Remove deprecated attributes from ignore_changes ([#179](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/179)) ([8366ccc](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/8366cccab085e73f794af1e2f4ec4d1abd240806))
+
 ## [3.3.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.2.4...v3.3.0) (2022-06-17)
 
 
