@@ -1,4 +1,4 @@
-resource "aws_s3_bucket_object" "this" {
+resource "aws_s3_object" "this" {
   count = var.create ? 1 : 0
 
   bucket        = var.bucket
@@ -28,6 +28,8 @@ resource "aws_s3_bucket_object" "this" {
   object_lock_legal_hold_status = try(tobool(var.object_lock_legal_hold_status) ? "ON" : upper(var.object_lock_legal_hold_status), var.object_lock_legal_hold_status)
   object_lock_mode              = try(upper(var.object_lock_mode), var.object_lock_mode)
   object_lock_retain_until_date = var.object_lock_retain_until_date
+
+  source_hash = var.source_hash
 
   tags = var.tags
 

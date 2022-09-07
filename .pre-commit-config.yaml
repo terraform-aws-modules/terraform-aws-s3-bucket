@@ -1,27 +1,13 @@
 repos:
-#  - repo: local  # @todo: move to pre-commit-terraform, add support for multiple module dirs, and run before terraform_docs
-#    hooks:
-#      - id: terraform_wrapper
-#        name: "Terraform module wrapper - root"
-#        entry: /Users/Bob/Sites/terraform-aws-modules/scripts/generate-terraform-wrappers.sh --overwrite
-#        language: system
-#        pass_filenames: false
-#      - id: terraform_wrapper
-#        name: "Terraform module wrapper - object"
-#        entry: /Users/Bob/Sites/terraform-aws-modules/scripts/generate-terraform-wrappers.sh --module-dir modules/object --overwrite
-#        language: system
-#        pass_filenames: false
-#      - id: terraform_wrapper
-#        name: "Terraform module wrapper - notification"
-#        entry: /Users/Bob/Sites/terraform-aws-modules/scripts/generate-terraform-wrappers.sh --module-dir modules/notification --overwrite
-#        language: system
-#        pass_filenames: false
-  - repo: git://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.50.0
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.74.1
     hooks:
       - id: terraform_fmt
+      - id: terraform_wrapper_module_for_each
       - id: terraform_validate
       - id: terraform_docs
+        args:
+          - '--args=--lockfile=false'
       - id: terraform_tflint
         args:
           - '--args=--only=terraform_deprecated_interpolation'
@@ -37,7 +23,8 @@ repos:
           - '--args=--only=terraform_required_providers'
           - '--args=--only=terraform_standard_module_structure'
           - '--args=--only=terraform_workspace_remote'
-  - repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
     hooks:
       - id: check-merge-conflict
+      - id: end-of-file-fixer
