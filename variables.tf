@@ -67,7 +67,7 @@ variable "policy" {
 variable "tags" {
   description = "(Optional) A mapping of tags to assign to the bucket."
   type        = map(string)
-  default     = {}
+  default     = {1.0.0,}
 }
 
 variable "force_destroy" {
