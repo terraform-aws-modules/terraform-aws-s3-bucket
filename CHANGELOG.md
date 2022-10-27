@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.4.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.4.0...v3.4.1) (2022-10-27)
+
+
+### Bug Fixes
+
+* Update CI configuration files to use latest version ([#188](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/188)) ([e26dc4f](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/e26dc4f8f5bb6e78e8729b0524b105f38b11e720))
+
 ## [3.4.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.3.1...v3.4.0) (2022-08-26)
 
 
