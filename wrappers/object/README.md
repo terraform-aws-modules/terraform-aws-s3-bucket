@@ -14,7 +14,7 @@ This wrapper does not implement any extra functionality.
 terraform {
   source = "tfr:///terraform-aws-modules/s3-bucket/aws//wrappers/object"
   # Alternative source:
-  # source = "git::git@github.com:terraform-aws-modules/terraform-aws-s3-bucket.git?ref=master//wrappers/object"
+  # source = "git::git@github.com:terraform-aws-modules/terraform-aws-s3-bucket.git//wrappers/object?ref=master"
 }
 
 inputs = {
@@ -72,7 +72,7 @@ module "wrapper" {
 terraform {
   source = "tfr:///terraform-aws-modules/s3-bucket/aws//wrappers"
   # Alternative source:
-  # source = "git::git@github.com:terraform-aws-modules/terraform-aws-s3-bucket.git?ref=master//wrappers"
+  # source = "git::git@github.com:terraform-aws-modules/terraform-aws-s3-bucket.git//wrappers?ref=master"
 }
 
 inputs = {
