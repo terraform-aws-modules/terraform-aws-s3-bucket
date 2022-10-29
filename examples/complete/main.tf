@@ -348,4 +348,27 @@ module "s3_bucket" {
     }
   ]
 
+  inventory_configuration = {
+    daily = {
+      included_object_versions = "Current"
+      destination = {
+        format = "CSV"
+        encryption = {
+          encryption_type = "sse_kms"
+          kms_key_id      = aws_kms_key.objects.arn
+        }
+      }
+      frequency = "Daily"
+    }
+    weekly = {
+      included_object_versions = "All"
+      destination = {
+        format = "CSV"
+        encryption = {
+          encryption_type = "sse_s3"
+        }
+      }
+      frequency = "Weekly"
+    }
+  }
 }
