@@ -364,11 +364,30 @@ module "s3_bucket" {
       included_object_versions = "All"
       destination = {
         format = "CSV"
+      }
+      frequency = "Weekly"
+    }
+    destination_other = {
+      included_object_versions = "All"
+      destination = {
+        bucket_arn = module.log_bucket.s3_bucket_arn
+        format     = "Parquet"
         encryption = {
           encryption_type = "sse_s3"
         }
       }
       frequency = "Weekly"
+    }
+    source_other = {
+      included_object_versions = "Current"
+      bucket                   = module.cloudfront_log_bucket.s3_bucket_id
+      destination = {
+        format = "ORC"
+        encryption = {
+          encryption_type = "sse_s3"
+        }
+      }
+      frequency = "Daily"
     }
   }
 }
