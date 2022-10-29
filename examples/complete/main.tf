@@ -339,7 +339,7 @@ module "s3_bucket" {
       name = "other"
       filter = {
         tags = {
-          production = true
+          production = "true"
         }
       }
     },
