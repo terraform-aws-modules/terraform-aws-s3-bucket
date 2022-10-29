@@ -160,6 +160,12 @@ variable "object_lock_configuration" {
   default     = {}
 }
 
+variable "metric_configuration" {
+  description = "Map containing bucket metric configuration."
+  type        = any
+  default     = []
+}
+
 variable "object_lock_enabled" {
   description = "Whether S3 bucket should have an Object Lock configuration enabled."
   type        = bool

@@ -30,6 +30,7 @@ module "wrapper" {
   server_side_encryption_configuration  = try(each.value.server_side_encryption_configuration, var.defaults.server_side_encryption_configuration, {})
   intelligent_tiering                   = try(each.value.intelligent_tiering, var.defaults.intelligent_tiering, {})
   object_lock_configuration             = try(each.value.object_lock_configuration, var.defaults.object_lock_configuration, {})
+  metric_configuration                  = try(each.value.metric_configuration, var.defaults.metric_configuration, [])
   object_lock_enabled                   = try(each.value.object_lock_enabled, var.defaults.object_lock_enabled, false)
   block_public_acls                     = try(each.value.block_public_acls, var.defaults.block_public_acls, false)
   block_public_policy                   = try(each.value.block_public_policy, var.defaults.block_public_policy, false)
