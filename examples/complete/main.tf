@@ -324,4 +324,19 @@ module "s3_bucket" {
       }
     }
   }
+
+  metric_configuration = {
+    documents = {
+      prefix = "documents/"
+      tags = {
+        priority = "high"
+      }
+    }
+    "other" = {
+      tags = {
+        production = true
+      }
+    }
+  }
+
 }

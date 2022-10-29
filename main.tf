@@ -6,10 +6,11 @@ locals {
   attach_policy = var.attach_require_latest_tls_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_policy
 
   # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
-  grants              = try(jsondecode(var.grant), var.grant)
-  cors_rules          = try(jsondecode(var.cors_rule), var.cors_rule)
-  lifecycle_rules     = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
-  intelligent_tiering = try(jsondecode(var.intelligent_tiering), var.intelligent_tiering)
+  grants               = try(jsondecode(var.grant), var.grant)
+  cors_rules           = try(jsondecode(var.cors_rule), var.cors_rule)
+  lifecycle_rules      = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
+  intelligent_tiering  = try(jsondecode(var.intelligent_tiering), var.intelligent_tiering)
+  metric_configuration = try(jsondecode(var.metric_configuration), var.metric_configuration)
 }
 
 resource "aws_s3_bucket" "this" {
@@ -716,6 +717,19 @@ resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
       access_tier = tiering.key
       days        = tiering.value.days
     }
+  }
+
+}
+
+resource "aws_s3_bucket_metric" "this" {
+  for_each = { for k, v in local.metric_configuration : k => v if local.create_bucket }
+
+  name   = each.key
+  bucket = aws_s3_bucket.this[0].id
+
+  filter {
+    prefix = try(each.value.prefix, null)
+    tags   = try(each.value.tags, null)
   }
 
 }
