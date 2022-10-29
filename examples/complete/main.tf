@@ -358,6 +358,9 @@ module "s3_bucket" {
           kms_key_id      = aws_kms_key.objects.arn
         }
       }
+      filter = {
+        prefix = "documents/"
+      }
       frequency = "Daily"
     }
     weekly = {
@@ -376,7 +379,8 @@ module "s3_bucket" {
           encryption_type = "sse_s3"
         }
       }
-      frequency = "Weekly"
+      frequency       = "Weekly"
+      optional_fields = ["Size", "EncryptionStatus", "StorageClass", "ChecksumAlgorithm"]
     }
     source_other = {
       included_object_versions = "Current"
