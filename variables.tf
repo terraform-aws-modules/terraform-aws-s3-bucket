@@ -163,7 +163,7 @@ variable "object_lock_configuration" {
 variable "metric_configuration" {
   description = "Map containing bucket metric configuration."
   type        = any
-  default     = {}
+  default     = []
 }
 
 variable "object_lock_enabled" {
