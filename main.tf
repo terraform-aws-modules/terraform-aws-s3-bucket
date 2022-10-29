@@ -724,12 +724,14 @@ resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
 resource "aws_s3_bucket_metric" "this" {
   for_each = { for k, v in local.metric_configuration : k => v if local.create_bucket }
 
-  name   = each.key
+  name   = each.value.name
   bucket = aws_s3_bucket.this[0].id
 
-  filter {
-    prefix = try(each.value.prefix, null)
-    tags   = try(each.value.tags, null)
+  dynamic "filter" {
+    for_each = length(try(flatten([each.value.filter]), [])) == 0 ? [] : [true]
+    content {
+      prefix = try(each.value.filter.prefix, null)
+      tags   = try(each.value.filter.tags, null)
+    }
   }
-
 }
