@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.4.1...v3.5.0) (2022-10-29)
+
+
+### Features
+
+* Add bucket metrics support ([#190](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/190)) ([65ed0fb](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/65ed0fbf8db52ea6f2ad7c86afa1719a417c0e46))
+
 ### [3.4.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.4.0...v3.4.1) (2022-10-27)
 
 
