@@ -37,3 +37,8 @@ output "s3_bucket_website_domain" {
   description = "The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records."
   value       = try(aws_s3_bucket_website_configuration.this[0].website_domain, "")
 }
+
+output "s3_bucket_versioning_id" {
+  description = "The bucket versioning id. This is the bucket id or bucket and expected_bucket_owner separated by a comma (,) if the latter is provided. This can be used when other resources depend on the versioning to be enabled first."
+  value       = try(aws_s3_bucket_versioning.this[0].id, "")
+}
