@@ -20,34 +20,44 @@ resource "random_pet" "this" {
   length = 2
 }
 
-resource "aws_kms_key" "objects" {
-  description             = "KMS key is used to encrypt bucket objects"
+# https://docs.aws.amazon.com/AmazonS3/latest/userguide/configure-inventory.html#configure-inventory-kms-key-policy
+module "kms" {
+  source                  = "terraform-aws-modules/kms/aws"
+  description             = "Key example for Inventory S3 destination encyrption"
   deletion_window_in_days = 7
-  policy                  = data.aws_iam_policy_document.inventory_kms_policy.json
-}
+  key_statements = [
+    {
+      sid = "s3InventoryPolicy"
+      actions = [
+        "kms:GenerateDataKey",
+      ]
+      resources = ["*"]
 
-# A kms key policy is required if using s3 aws:kms encryption for inventory reports
-data "aws_iam_policy_document" "inventory_kms_policy" {
-  statement {
-    sid     = "s3InventoryPolicy"
-    effect  = "Allow"
-    actions = ["kms:GenerateDataKey"]
-    principals {
-      identifiers = ["s3.amazonaws.com"]
-      type        = "Service"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["s3.amazonaws.com"]
+        }
+      ]
+
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values = [
+            data.aws_caller_identity.current.id,
+          ]
+        },
+        {
+          test     = "ArnLike"
+          variable = "aws:SourceARN"
+          values = [
+            module.inventory_source_bucket.s3_bucket_arn,
+          ]
+        }
+      ]
     }
-    resources = ["*"]
-    condition {
-      test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.id] # source bucket account
-      variable = "aws:SourceAccount"
-    }
-    condition {
-      test     = "ArnLike"
-      values   = [module.inventory_source_bucket.s3_bucket_arn] # source bucket arn
-      variable = "aws:SourceARN"
-    }
-  }
+  ]
 }
 
 module "inventory_destination_bucket" {
@@ -94,7 +104,7 @@ module "multi_inventory_configurations_bucket" {
         format = "CSV"
         encryption = {
           encryption_type = "sse_kms"
-          kms_key_id      = aws_kms_key.objects.arn
+          kms_key_id      = module.kms.key_arn
         }
       }
       filter = {

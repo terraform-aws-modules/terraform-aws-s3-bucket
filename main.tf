@@ -788,6 +788,7 @@ resource "aws_s3_bucket_inventory" "this" {
 }
 
 # Inventory destination bucket requires a bucket policy to allow source to PutObjects
+# https://docs.aws.amazon.com/AmazonS3/latest/userguide/example-bucket-policies.html#example-bucket-policies-use-case-9
 data "aws_iam_policy_document" "inventory_destination_policy" {
   count = var.attach_inventory_destination_policy ? 1 : 0
   statement {
