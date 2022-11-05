@@ -40,6 +40,12 @@ variable "attach_public_policy" {
   default     = true
 }
 
+variable "attach_inventory_destination_policy" {
+  description = "Controls is S3 bucket should be the inventory destination bucket"
+  type        = bool
+  default     = false
+}
+
 variable "bucket" {
   description = "(Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name."
   type        = string
@@ -170,6 +176,24 @@ variable "inventory_configuration" {
   description = "Map containing S3 inventory configuration."
   type        = any
   default     = {}
+}
+
+variable "inventory_source_account_id" {
+  description = "The inventory source account id."
+  type        = string
+  default     = null
+}
+
+variable "inventory_source_bucket_arn" {
+  description = "The inventory source bucket ARN."
+  type        = string
+  default     = null
+}
+
+variable "inventory_self_source_destination" {
+  description = "Whether or not the inventory source bucket is also the destination bucket."
+  type        = bool
+  default     = false
 }
 
 variable "object_lock_enabled" {
