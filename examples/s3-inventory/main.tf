@@ -53,6 +53,7 @@ module "kms" {
           variable = "aws:SourceARN"
           values = [
             module.inventory_source_bucket.s3_bucket_arn,
+            module.multi_inventory_configurations_bucket.s3_bucket_arn
           ]
         }
       ]
