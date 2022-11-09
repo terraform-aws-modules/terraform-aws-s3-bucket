@@ -41,7 +41,7 @@ variable "attach_public_policy" {
 }
 
 variable "attach_inventory_destination_policy" {
-  description = "Controls is S3 bucket should be the inventory destination bucket"
+  description = "Controls if S3 bucket should have bucket inventory destination policy attached."
   type        = bool
   default     = false
 }
