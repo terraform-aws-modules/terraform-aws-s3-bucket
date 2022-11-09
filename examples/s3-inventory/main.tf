@@ -99,6 +99,7 @@ module "multi_inventory_configurations_bucket" {
 
   inventory_configuration = {
 
+    # Same source and destination buckets
     daily = {
       included_object_versions = "Current"
       destination = {
@@ -122,6 +123,7 @@ module "multi_inventory_configurations_bucket" {
       frequency = "Weekly"
     }
 
+    # Different destination bucket
     destination_other = {
       included_object_versions = "All"
       destination = {
@@ -135,6 +137,7 @@ module "multi_inventory_configurations_bucket" {
       optional_fields = ["Size", "EncryptionStatus", "StorageClass", "ChecksumAlgorithm"]
     }
 
+    # Different source bucket
     source_other = {
       included_object_versions = "Current"
       bucket                   = module.inventory_source_bucket.s3_bucket_id
