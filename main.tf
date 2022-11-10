@@ -740,7 +740,8 @@ resource "aws_s3_bucket_metric" "this" {
 }
 
 resource "aws_s3_bucket_inventory" "this" {
-  for_each                 = { for k, v in var.inventory_configuration : k => v if local.create_bucket }
+  for_each = { for k, v in var.inventory_configuration : k => v if local.create_bucket }
+
   name                     = each.key
   bucket                   = try(each.value.bucket, aws_s3_bucket.this[0].id)
   included_object_versions = each.value.included_object_versions
@@ -756,10 +757,12 @@ resource "aws_s3_bucket_inventory" "this" {
 
       dynamic "encryption" {
         for_each = length(try(flatten([each.value.destination.encryption]), [])) == 0 ? [] : [true]
+
         content {
 
           dynamic "sse_kms" {
             for_each = each.value.destination.encryption.encryption_type == "sse_kms" ? [true] : []
+
             content {
               key_id = try(each.value.destination.encryption.kms_key_id, null)
             }
@@ -767,6 +770,7 @@ resource "aws_s3_bucket_inventory" "this" {
 
           dynamic "sse_s3" {
             for_each = each.value.destination.encryption.encryption_type == "sse_s3" ? [true] : []
+
             content {
             }
           }
@@ -781,6 +785,7 @@ resource "aws_s3_bucket_inventory" "this" {
 
   dynamic "filter" {
     for_each = length(try(flatten([each.value.filter]), [])) == 0 ? [] : [true]
+
     content {
       prefix = try(each.value.filter.prefix, null)
     }
@@ -790,7 +795,8 @@ resource "aws_s3_bucket_inventory" "this" {
 # Inventory destination bucket requires a bucket policy to allow source to PutObjects
 # https://docs.aws.amazon.com/AmazonS3/latest/userguide/example-bucket-policies.html#example-bucket-policies-use-case-9
 data "aws_iam_policy_document" "inventory_destination_policy" {
-  count = var.attach_inventory_destination_policy ? 1 : 0
+  count = local.create_bucket && var.attach_inventory_destination_policy ? 1 : 0
+
   statement {
     sid    = "destinationInventoryPolicy"
     effect = "Allow"
