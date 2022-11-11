@@ -347,5 +347,4 @@ module "s3_bucket" {
       name = "all"
     }
   ]
-
 }
