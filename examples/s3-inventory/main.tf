@@ -22,6 +22,7 @@ resource "random_pet" "this" {
 
 module "multi_inventory_configurations_bucket" {
   source = "../../"
+
   bucket = local.bucket_name
 
   force_destroy = true
