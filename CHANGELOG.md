@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.6.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.5.0...v3.6.0) (2022-11-11)
+
+
+### Features
+
+* Add inventory config support ([#192](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/192)) ([8836d0f](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/8836d0f19b23bf36e9c250307e4f4858a5cb3f4c))
+
 ## [3.5.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.4.1...v3.5.0) (2022-10-29)
 
 
