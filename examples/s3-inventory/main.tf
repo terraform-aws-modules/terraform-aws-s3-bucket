@@ -16,10 +16,6 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-resource "random_pet" "this" {
-  length = 2
-}
-
 module "multi_inventory_configurations_bucket" {
   source = "../../"
 
@@ -90,6 +86,10 @@ module "multi_inventory_configurations_bucket" {
       frequency = "Daily"
     }
   }
+}
+
+resource "random_pet" "this" {
+  length = 2
 }
 
 # https://docs.aws.amazon.com/AmazonS3/latest/userguide/configure-inventory.html#configure-inventory-kms-key-policy
