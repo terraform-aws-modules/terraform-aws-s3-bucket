@@ -24,8 +24,10 @@ Please check [complete example](https://github.com/terraform-aws-modules/terrafo
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_analytics_and_inventory_destination_bucket"></a> [analytics\_and\_inventory\_destination\_bucket](#module\_analytics\_and\_inventory\_destination\_bucket) | ../../ | n/a |
 | <a name="module_analytics_configuration_bucket"></a> [analytics\_configuration\_bucket](#module\_analytics\_configuration\_bucket) | ../../ | n/a |
 | <a name="module_analytics_destination_bucket"></a> [analytics\_destination\_bucket](#module\_analytics\_destination\_bucket) | ../../ | n/a |
+| <a name="module_inventory_source_bucket"></a> [inventory\_source\_bucket](#module\_inventory\_source\_bucket) | ../.. | n/a |
 
 ## Resources
 
