@@ -339,13 +339,13 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 }
 
 resource "aws_s3_bucket_replication_configuration" "this" {
-  count = local.create_bucket && length(keys(var.replication_configuration)) > 0 ? 1 : 0
+  count = local.create_bucket && length(keys(local.replication_configuration)) > 0 ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].id
-  role   = var.replication_configuration["role"]
+  role   = local.replication_configuration["role"]
 
   dynamic "rule" {
-    for_each = flatten(try([var.replication_configuration["rule"]], [var.replication_configuration["rules"]], []))
+    for_each = flatten(try([local.replication_configuration["rule"]], [local.replication_configuration["rules"]], []))
 
     content {
       id       = try(rule.value.id, null)
