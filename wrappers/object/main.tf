@@ -22,7 +22,7 @@ module "wrapper" {
   kms_key_id                    = try(each.value.kms_key_id, var.defaults.kms_key_id, null)
   bucket_key_enabled            = try(each.value.bucket_key_enabled, var.defaults.bucket_key_enabled, null)
   metadata                      = try(each.value.metadata, var.defaults.metadata, {})
-  tags                          = try(each.value.tags, var.defaults.tags, {})
+  tags                          = merge(try(var.defaults.tags, null), try(each.value.tags, null))
   force_destroy                 = try(each.value.force_destroy, var.defaults.force_destroy, false)
   object_lock_legal_hold_status = try(each.value.object_lock_legal_hold_status, var.defaults.object_lock_legal_hold_status, null)
   object_lock_mode              = try(each.value.object_lock_mode, var.defaults.object_lock_mode, null)

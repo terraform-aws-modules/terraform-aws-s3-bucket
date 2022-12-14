@@ -15,7 +15,7 @@ module "wrapper" {
   bucket_prefix                         = try(each.value.bucket_prefix, var.defaults.bucket_prefix, null)
   acl                                   = try(each.value.acl, var.defaults.acl, null)
   policy                                = try(each.value.policy, var.defaults.policy, null)
-  tags                                  = try(each.value.tags, var.defaults.tags, {})
+  tags                                  = merge(try(var.defaults.tags, null), try(each.value.tags, null))
   force_destroy                         = try(each.value.force_destroy, var.defaults.force_destroy, false)
   acceleration_status                   = try(each.value.acceleration_status, var.defaults.acceleration_status, null)
   request_payer                         = try(each.value.request_payer, var.defaults.request_payer, null)
