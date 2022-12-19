@@ -69,6 +69,9 @@ resource "aws_s3_bucket_acl" "this" {
       }
     }
   }
+
+  # This `depends_on` is to prevent "AccessControlListNotSupported: The bucket does not allow ACLs."
+  depends_on = [aws_s3_bucket_ownership_controls.this]
 }
 
 resource "aws_s3_bucket_website_configuration" "this" {
