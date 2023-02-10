@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.7.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.6.1...v3.7.0) (2023-02-10)
+
+
+### Features
+
+* Adding analytics configuration support ([#193](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/193)) ([fd62dbc](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/fd62dbc0f111dd99552d5892ee26fe730445942e))
+
 ### [3.6.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.6.0...v3.6.1) (2023-01-24)
 
 
