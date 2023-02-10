@@ -46,6 +46,12 @@ variable "attach_inventory_destination_policy" {
   default     = false
 }
 
+variable "attach_analytics_destination_policy" {
+  description = "Controls if S3 bucket should have bucket analytics destination policy attached."
+  type        = bool
+  default     = false
+}
+
 variable "bucket" {
   description = "(Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name."
   type        = string
@@ -192,6 +198,30 @@ variable "inventory_source_bucket_arn" {
 
 variable "inventory_self_source_destination" {
   description = "Whether or not the inventory source bucket is also the destination bucket."
+  type        = bool
+  default     = false
+}
+
+variable "analytics_configuration" {
+  description = "Map containing bucket analytics configuration."
+  type        = any
+  default     = {}
+}
+
+variable "analytics_source_account_id" {
+  description = "The analytics source account id."
+  type        = string
+  default     = null
+}
+
+variable "analytics_source_bucket_arn" {
+  description = "The analytics source bucket ARN."
+  type        = string
+  default     = null
+}
+
+variable "analytics_self_source_destination" {
+  description = "Whether or not the analytics source bucket is also the destination bucket."
   type        = bool
   default     = false
 }
