@@ -58,7 +58,7 @@ variable "bucket" {
   default     = null
 }
 
-variable "bucket_prefix" {
+variable "prefix" {
   description = "(Optional, Forces new resource) Creates a unique bucket name beginning with the specified prefix. Conflicts with bucket."
   type        = string
   default     = null
