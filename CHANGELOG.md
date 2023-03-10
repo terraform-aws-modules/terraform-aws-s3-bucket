@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.8.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.7.0...v3.8.0) (2023-03-10)
+
+
+### Features
+
+* Added new S3 bucket policy statement for latest regions ([#218](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/218)) ([b04894f](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/b04894f2d1ec4faaf82dd8b2a871c95481928a60))
+
+## [3.7.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.6.1...v3.7.0) (2023-02-10)
+
+
+### Features
+
+* Adding analytics configuration support ([#193](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/193)) ([fd62dbc](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/fd62dbc0f111dd99552d5892ee26fe730445942e))
+
+### [3.6.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.6.0...v3.6.1) (2023-01-24)
+
+
+### Bug Fixes
+
+* Use a version for  to avoid GitHub API rate limiting on CI workflows ([#204](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/204)) ([769f2f6](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/769f2f6213f1851ff72d7939b9b8c5fd35c35111))
+
 ## [3.6.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.5.0...v3.6.0) (2022-11-11)
 
 
