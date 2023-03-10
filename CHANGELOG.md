@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.8.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.8.1...v3.8.2) (2023-03-10)
+
+
+### Bug Fixes
+
+* Fixed ELB log delivery policy for old and new regions ([#219](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/219)) ([3c094b3](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/3c094b32333a177a07477c4079ef3bd8cc56eea8))
+
 ### [3.8.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.8.0...v3.8.1) (2023-03-10)
 
 
