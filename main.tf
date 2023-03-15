@@ -4,6 +4,7 @@ data "aws_canonical_user_id" "this" {}
 
 data "aws_caller_identity" "current" {}
 
+data "aws_partition" "current" {}
 locals {
   create_bucket = var.create_bucket && var.putin_khuylo
 
@@ -571,7 +572,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 
       principals {
         type        = "AWS"
-        identifiers = [format("arn:aws:iam::%s:root", statement.value)]
+        identifiers = [format("arn:%s:iam::%s:root", data.aws_partition.current.partition, statement.value)]
       }
 
       effect = "Allow"
