@@ -62,9 +62,11 @@ module "log_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 2.0"
 
-  bucket        = "logs-${random_pet.this.id}"
-  acl           = "log-delivery-write"
-  force_destroy = true
+  bucket                   = "logs-${random_pet.this.id}"
+  acl                      = "log-delivery-write"
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter" //(default object_ownership has now changed by aws to "BucketOwnerEnforced")
+  force_destroy            = true
 
   attach_elb_log_delivery_policy        = true
   attach_lb_log_delivery_policy         = true
@@ -206,11 +208,11 @@ module "s3_bucket" {
     }
   }
 
-  # S3 bucket-level Public Access Block configuration
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  # S3 bucket-level Public Access Block configuration (by default now aws has made this default as true for s3 bucket-level block public access)
+  # block_public_acls       = true
+  # block_public_policy     = true
+  # ignore_public_acls      = true
+  # restrict_public_buckets = true
 
   # S3 Bucket Ownership Controls
   control_object_ownership = true
