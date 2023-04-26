@@ -127,7 +127,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
         protocol                = try(routing_rule.value.redirect["protocol"], null)
         replace_key_prefix_with = try(routing_rule.value.redirect["replace_key_prefix_with"], null)
         replace_key_with        = try(routing_rule.value.redirect["replace_key_with"], null)
-      }
+          }
     }
   }
 }
