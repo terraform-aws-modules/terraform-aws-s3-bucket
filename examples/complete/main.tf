@@ -70,6 +70,9 @@ module "log_bucket" {
   acl           = "log-delivery-write"
   force_destroy = true
 
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter"
+
   attach_elb_log_delivery_policy        = true
   attach_lb_log_delivery_policy         = true
   attach_deny_insecure_transport_policy = true
@@ -79,7 +82,9 @@ module "log_bucket" {
 module "cloudfront_log_bucket" {
   source = "../../"
 
-  bucket = "cloudfront-logs-${random_pet.this.id}"
+  bucket                   = "cloudfront-logs-${random_pet.this.id}"
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter"
 
   grant = [{
     type       = "CanonicalUser"
@@ -130,11 +135,11 @@ module "s3_bucket" {
   attach_deny_insecure_transport_policy = true
   attach_require_latest_tls_policy      = true
 
-  # S3 bucket-level Public Access Block configuration
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  # S3 bucket-level Public Access Block configuration (by default now AWS has made this default as true for S3 bucket-level block public access)
+  # block_public_acls       = true
+  # block_public_policy     = true
+  # ignore_public_acls      = true
+  # restrict_public_buckets = true
 
   # S3 Bucket Ownership Controls
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls
