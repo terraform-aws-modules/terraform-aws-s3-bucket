@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.9.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.8.2...v3.9.0) (2023-04-26)
+
+
+### Features
+
+* Updated S3 Bucket Block Public Access and ACL(Object Ownership) defaults to work since April 2023 ([#226](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/226)) ([12ad5b6](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/12ad5b667b7b6556390e6c49a9719457d2742e03))
+
 ### [3.8.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.8.1...v3.8.2) (2023-03-10)
 
 
