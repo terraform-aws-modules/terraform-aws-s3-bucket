@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.10.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.9.0...v3.10.0) (2023-04-27)
+
+
+### Features
+
+* Add default Access Log Delivery Policy (same as ALB/NLB) to work since April 2023 ([#230](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/230)) ([bafac30](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/bafac30bb577ead366fd0b1ab759b0c2a2f4bc5d))
+
 ## [3.9.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.8.2...v3.9.0) (2023-04-26)
 
 
