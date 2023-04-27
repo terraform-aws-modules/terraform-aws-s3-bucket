@@ -522,6 +522,7 @@ data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
     var.attach_lb_log_delivery_policy ? data.aws_iam_policy_document.lb_log_delivery[0].json : "",
+    var.attach_access_log_delivery_policy ? data.aws_iam_policy_document.access_log_delivery[0].json : "",
     var.attach_require_latest_tls_policy ? data.aws_iam_policy_document.require_latest_tls[0].json : "",
     var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
     var.attach_inventory_destination_policy || var.attach_analytics_destination_policy ? data.aws_iam_policy_document.inventory_and_analytics_destination_policy[0].json : "",
@@ -645,6 +646,71 @@ data "aws_iam_policy_document" "lb_log_delivery" {
     principals {
       type        = "Service"
       identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:GetBucketAcl",
+    ]
+
+    resources = [
+      aws_s3_bucket.this[0].arn,
+    ]
+
+  }
+}
+
+# Grant access to S3 log delivery group for server access logging
+# https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-ownership-migrating-acls-prerequisites.html#object-ownership-server-access-logs
+# https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general
+data "aws_iam_policy_document" "access_log_delivery" {
+  count = local.create_bucket && var.attach_access_log_delivery_policy ? 1 : 0
+
+  statement {
+    sid = "AWSAccessLogDeliveryWrite"
+
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.this[0].arn}/*",
+    ]
+
+    dynamic "condition" {
+      for_each = length(var.access_log_delivery_policy_source_buckets) != 0 ? [true] : []
+      content {
+        test     = "ForAnyValue:ArnLike"
+        variable = "aws:SourceArn"
+        values   = var.access_log_delivery_policy_source_buckets
+      }
+    }
+
+    dynamic "condition" {
+      for_each = length(var.access_log_delivery_policy_source_accounts) != 0 ? [true] : []
+      content {
+        test     = "ForAnyValue:StringEquals"
+        variable = "aws:SourceAccount"
+        values   = var.access_log_delivery_policy_source_accounts
+      }
+    }
+
+  }
+
+  statement {
+    sid = "AWSAccessLogDeliveryAclCheck"
+
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
     }
 
     actions = [

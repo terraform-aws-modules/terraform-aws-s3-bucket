@@ -16,6 +16,12 @@ variable "attach_lb_log_delivery_policy" {
   default     = false
 }
 
+variable "attach_access_log_delivery_policy" {
+  description = "Controls if S3 bucket should have S3 access log delivery policy attached"
+  type        = bool
+  default     = false
+}
+
 variable "attach_deny_insecure_transport_policy" {
   description = "Controls if S3 bucket should have deny non-SSL transport policy attached"
   type        = bool
@@ -122,6 +128,18 @@ variable "logging" {
   description = "Map containing access bucket logging configuration."
   type        = map(string)
   default     = {}
+}
+
+variable "access_log_delivery_policy_source_buckets" {
+  description = "(Optional) List of S3 bucket ARNs wich should be allowed to deliver access logs to this bucket."
+  type        = list(string)
+  default     = []
+}
+
+variable "access_log_delivery_policy_source_accounts" {
+  description = "(Optional) List of AWS Account IDs should be allowed to deliver access logs to this bucket."
+  type        = list(string)
+  default     = []
 }
 
 variable "grant" {
