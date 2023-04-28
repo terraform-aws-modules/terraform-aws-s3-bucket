@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.10.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.10.0...v3.10.1) (2023-04-28)
+
+
+### Bug Fixes
+
+* Fixed Bucket Policy chain dependency with Public Access Block ([#227](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/227)) ([fa19074](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/fa190740956fc2efab0d94c8e60b3d3c63d0ddd3))
+
 ## [3.10.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.9.0...v3.10.0) (2023-04-27)
 
 
