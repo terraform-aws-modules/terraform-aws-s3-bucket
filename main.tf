@@ -237,7 +237,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - expiration
       dynamic "expiration" {
-        for_each = try(flatten([rule.value.expiration]), [])
+        for_each = try(rule.value.expire_all_objects_in_bucket, false) == true || try(rule.value.filter.prefix, rule.value.filter.object_size_less_than, rule.value.filter.object_size_greater_than, rule.value.filter.tags, null) != null ? try(flatten([rule.value.expiration]), []) : []
 
         content {
           date                         = try(expiration.value.date, null)

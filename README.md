@@ -90,6 +90,67 @@ module "s3_bucket" {
 }
 ```
 
+## Expiration lifecycle rules for the whole bucket
+
+To prevent accidentally creating a lifecycle rule for the whole bucket that could remove all of your files, you must pass the `expire_all_objects_in_bucket = true` option.
+
+```hcl
+# This S3 bucket has an expiration lifecycle rule only for the specified prefix
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  lifecycle_rule = [
+    {
+      enabled = true
+
+      filter = {
+        prefix = "prefix-to-cleanup/"
+      }
+
+      expiration = {
+        days = 1
+      }
+    }
+  ]
+}
+```
+
+```hcl
+# This S3 bucket has an expiration lifecycle for the whole bucket
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  lifecycle_rule = [
+    {
+      enabled = true
+
+      expire_all_objects_in_bucket = true
+      expiration = {
+        days = 1
+      }
+    }
+  ]
+}
+```
+
+```hcl
+# This S3 bucket does NOT have ANY expiration lifecycle rule
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  lifecycle_rule = [
+    {
+      enabled = true
+
+      # no option or expire_all_objects_in_bucket = false
+      expiration = {
+        days = 1
+      }
+    }
+  ]
+}
+```
+
 ## Terragrunt and `variable "..." { type = any }`
 
 There is a bug [#1211](https://github.com/gruntwork-io/terragrunt/issues/1211) in Terragrunt related to the way how the variables of type `any` are passed to Terraform.
