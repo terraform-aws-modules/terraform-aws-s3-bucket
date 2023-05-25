@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.11.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.10.1...v3.11.0) (2023-05-25)
+
+
+### Features
+
+* Added outputs for s3 bucket lifecycle rules and policy ([#234](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/234)) ([24b88e8](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/24b88e8ec1b02c48f49b5eb04d7ccda8569cde1e))
+
 ### [3.10.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.10.0...v3.10.1) (2023-04-28)
 
 
