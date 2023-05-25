@@ -23,6 +23,16 @@ output "s3_bucket_hosted_zone_id" {
   value       = module.s3_bucket.s3_bucket_hosted_zone_id
 }
 
+output "s3_bucket_lifecycle_configuration_rules" {
+  description = "The lifecycle rules of the bucket, if the bucket is configured with lifecycle rules. If not, this will be an empty string."
+  value       = module.s3_bucket.s3_bucket_lifecycle_configuration_rules
+}
+
+output "s3_bucket_policy" {
+  description = "The policy of the bucket, if the bucket is configured with a policy. If not, this will be an empty string."
+  value       = module.s3_bucket.s3_bucket_policy
+}
+
 output "s3_bucket_region" {
   description = "The AWS region this bucket resides in."
   value       = module.s3_bucket.s3_bucket_region
