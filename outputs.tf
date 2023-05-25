@@ -25,12 +25,12 @@ output "s3_bucket_hosted_zone_id" {
 
 output "s3_bucket_lifecycle_configuration_rules" {
   description = "The lifecycle rules of the bucket, if the bucket is configured with lifecycle rules. If not, this will be an empty string."
-  value       = try(jsondecode(jsonencode(aws_s3_bucket_lifecycle_configuration.this[0].rule)), "")
+  value       = try(aws_s3_bucket_lifecycle_configuration.this[0].rule, "")
 }
 
 output "s3_bucket_policy" {
   description = "The policy of the bucket, if the bucket is configured with a policy. If not, this will be an empty string."
-  value       = try(jsondecode(aws_s3_bucket_policy.this[0].policy), "")
+  value       = try(aws_s3_bucket_policy.this[0].policy, "")
 }
 
 output "s3_bucket_region" {
