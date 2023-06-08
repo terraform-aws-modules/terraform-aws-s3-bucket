@@ -19,7 +19,7 @@ resource "aws_s3_bucket_notification" "this" {
     for_each = var.lambda_notifications
 
     content {
-      id                  = lambda_function.key
+      id                  = try(lambda_function.value.id, lambda_function.key)
       lambda_function_arn = lambda_function.value.function_arn
       events              = lambda_function.value.events
       filter_prefix       = try(lambda_function.value.filter_prefix, null)
@@ -31,7 +31,7 @@ resource "aws_s3_bucket_notification" "this" {
     for_each = var.sqs_notifications
 
     content {
-      id            = queue.key
+      id            = try(queue.value.id, queue.key)
       queue_arn     = queue.value.queue_arn
       events        = queue.value.events
       filter_prefix = try(queue.value.filter_prefix, null)
@@ -43,7 +43,7 @@ resource "aws_s3_bucket_notification" "this" {
     for_each = var.sns_notifications
 
     content {
-      id            = topic.key
+      id            = try(topic.value.id, topic.key)
       topic_arn     = topic.value.topic_arn
       events        = topic.value.events
       filter_prefix = try(topic.value.filter_prefix, null)
