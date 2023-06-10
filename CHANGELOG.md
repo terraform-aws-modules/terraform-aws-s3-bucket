@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.12.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.11.0...v3.12.0) (2023-06-08)
+
+
+### Features
+
+* Allow setting id parameter in notification object ([#236](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/236)) ([f9067dc](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/f9067dca08248d90c24a8b664aa006bc356dcc98))
+
 ## [3.11.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.10.1...v3.11.0) (2023-05-25)
 
 
