@@ -797,7 +797,7 @@ data "aws_iam_policy_document" "require_latest_tls" {
 }
 
 data "aws_iam_policy_document" "deny_incorrect_encryption_headers" {
-  count = local.create_bucket && length(keys(var.server_side_encryption_configuration)) > 0 && var.attach_deny_incorrect_encryption_headers ? 1 : 0
+  count = local.create_bucket && var.attach_deny_incorrect_encryption_headers ? 1 : 0
 
   statement {
     sid    = "denyIncorrectEncryptionHeaders"
@@ -819,13 +819,13 @@ data "aws_iam_policy_document" "deny_incorrect_encryption_headers" {
     condition {
       test     = "StringNotEquals"
       variable = "s3:x-amz-server-side-encryption"
-      values   = var.server_side_encryption_configuration.rule.apply_server_side_encryption_by_default.sse_algorithm == "aws:kms" ? ["aws:kms"] : ["AES256"]
+      values   = try(var.server_side_encryption_configuration.rule.apply_server_side_encryption_by_default.sse_algorithm, null) == "aws:kms" ? ["aws:kms"] : ["AES256"]
     }
   }
 }
 
 data "aws_iam_policy_document" "deny_unencrypted_object_uploads" {
-  count = local.create_bucket && length(keys(var.server_side_encryption_configuration)) > 0 && var.attach_deny_unencrypted_object_uploads ? 1 : 0
+  count = local.create_bucket && var.attach_deny_unencrypted_object_uploads ? 1 : 0
 
   statement {
     sid    = "denyUnencryptedObjectUploads"
