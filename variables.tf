@@ -58,6 +58,18 @@ variable "attach_analytics_destination_policy" {
   default     = false
 }
 
+variable "attach_deny_incorrect_encryption_headers" {
+  description = "Controls if S3 bucket should deny incorrect encryption headers policy attached."
+  type        = bool
+  default     = false
+}
+
+variable "attach_deny_unencrypted_object_uploads" {
+  description = "Controls if S3 bucket should deny unencrypted object uploads policy attached."
+  type        = bool
+  default     = false
+}
+
 variable "bucket" {
   description = "(Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name."
   type        = string
