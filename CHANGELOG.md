@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.13.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.12.0...v3.13.0) (2023-06-11)
+
+
+### Features
+
+* Add "deny unencrypted object uploads" and "incorrect encryption headers" bucket policies ([#238](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/238)) ([2542a36](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/2542a36f2d85cba2996a348c70b5c7b6d523b675))
+
 ## [3.12.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.11.0...v3.12.0) (2023-06-08)
 
 
