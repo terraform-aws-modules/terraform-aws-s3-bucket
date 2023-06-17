@@ -64,6 +64,18 @@ variable "attach_deny_incorrect_encryption_headers" {
   default     = false
 }
 
+variable "attach_deny_incorrect_kms_key_sse" {
+  description = "Controls if S3 bucket should deny incorrect kms key sse policy attached."
+  type        = bool
+  default     = false
+}
+
+variable "kms_key_sse_arn" {
+  description = "The kms key sse ARN."
+  type        = string
+  default     = null
+}
+
 variable "attach_deny_unencrypted_object_uploads" {
   description = "Controls if S3 bucket should deny unencrypted object uploads policy attached."
   type        = bool
