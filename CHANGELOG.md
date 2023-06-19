@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.14.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.13.0...v3.14.0) (2023-06-19)
+
+
+### Features
+
+* Add "deny incorrect kms key sse" bucket policy ([#240](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/240)) ([e0d5788](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/e0d5788f7884280f66c62734127efa7661462640))
+
 ## [3.13.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.12.0...v3.13.0) (2023-06-11)
 
 
