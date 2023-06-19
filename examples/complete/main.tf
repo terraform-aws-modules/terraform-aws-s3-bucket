@@ -138,7 +138,7 @@ module "s3_bucket" {
   attach_require_latest_tls_policy         = true
   attach_deny_incorrect_encryption_headers = true
   attach_deny_incorrect_kms_key_sse        = true
-  kms_key_sse_arn                          = aws_kms_key.objects.arn
+  allowed_kms_key_arn                      = aws_kms_key.objects.arn
   attach_deny_unencrypted_object_uploads   = true
 
   # S3 bucket-level Public Access Block configuration (by default now AWS has made this default as true for S3 bucket-level block public access)

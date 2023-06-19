@@ -848,7 +848,7 @@ data "aws_iam_policy_document" "deny_incorrect_kms_key_sse" {
     condition {
       test     = "StringNotEquals"
       variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
-      values   = [try(var.kms_key_sse_arn, null)]
+      values   = [try(var.allowed_kms_key_arn, null)]
     }
   }
 }

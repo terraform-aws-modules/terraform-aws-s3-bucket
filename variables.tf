@@ -65,13 +65,13 @@ variable "attach_deny_incorrect_encryption_headers" {
 }
 
 variable "attach_deny_incorrect_kms_key_sse" {
-  description = "Controls if S3 bucket should deny incorrect kms key sse policy attached."
+  description = "Controls if S3 bucket policy should deny usage of incorrect KMS key SSE."
   type        = bool
   default     = false
 }
 
-variable "kms_key_sse_arn" {
-  description = "The kms key sse ARN."
+variable "allowed_kms_key_arn" {
+  description = "The ARN of KMS key which should be allowed in PutObject"
   type        = string
   default     = null
 }
