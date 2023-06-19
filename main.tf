@@ -8,7 +8,7 @@ data "aws_partition" "current" {}
 locals {
   create_bucket = var.create_bucket && var.putin_khuylo
 
-  attach_policy = var.attach_require_latest_tls_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_unencrypted_object_uploads || var.attach_policy
+  attach_policy = var.attach_require_latest_tls_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_policy
 
   # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
   grants               = try(jsondecode(var.grant), var.grant)
@@ -534,6 +534,7 @@ data "aws_iam_policy_document" "combined" {
     var.attach_require_latest_tls_policy ? data.aws_iam_policy_document.require_latest_tls[0].json : "",
     var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
     var.attach_deny_unencrypted_object_uploads ? data.aws_iam_policy_document.deny_unencrypted_object_uploads[0].json : "",
+    var.attach_deny_incorrect_kms_key_sse ? data.aws_iam_policy_document.deny_incorrect_kms_key_sse[0].json : "",
     var.attach_deny_incorrect_encryption_headers ? data.aws_iam_policy_document.deny_incorrect_encryption_headers[0].json : "",
     var.attach_inventory_destination_policy || var.attach_analytics_destination_policy ? data.aws_iam_policy_document.inventory_and_analytics_destination_policy[0].json : "",
     var.attach_policy ? var.policy : ""
@@ -820,6 +821,34 @@ data "aws_iam_policy_document" "deny_incorrect_encryption_headers" {
       test     = "StringNotEquals"
       variable = "s3:x-amz-server-side-encryption"
       values   = try(var.server_side_encryption_configuration.rule.apply_server_side_encryption_by_default.sse_algorithm, null) == "aws:kms" ? ["aws:kms"] : ["AES256"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "deny_incorrect_kms_key_sse" {
+  count = local.create_bucket && var.attach_deny_incorrect_kms_key_sse ? 1 : 0
+
+  statement {
+    sid    = "denyIncorrectKmsKeySse"
+    effect = "Deny"
+
+    actions = [
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "${aws_s3_bucket.this[0].arn}/*"
+    ]
+
+    principals {
+      identifiers = ["*"]
+      type        = "*"
+    }
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
+      values   = [try(var.allowed_kms_key_arn, null)]
     }
   }
 }

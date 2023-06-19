@@ -14,6 +14,8 @@ module "wrapper" {
   attach_inventory_destination_policy        = try(each.value.attach_inventory_destination_policy, var.defaults.attach_inventory_destination_policy, false)
   attach_analytics_destination_policy        = try(each.value.attach_analytics_destination_policy, var.defaults.attach_analytics_destination_policy, false)
   attach_deny_incorrect_encryption_headers   = try(each.value.attach_deny_incorrect_encryption_headers, var.defaults.attach_deny_incorrect_encryption_headers, false)
+  attach_deny_incorrect_kms_key_sse          = try(each.value.attach_deny_incorrect_kms_key_sse, var.defaults.attach_deny_incorrect_kms_key_sse, false)
+  allowed_kms_key_arn                        = try(each.value.allowed_kms_key_arn, var.defaults.allowed_kms_key_arn, null)
   attach_deny_unencrypted_object_uploads     = try(each.value.attach_deny_unencrypted_object_uploads, var.defaults.attach_deny_unencrypted_object_uploads, false)
   bucket                                     = try(each.value.bucket, var.defaults.bucket, null)
   bucket_prefix                              = try(each.value.bucket_prefix, var.defaults.bucket_prefix, null)
