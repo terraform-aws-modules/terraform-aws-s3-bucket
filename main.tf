@@ -1,6 +1,8 @@
 data "aws_region" "current" {}
 
-data "aws_canonical_user_id" "this" {}
+data "aws_canonical_user_id" "this" {
+  count = local.create_bucket && ((var.acl != null && var.acl != "null") || length(local.grants) > 0) ? 1 : 0
+}
 
 data "aws_caller_identity" "current" {}
 
@@ -67,7 +69,7 @@ resource "aws_s3_bucket_acl" "this" {
       }
 
       owner {
-        id           = try(var.owner["id"], data.aws_canonical_user_id.this.id)
+        id           = try(var.owner["id"], data.aws_canonical_user_id.this[0].id)
         display_name = try(var.owner["display_name"], null)
       }
     }
