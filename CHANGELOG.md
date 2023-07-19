@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.14.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.14.0...v3.14.1) (2023-07-19)
+
+
+### Bug Fixes
+
+* Update log delivery policy to add `s3:ListBucket` action ([#245](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/245)) ([af0a28d](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/af0a28d70b8722e77ecf16c15a2b029105074934))
+
 ## [3.14.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.13.0...v3.14.0) (2023-06-19)
 
 
