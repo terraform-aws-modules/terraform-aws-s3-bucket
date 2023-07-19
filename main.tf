@@ -661,6 +661,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
 
     actions = [
       "s3:GetBucketAcl",
+      "s3:ListBucket",
     ]
 
     resources = [
