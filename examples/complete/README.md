@@ -47,6 +47,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="module_cloudfront_log_bucket"></a> [cloudfront\_log\_bucket](#module\_cloudfront\_log\_bucket) | ../../ | n/a |
 | <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | ../../ | n/a |
 | <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
+| <a name="module_simple_bucket"></a> [simple\_bucket](#module\_simple\_bucket) | ../../ | n/a |
 
 ## Resources
 

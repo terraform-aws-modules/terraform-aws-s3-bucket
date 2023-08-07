@@ -106,6 +106,14 @@ module "cloudfront_log_bucket" {
   force_destroy = true
 }
 
+module "simple_bucket" {
+  source = "../../"
+
+  bucket = "simple-${random_pet.this.id}"
+
+  force_destroy = true
+}
+
 module "s3_bucket" {
   source = "../../"
 
