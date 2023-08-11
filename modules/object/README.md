@@ -9,12 +9,14 @@ Creates S3 bucket objects with different configurations.
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.75 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | >= 3.4 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.75 |
+| <a name="provider_http"></a> [http](#provider\_http) | >= 3.4 |
 
 ## Modules
 
@@ -25,6 +27,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [aws_s3_object.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
+| [http_http.mime_types_db](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
 ## Inputs
 
@@ -41,6 +44,7 @@ No modules.
 | <a name="input_content_language"></a> [content\_language](#input\_content\_language) | The language the content is in e.g. en-US or en-GB. | `string` | `null` | no |
 | <a name="input_content_type"></a> [content\_type](#input\_content\_type) | A standard MIME type describing the format of the object data, e.g. application/octet-stream. All Valid MIME Types are valid for this input. | `string` | `null` | no |
 | <a name="input_create"></a> [create](#input\_create) | Whether to create this resource or not? | `bool` | `true` | no |
+| <a name="input_detect_content_type"></a> [detect\_content\_type](#input\_detect\_content\_type) | Whether to set content\_type depending on file extension | `bool` | `true` | no |
 | <a name="input_etag"></a> [etag](#input\_etag) | Used to trigger updates. This attribute is not compatible with KMS encryption, kms\_key\_id or server\_side\_encryption = "aws:kms". | `string` | `null` | no |
 | <a name="input_file_source"></a> [file\_source](#input\_file\_source) | The path to a file that will be read and uploaded as raw bytes for the object content. | `string` | `null` | no |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Allow the object to be deleted by removing any legal hold on any object version. Default is false. This value should be set to true only if the bucket has S3 object lock enabled. | `bool` | `false` | no |
@@ -50,6 +54,7 @@ No modules.
 | <a name="input_object_lock_legal_hold_status"></a> [object\_lock\_legal\_hold\_status](#input\_object\_lock\_legal\_hold\_status) | The legal hold status that you want to apply to the specified object. Valid values are ON and OFF. | `string` | `null` | no |
 | <a name="input_object_lock_mode"></a> [object\_lock\_mode](#input\_object\_lock\_mode) | The object lock retention mode that you want to apply to this object. Valid values are GOVERNANCE and COMPLIANCE. | `string` | `null` | no |
 | <a name="input_object_lock_retain_until_date"></a> [object\_lock\_retain\_until\_date](#input\_object\_lock\_retain\_until\_date) | The date and time, in RFC3339 format, when this object's object lock will expire. | `string` | `null` | no |
+| <a name="input_query_mime_types"></a> [query\_mime\_types](#input\_query\_mime\_types) | Whether to query mime types (local copy used if not, only applies if detect\_content\_type == true) | `bool` | `false` | no |
 | <a name="input_server_side_encryption"></a> [server\_side\_encryption](#input\_server\_side\_encryption) | Specifies server-side encryption of the object in S3. Valid values are "AES256" and "aws:kms". | `string` | `null` | no |
 | <a name="input_source_hash"></a> [source\_hash](#input\_source\_hash) | Triggers updates like etag but useful to address etag encryption limitations. Set using filemd5("path/to/source") (Terraform 0.11.12 or later). (The value is only stored in state and not saved by AWS.) | `string` | `null` | no |
 | <a name="input_storage_class"></a> [storage\_class](#input\_storage\_class) | Specifies the desired Storage Class for the object. Can be either STANDARD, REDUCED\_REDUNDANCY, ONEZONE\_IA, INTELLIGENT\_TIERING, GLACIER, DEEP\_ARCHIVE, or STANDARD\_IA. Defaults to STANDARD. | `string` | `null` | no |
