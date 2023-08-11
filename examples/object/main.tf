@@ -16,7 +16,7 @@ module "object" {
   source = "../../modules/object"
 
   bucket = module.s3_bucket.s3_bucket_id
-  key    = "${random_pet.this.id}-local"
+  key    = "${random_pet.this.id}-local.md"
 
   file_source = "README.md"
   #  content = file("README.md")
@@ -26,6 +26,7 @@ module "object" {
     Sensitive = "not-really"
   }
 }
+
 module "object_complete" {
   source = "../../modules/object"
 
@@ -43,6 +44,9 @@ module "object_complete" {
   content_encoding    = "gzip"
   content_language    = "en-US"
   content_type        = "application/json"
+
+  detect_content_type = false
+  query_mime_types    = false
 
   website_redirect = "https://www.google.com/"
   metadata = {
