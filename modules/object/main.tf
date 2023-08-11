@@ -17,7 +17,7 @@ resource "aws_s3_object" "this" {
   content_disposition = var.content_disposition
   content_encoding    = var.content_encoding
   content_language    = var.content_language
-  content_type        = var.content_type
+  content_type        = local.enable_content_type_detection ? local.content_type : var.content_type
   website_redirect    = var.website_redirect
   metadata            = var.metadata
 

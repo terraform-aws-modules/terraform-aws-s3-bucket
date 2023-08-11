@@ -147,3 +147,15 @@ variable "source_hash" {
   type        = string
   default     = null
 }
+
+variable "detect_content_type" {
+  description = "Whether to set content_type depending on file extension"
+  type        = bool
+  default     = true
+}
+
+variable "query_mime_types" {
+  description = "Whether to query mime types (local copy used if not, only applies if detect_content_type == true)"
+  type        = bool
+  default     = false
+}
