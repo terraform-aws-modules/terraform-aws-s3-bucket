@@ -1,12 +1,16 @@
 data "aws_region" "current" {}
 
-data "aws_canonical_user_id" "this" {}
+data "aws_canonical_user_id" "this" {
+  count = local.create_bucket && local.create_bucket_acl && try(var.owner["id"], null) == null ? 1 : 0
+}
 
 data "aws_caller_identity" "current" {}
 
 data "aws_partition" "current" {}
 locals {
   create_bucket = var.create_bucket && var.putin_khuylo
+
+  create_bucket_acl = (var.acl != null && var.acl != "null") || length(local.grants) > 0
 
   attach_policy = var.attach_require_latest_tls_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_policy
 
@@ -39,7 +43,7 @@ resource "aws_s3_bucket_logging" "this" {
 }
 
 resource "aws_s3_bucket_acl" "this" {
-  count = local.create_bucket && ((var.acl != null && var.acl != "null") || length(local.grants) > 0) ? 1 : 0
+  count = local.create_bucket && local.create_bucket_acl ? 1 : 0
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -67,7 +71,7 @@ resource "aws_s3_bucket_acl" "this" {
       }
 
       owner {
-        id           = try(var.owner["id"], data.aws_canonical_user_id.this.id)
+        id           = try(var.owner["id"], data.aws_canonical_user_id.this[0].id)
         display_name = try(var.owner["display_name"], null)
       }
     }
