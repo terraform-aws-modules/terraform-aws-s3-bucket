@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.15.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.14.1...v3.15.0) (2023-08-22)
+
+
+### Features
+
+* Stop requiring `s3:ListAllMyBuckets` IAM permission unless needed (for bucket ACL) ([#243](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/243)) ([74fcc60](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/74fcc607d21bdd34c2daf3a3ca997c7c0c1c4dde))
+
 ### [3.14.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.14.0...v3.14.1) (2023-07-19)
 
 
