@@ -535,6 +535,8 @@ data "aws_iam_policy_document" "combined" {
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
     var.attach_lb_log_delivery_policy ? data.aws_iam_policy_document.lb_log_delivery[0].json : "",
     var.attach_access_log_delivery_policy ? data.aws_iam_policy_document.access_log_delivery[0].json : "",
+    var.attach_cloudfront_oai_read_policy ? data.aws_iam_policy_document.cloudfront_oai_read_policy[0].json : "",
+    var.attach_cloudfront_oac_read_policy ? data.aws_iam_policy_document.cloudfront_oac_read_policy[0].json : "",
     var.attach_require_latest_tls_policy ? data.aws_iam_policy_document.require_latest_tls[0].json : "",
     var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
     var.attach_deny_unencrypted_object_uploads ? data.aws_iam_policy_document.deny_unencrypted_object_uploads[0].json : "",
@@ -737,6 +739,66 @@ data "aws_iam_policy_document" "access_log_delivery" {
       aws_s3_bucket.this[0].arn,
     ]
 
+  }
+}
+
+# Grant read and list access to CloudFront Origin Access Identities (deprecated by AWS)
+data "aws_iam_policy_document" "cloudfront_oai_read_policy" {
+  count = local.create_bucket && var.attach_cloudfront_oai_read_policy ? 1 : 0
+
+  statement {
+    sid = "AWSCloudFrontOAIRead"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.this[0].arn}/*"]
+    principals {
+      type        = "AWS"
+      identifiers = var.cloudfront_oai_iam_arns
+    }
+  }
+
+  statement {
+    sid = "AWSCloudFrontOAIList"
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.this[0].arn]
+    principals {
+      type        = "AWS"
+      identifiers = var.cloudfront_oai_iam_arns
+    }
+  }
+}
+
+# Grant read and list access to CloudFront Origin Access Controls
+data "aws_iam_policy_document" "cloudfront_oac_read_policy" {
+  count = local.create_bucket && var.attach_cloudfront_oac_read_policy ? 1 : 0
+
+  statement {
+    sid       = "AWSCloudFrontOACRead"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.this[0].arn}/*"]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = var.cloudfront_oac_distribution_arns
+    }
+  }
+
+  statement {
+    sid       = "AWSCloudFrontOACList"
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.this[0].arn]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = var.cloudfront_oac_distribution_arns
+    }
   }
 }
 
