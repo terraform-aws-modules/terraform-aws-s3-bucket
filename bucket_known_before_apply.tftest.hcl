@@ -3,9 +3,9 @@ provider "aws" {
 }
 
 variables {
-  bucket = "known-value"
+  bucket            = "known-value"
   create_bucket_acl = true
-  acl = "private"
+  acl               = "private"
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
