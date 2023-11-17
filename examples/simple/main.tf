@@ -1,8 +1,8 @@
 locals {
-    bucket_name = "known-name"
+  bucket_name = "known-name"
 }
 provider "aws" {
-  region      = "eu-west-1"
+  region = "eu-west-1"
 }
 
 module "simple_bucket" {
