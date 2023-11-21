@@ -101,3 +101,19 @@ module "s3_bucket_with_object_lock" {
     object_lock_enabled = "Enabled"
   }
 }
+
+module "object_with_default_tags_override" {
+  source = "../../modules/object"
+
+  bucket                = module.s3_bucket.s3_bucket_id
+  key                   = "${random_pet.this.id}-local"
+  override_default_tags = true
+
+  file_source = "README.md"
+  #  content = file("README.md")
+  #  content_base64 = filebase64("README.md")
+
+  tags = {
+    Sensitive = "not-really"
+  }
+}
