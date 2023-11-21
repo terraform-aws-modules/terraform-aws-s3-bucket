@@ -147,3 +147,9 @@ variable "source_hash" {
   type        = string
   default     = null
 }
+
+variable "override_default_tags" {
+  description = "Ignore provider default_tags. S3 objects support a maximum of 10 tags."
+  type        = bool
+  default     = false
+}
