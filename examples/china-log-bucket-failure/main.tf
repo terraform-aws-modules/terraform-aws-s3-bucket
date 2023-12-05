@@ -17,7 +17,7 @@ locals {
   name        = "china-alb-fail-${random_pet.this.id}"
   vpc_cidr    = "10.0.0.0/16"
 
-  azs         = slice(data.aws_availability_zones.available.names, 0, 3)
+  azs = slice(data.aws_availability_zones.available.names, 0, 3)
 }
 
 ##################################################################
@@ -51,26 +51,9 @@ resource "aws_iam_role" "this" {
 EOF
 }
 
-data "aws_iam_policy_document" "bucket_policy" {
-  statement {
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.this.arn]
-    }
-
-    actions = [
-      "s3:ListBucket",
-    ]
-
-    resources = [
-      "arn:aws:s3:::${local.bucket_name}",
-    ]
-  }
-}
-
 module "log_bucket" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-#  source = "git::https://github.com/bohnjamin/terraform-aws-s3-bucket.git?ref=add-china-regions"
+  source = "terraform-aws-modules/s3-bucket/aws"
+  #  source = "git::https://github.com/bohnjamin/terraform-aws-s3-bucket.git?ref=add-china-regions"
 
   bucket        = "logs-${random_pet.this.id}"
   force_destroy = true
@@ -152,4 +135,3 @@ module "vpc" {
   public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
 
 }
-
