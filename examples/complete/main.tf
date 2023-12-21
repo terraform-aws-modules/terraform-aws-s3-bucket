@@ -167,6 +167,12 @@ module "s3_bucket" {
   logging = {
     target_bucket = module.log_bucket.s3_bucket_id
     target_prefix = "log/"
+    target_object_key_format = {
+      partitioned_prefix = {
+        partition_date_source = "DeliveryTime" # "EventTime"
+      }
+      # simple_prefix = {}
+    }
   }
 
   versioning = {
