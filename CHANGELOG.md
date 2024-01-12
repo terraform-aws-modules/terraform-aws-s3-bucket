@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [3.15.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.15.1...v3.15.2) (2024-01-12)
+
+
+### Bug Fixes
+
+* Add China regions to elb_service_accounts ([#264](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/264)) ([c6870d5](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/c6870d5187eaa83d089ebeb7d1e750217da4ec89))
+
 ### [3.15.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.15.0...v3.15.1) (2023-08-26)
 
 
