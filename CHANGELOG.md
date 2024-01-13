@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [4.0.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.0.0...v4.0.1) (2024-01-13)
+
+
+### Bug Fixes
+
+* Fixed routing rule condition ([#270](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/270)) ([116f79b](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/116f79be982b02c3f14dd92a8694d214dc81b3f5))
+
 ## [4.0.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.15.2...v4.0.0) (2024-01-13)
 
 
