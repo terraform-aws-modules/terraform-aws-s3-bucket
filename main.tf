@@ -138,7 +138,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
 
     content {
       dynamic "condition" {
-        for_each = [try([routing_rule.value.condition], [])]
+        for_each = try([routing_rule.value.condition], [])
 
         content {
           http_error_code_returned_equals = try(routing_rule.value.condition["http_error_code_returned_equals"], null)
