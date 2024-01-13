@@ -5,7 +5,6 @@ provider "aws" {
   skip_metadata_api_check     = true
   skip_region_validation      = true
   skip_credentials_validation = true
-  skip_requesting_account_id  = true
 }
 
 locals {
@@ -167,6 +166,12 @@ module "s3_bucket" {
   logging = {
     target_bucket = module.log_bucket.s3_bucket_id
     target_prefix = "log/"
+    target_object_key_format = {
+      partitioned_prefix = {
+        partition_date_source = "DeliveryTime" # "EventTime"
+      }
+      # simple_prefix = {}
+    }
   }
 
   versioning = {
