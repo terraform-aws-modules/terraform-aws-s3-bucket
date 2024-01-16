@@ -36,7 +36,7 @@ resource "aws_s3_bucket" "this" {
 resource "aws_s3_bucket_logging" "this" {
   count = local.create_bucket && length(keys(var.logging)) > 0 ? 1 : 0
 
-  bucket = aws_s3_bucket.this[0].bucket
+  bucket = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
 
   target_bucket = var.logging["target_bucket"]
   target_prefix = try(var.logging["target_prefix"], null)
@@ -45,7 +45,7 @@ resource "aws_s3_bucket_logging" "this" {
 resource "aws_s3_bucket_acl" "this" {
   count = local.create_bucket && local.create_bucket_acl ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].bucket
+  bucket                = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   expected_bucket_owner = var.expected_bucket_owner
 
   # hack when `null` value can't be used (eg, from terragrunt, https://github.com/gruntwork-io/terragrunt/pull/1367)
@@ -84,7 +84,7 @@ resource "aws_s3_bucket_acl" "this" {
 resource "aws_s3_bucket_website_configuration" "this" {
   count = local.create_bucket && length(keys(var.website)) > 0 ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].bucket
+  bucket                = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "index_document" {
@@ -139,7 +139,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
 resource "aws_s3_bucket_versioning" "this" {
   count = local.create_bucket && length(keys(var.versioning)) > 0 ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].bucket
+  bucket                = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   expected_bucket_owner = var.expected_bucket_owner
   mfa                   = try(var.versioning["mfa"], null)
 
@@ -155,7 +155,7 @@ resource "aws_s3_bucket_versioning" "this" {
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
   count = local.create_bucket && length(keys(var.server_side_encryption_configuration)) > 0 ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].bucket
+  bucket                = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "rule" {
@@ -179,7 +179,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 resource "aws_s3_bucket_accelerate_configuration" "this" {
   count = local.create_bucket && var.acceleration_status != null ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].bucket
+  bucket                = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   expected_bucket_owner = var.expected_bucket_owner
 
   # Valid values: "Enabled" or "Suspended"
@@ -189,7 +189,7 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
 resource "aws_s3_bucket_request_payment_configuration" "this" {
   count = local.create_bucket && var.request_payer != null ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].bucket
+  bucket                = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   expected_bucket_owner = var.expected_bucket_owner
 
   # Valid values: "BucketOwner" or "Requester"
@@ -199,7 +199,7 @@ resource "aws_s3_bucket_request_payment_configuration" "this" {
 resource "aws_s3_bucket_cors_configuration" "this" {
   count = local.create_bucket && length(local.cors_rules) > 0 ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].bucket
+  bucket                = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "cors_rule" {
@@ -219,7 +219,7 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
   count = local.create_bucket && length(local.lifecycle_rules) > 0 ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].bucket
+  bucket                = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "rule" {
@@ -334,7 +334,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 resource "aws_s3_bucket_object_lock_configuration" "this" {
   count = local.create_bucket && var.object_lock_enabled && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].bucket
+  bucket                = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   expected_bucket_owner = var.expected_bucket_owner
   token                 = try(var.object_lock_configuration.token, null)
 
@@ -350,7 +350,7 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 resource "aws_s3_bucket_replication_configuration" "this" {
   count = local.create_bucket && length(keys(var.replication_configuration)) > 0 ? 1 : 0
 
-  bucket = aws_s3_bucket.this[0].bucket
+  bucket = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   role   = var.replication_configuration["role"]
 
   dynamic "rule" {
@@ -520,7 +520,7 @@ resource "aws_s3_bucket_policy" "this" {
   # to prevent "A conflicting conditional operation is currently in progress against this resource."
   # Ref: https://github.com/hashicorp/terraform-provider-aws/issues/7628
 
-  bucket = aws_s3_bucket.this[0].bucket
+  bucket = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   policy = data.aws_iam_policy_document.combined[0].json
 
   depends_on = [
@@ -889,7 +889,7 @@ data "aws_iam_policy_document" "deny_unencrypted_object_uploads" {
 resource "aws_s3_bucket_public_access_block" "this" {
   count = local.create_bucket && var.attach_public_policy ? 1 : 0
 
-  bucket = aws_s3_bucket.this[0].bucket
+  bucket = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
 
   block_public_acls       = var.block_public_acls
   block_public_policy     = var.block_public_policy
@@ -900,7 +900,7 @@ resource "aws_s3_bucket_public_access_block" "this" {
 resource "aws_s3_bucket_ownership_controls" "this" {
   count = local.create_bucket && var.control_object_ownership ? 1 : 0
 
-  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].bucket
+  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
 
   rule {
     object_ownership = var.object_ownership
@@ -918,7 +918,7 @@ resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
   for_each = { for k, v in local.intelligent_tiering : k => v if local.create_bucket }
 
   name   = each.key
-  bucket = aws_s3_bucket.this[0].bucket
+  bucket = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   status = try(tobool(each.value.status) ? "Enabled" : "Disabled", title(lower(each.value.status)), null)
 
   # Max 1 block - filter
@@ -946,7 +946,7 @@ resource "aws_s3_bucket_metric" "this" {
   for_each = { for k, v in local.metric_configuration : k => v if local.create_bucket }
 
   name   = each.value.name
-  bucket = aws_s3_bucket.this[0].bucket
+  bucket = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
 
   dynamic "filter" {
     for_each = length(try(flatten([each.value.filter]), [])) == 0 ? [] : [true]
@@ -961,7 +961,7 @@ resource "aws_s3_bucket_inventory" "this" {
   for_each = { for k, v in var.inventory_configuration : k => v if local.create_bucket }
 
   name                     = each.key
-  bucket                   = try(each.value.bucket, aws_s3_bucket.this[0].bucket)
+  bucket                   = try(each.value.bucket, coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id))
   included_object_versions = each.value.included_object_versions
   enabled                  = try(each.value.enabled, true)
   optional_fields          = try(each.value.optional_fields, null)
@@ -1061,7 +1061,7 @@ data "aws_iam_policy_document" "inventory_and_analytics_destination_policy" {
 resource "aws_s3_bucket_analytics_configuration" "this" {
   for_each = { for k, v in var.analytics_configuration : k => v if local.create_bucket }
 
-  bucket = aws_s3_bucket.this[0].bucket
+  bucket = coalesce(aws_s3_bucket.this[0].bucket, aws_s3_bucket.this[0].id)
   name   = each.key
 
   dynamic "filter" {
