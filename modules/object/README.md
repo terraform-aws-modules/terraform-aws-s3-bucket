@@ -8,13 +8,13 @@ Creates S3 bucket objects with different configurations.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.75 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.24 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.75 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.24 |
 
 ## Modules
 
@@ -50,6 +50,7 @@ No modules.
 | <a name="input_object_lock_legal_hold_status"></a> [object\_lock\_legal\_hold\_status](#input\_object\_lock\_legal\_hold\_status) | The legal hold status that you want to apply to the specified object. Valid values are ON and OFF. | `string` | `null` | no |
 | <a name="input_object_lock_mode"></a> [object\_lock\_mode](#input\_object\_lock\_mode) | The object lock retention mode that you want to apply to this object. Valid values are GOVERNANCE and COMPLIANCE. | `string` | `null` | no |
 | <a name="input_object_lock_retain_until_date"></a> [object\_lock\_retain\_until\_date](#input\_object\_lock\_retain\_until\_date) | The date and time, in RFC3339 format, when this object's object lock will expire. | `string` | `null` | no |
+| <a name="input_override_default_tags"></a> [override\_default\_tags](#input\_override\_default\_tags) | Ignore provider default\_tags. S3 objects support a maximum of 10 tags. | `bool` | `false` | no |
 | <a name="input_server_side_encryption"></a> [server\_side\_encryption](#input\_server\_side\_encryption) | Specifies server-side encryption of the object in S3. Valid values are "AES256" and "aws:kms". | `string` | `null` | no |
 | <a name="input_source_hash"></a> [source\_hash](#input\_source\_hash) | Triggers updates like etag but useful to address etag encryption limitations. Set using filemd5("path/to/source") (Terraform 0.11.12 or later). (The value is only stored in state and not saved by AWS.) | `string` | `null` | no |
 | <a name="input_storage_class"></a> [storage\_class](#input\_storage\_class) | Specifies the desired Storage Class for the object. Can be either STANDARD, REDUCED\_REDUNDANCY, ONEZONE\_IA, INTELLIGENT\_TIERING, GLACIER, DEEP\_ARCHIVE, or STANDARD\_IA. Defaults to STANDARD. | `string` | `null` | no |
