@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.0.1...v4.1.0) (2024-01-26)
+
+
+### Features
+
+* Allow override of the default tags override ([#261](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/261)) ([f9e1740](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/f9e1740cafe597f2764a0d2ee7dbd34a0e19753c))
+
 ### [4.0.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.0.0...v4.0.1) (2024-01-13)
 
 
