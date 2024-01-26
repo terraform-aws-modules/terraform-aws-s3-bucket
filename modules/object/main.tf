@@ -33,16 +33,17 @@ resource "aws_s3_object" "this" {
 
   tags = var.tags
 
-  lifecycle {
-    ignore_changes = [object_lock_retain_until_date]
-  }
+  dynamic "override_provider" {
+    for_each = var.override_default_tags ? [true] : []
 
-  override_provider {
-    dynamic "default_tags" {
-      for_each = var.override_default_tags ? [true] : []
-      content {
+    content {
+      default_tags {
         tags = {}
       }
     }
+  }
+
+  lifecycle {
+    ignore_changes = [object_lock_retain_until_date]
   }
 }
