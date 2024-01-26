@@ -5,6 +5,12 @@ provider "aws" {
   skip_metadata_api_check     = true
   skip_region_validation      = true
   skip_credentials_validation = true
+
+  default_tags {
+    tags = {
+      Example = "object"
+    }
+  }
 }
 
 locals {
@@ -25,6 +31,7 @@ module "object" {
     Sensitive = "not-really"
   }
 }
+
 module "object_complete" {
   source = "../../modules/object"
 
@@ -33,7 +40,7 @@ module "object_complete" {
 
   content = jsonencode({ data : "value" })
 
-  acl           = "public-read"
+  # acl           = "public-read"
   storage_class = "ONEZONE_IA"
   force_destroy = true
 
@@ -68,6 +75,21 @@ module "object_locked" {
   object_lock_retain_until_date = formatdate("YYYY-MM-DD'T'hh:00:00Z", timeadd(timestamp(), "1h")) # some time in the future
 }
 
+module "object_with_override_default_tags" {
+  source = "../../modules/object"
+
+  bucket = module.s3_bucket.s3_bucket_id
+  key    = "${random_pet.this.id}-local-override-default-tags"
+
+  override_default_tags = true
+
+  file_source = "README.md"
+
+  tags = {
+    Override = "true"
+  }
+}
+
 ##################
 # Extra resources
 ##################
@@ -96,7 +118,13 @@ module "s3_bucket_with_object_lock" {
   bucket        = "${random_pet.this.id}-with-object-lock"
   force_destroy = true
 
+  object_lock_enabled = true
   object_lock_configuration = {
-    object_lock_enabled = "Enabled"
+    rule = {
+      default_retention = {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
   }
 }
