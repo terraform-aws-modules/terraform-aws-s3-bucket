@@ -40,6 +40,27 @@ resource "aws_s3_bucket_logging" "this" {
 
   target_bucket = var.logging["target_bucket"]
   target_prefix = try(var.logging["target_prefix"], null)
+
+
+  dynamic "target_object_key_format" {
+    for_each = try([var.logging["target_object_key_format"]], [])
+
+    content {
+      dynamic "partitioned_prefix" {
+        for_each = try(target_object_key_format.value["partitioned_prefix"], [])
+
+        content {
+          partition_date_source = try(partitioned_prefix.value, null)
+        }
+      }
+
+      dynamic "simple_prefix" {
+        for_each = contains(keys(target_object_key_format.value), "simple_prefix") ? [true] : []
+
+        content {}
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket_acl" "this" {
@@ -117,7 +138,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
 
     content {
       dynamic "condition" {
-        for_each = [try([routing_rule.value.condition], [])]
+        for_each = try([routing_rule.value.condition], [])
 
         content {
           http_error_code_returned_equals = try(routing_rule.value.condition["http_error_code_returned_equals"], null)
@@ -573,6 +594,8 @@ locals {
     sa-east-1      = "507241528517"
     us-gov-west-1  = "048591011584"
     us-gov-east-1  = "190560391635"
+    cn-north-1     = "638102146993"
+    cn-northwest-1 = "037604701340"
   }
 }
 

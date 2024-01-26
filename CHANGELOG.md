@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+### [4.0.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.0.0...v4.0.1) (2024-01-13)
+
+
+### Bug Fixes
+
+* Fixed routing rule condition ([#270](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/270)) ([116f79b](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/116f79be982b02c3f14dd92a8694d214dc81b3f5))
+
+## [4.0.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.15.2...v4.0.0) (2024-01-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* upd versions.tf to require >= 5.27
+
+### Features
+
+* **logging:** change logging variable type to any ([2c45bde](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/2c45bdeb097cac250c395ed6dfb7c091e5f54abd))
+* **logging:** Date based partitioning for access-logs ([59f65af](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/59f65afbc5050a6c651b51d41180f64de71478dc))
+* upd versions.tf to require >= 5.27 ([7a4aab6](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/7a4aab6d27a5d09404f517a5ef419898e0ce2281))
+
+### [3.15.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.15.1...v3.15.2) (2024-01-12)
+
+
+### Bug Fixes
+
+* Add China regions to elb_service_accounts ([#264](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/264)) ([c6870d5](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/c6870d5187eaa83d089ebeb7d1e750217da4ec89))
+
 ### [3.15.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v3.15.0...v3.15.1) (2023-08-26)
 
 
