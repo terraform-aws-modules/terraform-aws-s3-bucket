@@ -277,7 +277,7 @@ variable "object_lock_enabled" {
 variable "block_public_acls" {
   description = "Whether Amazon S3 should block public ACLs for this bucket."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "block_public_policy" {
