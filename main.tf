@@ -745,7 +745,7 @@ data "aws_iam_policy_document" "access_log_delivery" {
       content {
         test     = "StringEquals"
         variable = "aws:SourceOrgId"
-        values   = var.access_log_delivery_policy_source_org_id
+        values   = [var.access_log_delivery_policy_source_org_id]
       }
     }
 

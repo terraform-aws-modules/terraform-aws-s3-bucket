@@ -14,6 +14,8 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
+data "aws_organizations_organization" "current" {}
+
 data "aws_canonical_user_id" "current" {}
 
 data "aws_cloudfront_log_delivery_canonical_user_id" "cloudfront" {}
@@ -78,6 +80,7 @@ module "log_bucket" {
 
   access_log_delivery_policy_source_accounts = [data.aws_caller_identity.current.account_id]
   access_log_delivery_policy_source_buckets  = ["arn:aws:s3:::${local.bucket_name}"]
+  access_log_delivery_policy_source_org_id   = data.aws_organizations_organization.current.id
 }
 
 module "cloudfront_log_bucket" {
