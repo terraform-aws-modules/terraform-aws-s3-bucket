@@ -740,6 +740,24 @@ data "aws_iam_policy_document" "access_log_delivery" {
       }
     }
 
+    dynamic "condition" {
+      for_each = length(var.access_log_delivery_policy_source_org_id) != 0 ? [true] : []
+      content {
+        test     = "StringEquals"
+        variable = "aws:SourceOrgId"
+        values   = var.access_log_delivery_policy_source_org_id
+      }
+    }
+
+    dynamic "condition" {
+      for_each = length(var.access_log_delivery_policy_source_org_paths) != 0 ? [true] : []
+      content {
+        test     = "ForAnyValue:StringEquals"
+        variable = "aws:SourceOrgPaths"
+        values   = var.access_log_delivery_policy_source_org_paths
+      }
+    }
+
   }
 
   statement {
