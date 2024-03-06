@@ -7,7 +7,7 @@ If you find a bug, please open an issue with supporting configuration to reprodu
 ## List of backwards incompatible changes
 
 - Terraform AWS provider minimum version is now `v4.5.0` in order to have forward compatibility with Terraform AWS provider `v4.x`. Using the latest version of `v4` is highly recommended, if possible.
-- If you are using AWS provider `v3.75` the latest supported version of this module is `v3.0.1` 
+- If you are using AWS provider `v3.75` the latest supported version of this module is `v3.0.1`
 - Main group of changes is related to refactoring of `aws_s3_bucket` resource into several smaller resources. Read [`S3 bucket refactor` section in the official Terraform AWS Provider Version 4 Upgrade Guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade#s3-bucket-refactor) and [discussion around these changes](https://github.com/hashicorp/terraform-provider-aws/issues/23106).
 - `modules/object`: Changed resource type from `aws_bucket_s3_object` to `aws_s3_object`. After upgrade, on the next apply, Terraform will recreate the object. If you prefer to not have Terraform recreate the object, import the object using `aws_s3_object`. [Read more](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_object#import).
 
