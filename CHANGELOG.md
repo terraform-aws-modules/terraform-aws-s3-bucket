@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.1.0...v4.1.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* Update CI workflow versions to remove deprecated runtime warnings ([#274](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/274)) ([ca372ac](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/ca372acbc82e6f8e16ff810a9f1b4a5ae52230b5))
+
 ## [4.1.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.0.1...v4.1.0) (2024-01-26)
 
 
