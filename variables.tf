@@ -22,6 +22,18 @@ variable "attach_access_log_delivery_policy" {
   default     = false
 }
 
+variable "attach_cloudfront_oai_read_policy" {
+  description = "Controls if S3 bucket should have CloudFront Origin Access Identities policy attached (configure with `cloudfront_oai_iam_arns`)"
+  type        = bool
+  default     = false
+}
+
+variable "attach_cloudfront_oac_read_policy" {
+  description = "Controls if S3 bucket should have CloudFront Origin Access Controls policy attached (configure with `cloudfront_oac_distribution_arns`)"
+  type        = bool
+  default     = false
+}
+
 variable "attach_deny_insecure_transport_policy" {
   description = "Controls if S3 bucket should have deny non-SSL transport policy attached"
   type        = bool
@@ -98,6 +110,18 @@ variable "acl" {
   description = "(Optional) The canned ACL to apply. Conflicts with `grant`"
   type        = string
   default     = null
+}
+
+variable "cloudfront_oai_iam_arns" {
+  description = "(Optional) List of CloudFront IAM ARNs to use in the CloudFront Origin Access Identities policy"
+  type        = list(string)
+  default     = []
+}
+
+variable "cloudfront_oac_distribution_arns" {
+  description = "(Optional) List of CloudFront distribution ARNs to use in the CloudFront Origin Access Controls policy"
+  type        = list(string)
+  default     = []
 }
 
 variable "policy" {
