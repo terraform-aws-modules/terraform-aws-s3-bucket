@@ -12,7 +12,7 @@ locals {
 
   create_bucket_acl = (var.acl != null && var.acl != "null") || length(local.grants) > 0
 
-  attach_policy = var.attach_require_latest_tls_policy || var.attach_access_log_delivery_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_policy
+  attach_policy = var.attach_require_latest_tls_policy || var.attach_access_log_delivery_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_policy || var.nist_mode
 
   # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
   grants               = try(jsondecode(var.grant), var.grant)
@@ -555,9 +555,9 @@ data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
     var.attach_lb_log_delivery_policy ? data.aws_iam_policy_document.lb_log_delivery[0].json : "",
-    var.attach_access_log_delivery_policy ? data.aws_iam_policy_document.access_log_delivery[0].json : "",
+    var.attach_access_log_delivery_policy || var.nist_mode ? data.aws_iam_policy_document.access_log_delivery[0].json : "",
     var.attach_require_latest_tls_policy ? data.aws_iam_policy_document.require_latest_tls[0].json : "",
-    var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
+    var.attach_deny_insecure_transport_policy || var.nist_mode ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
     var.attach_deny_unencrypted_object_uploads ? data.aws_iam_policy_document.deny_unencrypted_object_uploads[0].json : "",
     var.attach_deny_incorrect_kms_key_sse ? data.aws_iam_policy_document.deny_incorrect_kms_key_sse[0].json : "",
     var.attach_deny_incorrect_encryption_headers ? data.aws_iam_policy_document.deny_incorrect_encryption_headers[0].json : "",
@@ -702,7 +702,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
 # https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-ownership-migrating-acls-prerequisites.html#object-ownership-server-access-logs
 # https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general
 data "aws_iam_policy_document" "access_log_delivery" {
-  count = local.create_bucket && var.attach_access_log_delivery_policy ? 1 : 0
+  count = local.create_bucket && var.attach_access_log_delivery_policy || var.nist_mode ? 1 : 0
 
   statement {
     sid = "AWSAccessLogDeliveryWrite"
@@ -764,7 +764,7 @@ data "aws_iam_policy_document" "access_log_delivery" {
 }
 
 data "aws_iam_policy_document" "deny_insecure_transport" {
-  count = local.create_bucket && var.attach_deny_insecure_transport_policy ? 1 : 0
+  count = local.create_bucket && var.attach_deny_insecure_transport_policy || var.nist_mode ? 1 : 0
 
   statement {
     sid    = "denyInsecureTransport"
