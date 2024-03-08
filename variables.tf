@@ -4,6 +4,12 @@ variable "create_bucket" {
   default     = true
 }
 
+variable "nist_mode" {
+  description = "Ensures compliance with NIST requirements. Overrides certain other variables. See README for documentation of the effects in this module."
+  type        = bool
+  default     = false
+}
+
 variable "attach_elb_log_delivery_policy" {
   description = "Controls if S3 bucket should have ELB log delivery policy attached"
   type        = bool
