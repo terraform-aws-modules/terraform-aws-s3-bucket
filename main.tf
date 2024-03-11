@@ -29,7 +29,7 @@ resource "aws_s3_bucket" "this" {
   bucket_prefix = var.bucket_prefix
 
   force_destroy       = var.force_destroy
-  object_lock_enabled = var.object_lock_enabled
+  object_lock_enabled = var.nist_mode ? true : var.object_lock_enabled
   tags                = var.tags
 }
 
