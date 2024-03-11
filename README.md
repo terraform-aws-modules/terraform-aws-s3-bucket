@@ -76,6 +76,41 @@ module "s3_bucket_for_logs" {
 }
 ```
 
+## NIST Mode
+
+For government, FedRAMP, and other regulated environments who need to maintain compliance with NIST standards, enabling NIST Mode sets certain values within the module to achieve these requirements. In this module, setting `nist_mode = true` supports the following NIST SP-800-53r.5 requirements:
+- AC-2(4) -- Account Management: Automated Audit Actions
+- AC-3 -- Access Enforcement -- AC-3(7) -- Role Based Access Control
+- AC-4 -- Information Flow Enforcement -- AC-4(21) -- Physical or Logical Separation of Information Flows -- AC-4(26) -- Audit Filtering Actions
+- AC-6 -- Least Privilege -- AC-6(9) -- Log Use of Privileged Functions
+- AC-17(2) -- Remote Access: Protection of Confidentiality and Integrity Using Encryption
+- AC-21 -- Information Sharing
+- AU-2 -- Event Logging
+- AU-3 -- Content of Audit Records
+- AU-6 -- Audit Record Review, Analysis, and Reporting -- AU-6(3) -- Correlate Audit Record Repositories -- AU-6(4) -- Central Review and Analysis
+- AU-10 -- Non-Repudiation
+- AU-12 -- Audit Record Generation
+- CA-7 -- Continuous Monitoring
+- CP-6(2) -- Alternate Storage Site: Recovery Time and Recovery Point Objectives
+- IA-5(1) -- Authenticator Management: Password Based Authentication
+- SC-7 -- Boundary Sharing -- SC-7(3) -- Access Points -- SC-7(4) -- External Telecommunications Services -- SC-7(9) -- Restrict Threatening Outgoing Communications Traffic -- SC-7(11) -- Restrict Incoming Communications Traffic -- SC-7(16) -- Prevent Discovery of System Components -- SC-7(20) -- Dynamic Isolation and Segmentation -- SC-7(21) -- Isolation of System Components
+- SC-8 --Transmission Confidentaility and Integrity -- SC-8(1) --Cryptographic Protection -- SC-8(2) -- Pre- and Post-Transmission Handling
+- SC-12(3) -- Cryptographic Key Establishment and Management: Asymetric Keys
+- SC-13 -- Cryptographic Protection
+- SC-23 -- Session Authenticity -- SC-23(3) -- Unique, System Generated Session Identifiers
+- SI-3(8) -- Malicious Code Protection: Detect Unauthorized Commands
+- SI-4(20) -- System Monitoring: Privileged Users
+- SI-7(6) -- Software, Firmware, and Information Integrity: Cryptographic Protection, SI-7(8) -- Software, Firmware, and Information Integrity: Auditing Capability for Significant Events
+
+*Note:* Setting `nist_mode` to true in this module overrides any value for the following variables:
+- `var.block_public_acls` -- will always be `true` under `nist_mode`
+- `var.block_public_policy` -- will always be `true` under `nist_mode`
+- `var.ignore_public_acls` -- will always be `true` under `nist_mode`
+- `var.restrict_public_buckets` -- will always be `true` under `nist_mode`
+- `var.attach_access_log_delivery_policy` -- will always be `true` under `nist_mode`
+- `var.attach_deny_insecure_transport_policy` -- will always be `true` under `nist_mode`
+- `var.object_lock_enabled` -- will always be `true` under `nist_mode`
+
 ## Conditional creation
 
 Sometimes you need to have a way to create S3 resources conditionally but Terraform does not allow to use `count` inside `module` block, so the solution is to specify argument `create_bucket`.
