@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.1.1...v4.1.2) (2024-04-16)
+
+
+### Bug Fixes
+
+* Typo in description of `access_log_delivery_policy_source_buckets` variable ([#278](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/278)) ([b4a5347](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/b4a5347feb4120a6872c4aade8e50585aeb86e7c))
+
 ## [4.1.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.1.0...v4.1.1) (2024-03-06)
 
 
