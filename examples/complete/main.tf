@@ -70,8 +70,12 @@ module "log_bucket" {
 
   control_object_ownership = true
 
-  attach_elb_log_delivery_policy        = true
-  attach_lb_log_delivery_policy         = true
+  attach_elb_log_delivery_policy       = true
+  attach_lb_log_delivery_policy        = true
+  lb_log_delivery_source_accounts      = ["123456789012"]
+  lb_log_delivery_source_organizations = ["o-1234567891"]
+  lb_log_delivery_source_arns          = ["arn:aws:elasticloadbalancing:us-west-2:123456789012:loadbalancer/app/my-load-balancer/50dc6c495c0c9188"]
+
   attach_access_log_delivery_policy     = true
   attach_deny_insecure_transport_policy = true
   attach_require_latest_tls_policy      = true
