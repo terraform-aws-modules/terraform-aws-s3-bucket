@@ -674,6 +674,33 @@ data "aws_iam_policy_document" "lb_log_delivery" {
       variable = "s3:x-amz-acl"
       values   = ["bucket-owner-full-control"]
     }
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_source_accounts) != 0 ? [true] : []
+      content {
+        test     = "ForAnyValue:StringLike"
+        variable = "aws:SourceAccount"
+        values   = var.lb_log_delivery_source_accounts
+      }
+    }
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_source_organizations) != 0 ? [true] : []
+      content {
+        test     = "ForAnyValue:StringLike"
+        variable = "aws:SourceOrgID"
+        values   = var.lb_log_delivery_source_organizations
+      }
+    }
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_source_arns) != 0 ? [true] : []
+      content {
+        test     = "ForAnyValue:ArnLike"
+        variable = "aws:SourceArn"
+        values   = var.lb_log_delivery_source_arns
+      }
+    }
   }
 
   statement {
@@ -695,6 +722,32 @@ data "aws_iam_policy_document" "lb_log_delivery" {
       aws_s3_bucket.this[0].arn,
     ]
 
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_source_accounts) != 0 ? [true] : []
+      content {
+        test     = "ForAnyValue:StringLike"
+        variable = "aws:SourceAccount"
+        values   = var.lb_log_delivery_source_accounts
+      }
+    }
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_source_organizations) != 0 ? [true] : []
+      content {
+        test     = "ForAnyValue:StringLike"
+        variable = "aws:SourceOrgID"
+        values   = var.lb_log_delivery_source_organizations
+      }
+    }
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_source_arns) != 0 ? [true] : []
+      content {
+        test     = "ForAnyValue:ArnLike"
+        variable = "aws:SourceArn"
+        values   = var.lb_log_delivery_source_arns
+      }
+    }
   }
 }
 

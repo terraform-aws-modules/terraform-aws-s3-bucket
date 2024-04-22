@@ -16,6 +16,24 @@ variable "attach_lb_log_delivery_policy" {
   default     = false
 }
 
+variable "lb_log_delivery_source_accounts" {
+  description = "List of AWS Account IDs that are allowed to deliver ALB/NLB logs to this bucket."
+  type        = list(string)
+  default     = []
+}
+
+variable "lb_log_delivery_source_organizations" {
+  description = "List of Organization IDs that are allowed to deliver ALB/NLB logs to this bucket."
+  type        = list(string)
+  default     = []
+}
+
+variable "lb_log_delivery_source_arns" {
+  description = "List of ARNs that are allowed to deliver ALB/NLB logs to this bucket."
+  type        = list(string)
+  default     = []
+}
+
 variable "attach_access_log_delivery_policy" {
   description = "Controls if S3 bucket should have S3 access log delivery policy attached"
   type        = bool
