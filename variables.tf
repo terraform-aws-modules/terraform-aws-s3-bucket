@@ -82,6 +82,12 @@ variable "attach_deny_unencrypted_object_uploads" {
   default     = false
 }
 
+variable "attach_inspector_findings_delivery_policy" {
+  description = "Controls if S3 bucket should have Inspector findings delivery policy attached"
+  type        = bool
+  default     = false
+}
+
 variable "bucket" {
   description = "(Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name."
   type        = string
@@ -310,15 +316,8 @@ variable "object_ownership" {
   default     = "BucketOwnerEnforced"
 }
 
-variable "attach_inspector_findings_delivery_policy" {
-  description = "Controls if S3 bucket should have Inspector findings delivery policy attached"
-  type        = bool
-  default     = false
-}
-
 variable "putin_khuylo" {
   description = "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!"
   type        = bool
   default     = true
 }
-
