@@ -917,10 +917,10 @@ data "aws_iam_policy_document" "inspector_findings_delivery_policy" {
     sid    = "allow-inspector"
     effect = "Allow"
 
-    actions =[
-				"s3:PutObject",
-				"s3:PutObjectAcl",
-				"s3:AbortMultipartUpload"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:AbortMultipartUpload"
     ]
 
     resources = ["${aws_s3_bucket.this[0].arn}/*"]
@@ -941,7 +941,7 @@ data "aws_iam_policy_document" "inspector_findings_delivery_policy" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = [
-        format("%s%s%s","arn:aws:inspector2:Region:", data.aws_caller_identity.current.id, ":report/*")
+        format("%s%s%s", "arn:aws:inspector2:Region:", data.aws_caller_identity.current.id, ":report/*")
       ]
     }
   }
