@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.1.2...v4.2.0) (2024-10-06)
+
+
+### Features
+
+* Support `transition_default_minimum_object_size` ([#290](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/290)) ([f6fda8c](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/f6fda8c746d2b6951ae59d7a20d33dbaafe0d70f))
+
 ## [4.1.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.1.1...v4.1.2) (2024-04-16)
 
 
