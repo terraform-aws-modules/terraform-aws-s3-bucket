@@ -240,8 +240,9 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
   count = local.create_bucket && length(local.lifecycle_rules) > 0 ? 1 : 0
 
-  bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner
+  bucket                                 = aws_s3_bucket.this[0].id
+  expected_bucket_owner                  = var.expected_bucket_owner
+  transition_default_minimum_object_size = var.transition_default_minimum_object_size
 
   dynamic "rule" {
     for_each = local.lifecycle_rules

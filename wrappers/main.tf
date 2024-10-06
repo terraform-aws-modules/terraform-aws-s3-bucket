@@ -54,6 +54,7 @@ module "wrapper" {
   restrict_public_buckets                    = try(each.value.restrict_public_buckets, var.defaults.restrict_public_buckets, true)
   server_side_encryption_configuration       = try(each.value.server_side_encryption_configuration, var.defaults.server_side_encryption_configuration, {})
   tags                                       = try(each.value.tags, var.defaults.tags, {})
+  transition_default_minimum_object_size     = try(each.value.transition_default_minimum_object_size, var.defaults.transition_default_minimum_object_size, null)
   versioning                                 = try(each.value.versioning, var.defaults.versioning, {})
   website                                    = try(each.value.website, var.defaults.website, {})
 }
