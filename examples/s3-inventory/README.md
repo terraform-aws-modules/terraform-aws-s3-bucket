@@ -10,14 +10,14 @@ Please check [complete example](https://github.com/terraform-aws-modules/terrafo
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.27 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.70 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.27 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.70 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
 
 ## Modules
@@ -26,7 +26,7 @@ Please check [complete example](https://github.com/terraform-aws-modules/terrafo
 |------|--------|---------|
 | <a name="module_inventory_destination_bucket"></a> [inventory\_destination\_bucket](#module\_inventory\_destination\_bucket) | ../../ | n/a |
 | <a name="module_inventory_source_bucket"></a> [inventory\_source\_bucket](#module\_inventory\_source\_bucket) | ../../ | n/a |
-| <a name="module_kms"></a> [kms](#module\_kms) | terraform-aws-modules/kms/aws | n/a |
+| <a name="module_kms"></a> [kms](#module\_kms) | terraform-aws-modules/kms/aws | ~> 2.0 |
 | <a name="module_multi_inventory_configurations_bucket"></a> [multi\_inventory\_configurations\_bucket](#module\_multi\_inventory\_configurations\_bucket) | ../../ | n/a |
 
 ## Resources

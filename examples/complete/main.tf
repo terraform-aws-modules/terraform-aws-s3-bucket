@@ -159,7 +159,8 @@ module "s3_bucket" {
   control_object_ownership = true
   object_ownership         = "BucketOwnerPreferred"
 
-  expected_bucket_owner = data.aws_caller_identity.current.account_id
+  expected_bucket_owner                  = data.aws_caller_identity.current.account_id
+  transition_default_minimum_object_size = "varies_by_storage_class"
 
   acl = "private" # "acl" conflicts with "grant" and "owner"
 
