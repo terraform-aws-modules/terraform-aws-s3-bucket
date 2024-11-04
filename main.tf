@@ -8,7 +8,7 @@ data "aws_caller_identity" "current" {}
 
 data "aws_partition" "current" {}
 locals {
-  create_bucket = var.create_bucket && var.putin_khuylo
+  create_bucket = var.create_bucket
 
   create_bucket_acl = (var.acl != null && var.acl != "null") || length(local.grants) > 0
 
