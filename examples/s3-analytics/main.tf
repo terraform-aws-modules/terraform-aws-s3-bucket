@@ -24,7 +24,6 @@ module "analytics_configuration_bucket" {
   attach_analytics_destination_policy = true
   attach_policy                       = true
   analytics_self_source_destination   = true
-  acl                                 = "private" # "acl" conflicts with "grant" and "owner"
 
   versioning = {
     status     = true
@@ -77,7 +76,6 @@ module "analytics_destination_bucket" {
   source = "../../"
 
   bucket                              = "analytics-destination-${random_pet.this.id}"
-  acl                                 = "private" # "acl" conflicts with "grant" and "owner"
   force_destroy                       = true
   attach_policy                       = true
   attach_analytics_destination_policy = true
@@ -92,7 +90,6 @@ module "inventory_source_bucket" {
   bucket = "inventory-source-${random_pet.this.id}"
 
   force_destroy = true
-  acl           = "private" # "acl" conflicts with "grant" and "owner"
 
   inventory_configuration = {
     destination_other = {
@@ -115,7 +112,6 @@ module "analytics_and_inventory_destination_bucket" {
   source = "../../"
 
   bucket        = "analytics-and-inventory-destination-${random_pet.this.id}"
-  acl           = "private" # "acl" conflicts with "grant" and "owner"
   force_destroy = true
   attach_policy = true
 

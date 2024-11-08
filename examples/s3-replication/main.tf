@@ -16,7 +16,6 @@ provider "aws" {
   skip_metadata_api_check     = true
   skip_region_validation      = true
   skip_credentials_validation = true
-  skip_requesting_account_id  = true
 }
 
 locals {
@@ -47,7 +46,6 @@ module "replica_bucket" {
   }
 
   bucket = local.destination_bucket_name
-  acl    = "private"
 
   versioning = {
     enabled = true
@@ -58,7 +56,6 @@ module "s3_bucket" {
   source = "../../"
 
   bucket = local.bucket_name
-  acl    = "private"
 
   versioning = {
     enabled = true

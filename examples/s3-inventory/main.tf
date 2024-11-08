@@ -24,7 +24,6 @@ module "multi_inventory_configurations_bucket" {
   attach_policy                       = true
   attach_inventory_destination_policy = true
   inventory_self_source_destination   = true
-  acl                                 = "private" # "acl" conflicts with "grant" and "owner"
 
   versioning = {
     status     = true
@@ -137,7 +136,6 @@ module "inventory_destination_bucket" {
   source = "../../"
 
   bucket                              = "inventory-destination-${random_pet.this.id}"
-  acl                                 = "private" # "acl" conflicts with "grant" and "owner"
   force_destroy                       = true
   attach_policy                       = true
   attach_inventory_destination_policy = true
@@ -149,6 +147,5 @@ module "inventory_source_bucket" {
   source = "../../"
 
   bucket        = "inventory-source-${random_pet.this.id}"
-  acl           = "private" # "acl" conflicts with "grant" and "owner"
   force_destroy = true
 }
