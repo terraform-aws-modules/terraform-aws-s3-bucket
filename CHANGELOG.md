@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.2.1...v4.2.2) (2024-11-08)
+
+
+### Bug Fixes
+
+* Remove ACL in analytics, inventory, and replication examples ([#292](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/292)) ([1986daa](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/1986daa5634d1fde23997ecd7de1660a9babd427))
+
 ## [4.2.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.2.0...v4.2.1) (2024-10-11)
 
 
