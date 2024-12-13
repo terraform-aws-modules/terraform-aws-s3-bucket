@@ -76,8 +76,10 @@ module "log_bucket" {
   attach_deny_insecure_transport_policy = true
   attach_require_latest_tls_policy      = true
 
-  access_log_delivery_policy_source_accounts = [data.aws_caller_identity.current.account_id]
-  access_log_delivery_policy_source_buckets  = ["arn:aws:s3:::${local.bucket_name}"]
+  access_log_delivery_policy_source_accounts      = [data.aws_caller_identity.current.account_id]
+  access_log_delivery_policy_source_buckets       = ["arn:aws:s3:::${local.bucket_name}"]
+  access_log_delivery_policy_source_organizations = ["o-123456"]
+  lb_log_delivery_policy_source_organizations     = ["o-123456"]
 }
 
 module "cloudfront_log_bucket" {
