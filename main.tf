@@ -55,7 +55,7 @@ resource "aws_s3_bucket_logging" "this" {
       }
 
       dynamic "simple_prefix" {
-        for_each = contains(keys(target_object_key_format.value), "simple_prefix") ? [true] : []
+        for_each = can(target_object_key_format.value["simple_prefix"]) ? [true] : []
 
         content {}
       }
