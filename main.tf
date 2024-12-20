@@ -166,7 +166,7 @@ resource "aws_s3_bucket_versioning" "this" {
 
   versioning_configuration {
     # Valid values: "Enabled" or "Suspended"
-    status = try(var.versioning["enabled"] ? "Enabled" : "Suspended", tobool(var.versioning["status"]) ? "Enabled" : "Suspended", title(lower(var.versioning["status"])))
+    status = try(var.versioning["enabled"] ? "Enabled" : "Suspended", tobool(var.versioning["status"]) ? "Enabled" : "Suspended", title(lower(var.versioning["status"])), "Enabled")
 
     # Valid values: "Enabled" or "Disabled"
     mfa_delete = try(tobool(var.versioning["mfa_delete"]) ? "Enabled" : "Disabled", title(lower(var.versioning["mfa_delete"])), null)
