@@ -39,8 +39,7 @@ resource "aws_s3_bucket_logging" "this" {
   bucket = aws_s3_bucket.this[0].id
 
   target_bucket = var.logging["target_bucket"]
-  target_prefix = try(var.logging["target_prefix"], null)
-
+  target_prefix = var.logging["target_prefix"]
 
   dynamic "target_object_key_format" {
     for_each = try([var.logging["target_object_key_format"]], [])
@@ -55,7 +54,7 @@ resource "aws_s3_bucket_logging" "this" {
       }
 
       dynamic "simple_prefix" {
-        for_each = contains(keys(target_object_key_format.value), "simple_prefix") ? [true] : []
+        for_each = length(try(target_object_key_format.value["partitioned_prefix"], [])) == 0 || can(target_object_key_format.value["simple_prefix"]) ? [true] : []
 
         content {}
       }
@@ -166,7 +165,7 @@ resource "aws_s3_bucket_versioning" "this" {
 
   versioning_configuration {
     # Valid values: "Enabled" or "Suspended"
-    status = try(var.versioning["enabled"] ? "Enabled" : "Suspended", tobool(var.versioning["status"]) ? "Enabled" : "Suspended", title(lower(var.versioning["status"])))
+    status = try(var.versioning["enabled"] ? "Enabled" : "Suspended", tobool(var.versioning["status"]) ? "Enabled" : "Suspended", title(lower(var.versioning["status"])), "Enabled")
 
     # Valid values: "Enabled" or "Disabled"
     mfa_delete = try(tobool(var.versioning["mfa_delete"]) ? "Enabled" : "Disabled", title(lower(var.versioning["mfa_delete"])), null)
@@ -381,7 +380,6 @@ resource "aws_s3_bucket_replication_configuration" "this" {
     content {
       id       = try(rule.value.id, null)
       priority = try(rule.value.priority, null)
-      prefix   = try(rule.value.prefix, null)
       status   = try(tobool(rule.value.status) ? "Enabled" : "Disabled", title(lower(rule.value.status)), "Enabled")
 
       dynamic "delete_marker_replication" {
