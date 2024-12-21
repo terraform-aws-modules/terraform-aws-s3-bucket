@@ -16,6 +16,7 @@ These features of S3 bucket configurations are supported:
 - Cross-Region Replication (CRR)
 - ELB log delivery bucket policy
 - ALB/NLB log delivery bucket policy
+- Account-level Public Access Block
 
 ## Usage
 
@@ -117,8 +118,11 @@ Users of Terragrunt can achieve similar results by using modules provided in the
 
 - [Complete](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete) - Complete S3 bucket with most of supported features enabled
 - [Cross-Region Replication](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-replication) - S3 bucket with Cross-Region Replication (CRR) enabled
-- [S3 Bucket Notifications](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/notification) - S3 bucket notifications to Lambda functions, SQS queues, and SNS topics.
-- [S3 Bucket Object](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/object) - Manage S3 bucket objects.
+- [S3 Notifications](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/notification) - S3 bucket notifications to Lambda functions, SQS queues, and SNS topics.
+- [S3 Object](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/object) - Manage S3 bucket objects.
+- [S3 Analytics](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-analytics) - S3 bucket Analytics Configurations.
+- [S3 Inventory](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-inventory) - S3 bucket Inventory configuration.
+- [S3 Account-level Public Access Block](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/account-public-access) - Manage S3 account-level Public Access Block.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
