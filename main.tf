@@ -380,7 +380,6 @@ resource "aws_s3_bucket_replication_configuration" "this" {
     content {
       id       = try(rule.value.id, null)
       priority = try(rule.value.priority, null)
-      prefix   = try(rule.value.prefix, null)
       status   = try(tobool(rule.value.status) ? "Enabled" : "Disabled", title(lower(rule.value.status)), "Enabled")
 
       dynamic "delete_marker_replication" {
