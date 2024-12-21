@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.3.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.2.2...v4.3.0) (2024-12-21)
+
+
+### Features
+
+* Added Account-level Public Access Block module, and minor fixes as fallback ([#299](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/299)) ([69f0f4e](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/69f0f4ebfb93969ec8950e92fd32215d718f63c9))
+
 ## [4.2.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.2.1...v4.2.2) (2024-11-08)
 
 
