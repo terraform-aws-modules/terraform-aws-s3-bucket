@@ -673,6 +673,16 @@ data "aws_iam_policy_document" "lb_log_delivery" {
       variable = "s3:x-amz-acl"
       values   = ["bucket-owner-full-control"]
     }
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_policy_source_organizations) > 0 ? [true] : []
+
+      content {
+        test     = "StringEquals"
+        variable = "aws:ResourceOrgID"
+        values   = var.lb_log_delivery_policy_source_organizations
+      }
+    }
   }
 
   statement {
@@ -694,6 +704,15 @@ data "aws_iam_policy_document" "lb_log_delivery" {
       aws_s3_bucket.this[0].arn,
     ]
 
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_policy_source_organizations) > 0 ? [true] : []
+
+      content {
+        test     = "StringEquals"
+        variable = "aws:ResourceOrgID"
+        values   = var.lb_log_delivery_policy_source_organizations
+      }
+    }
   }
 }
 
@@ -739,6 +758,16 @@ data "aws_iam_policy_document" "access_log_delivery" {
       }
     }
 
+    dynamic "condition" {
+      for_each = length(var.access_log_delivery_policy_source_organizations) > 0 ? [true] : []
+
+      content {
+        test     = "StringEquals"
+        variable = "aws:ResourceOrgID"
+        values   = var.access_log_delivery_policy_source_organizations
+      }
+    }
+
   }
 
   statement {
@@ -758,6 +787,16 @@ data "aws_iam_policy_document" "access_log_delivery" {
     resources = [
       aws_s3_bucket.this[0].arn,
     ]
+
+    dynamic "condition" {
+      for_each = length(var.access_log_delivery_policy_source_organizations) > 0 ? [true] : []
+
+      content {
+        test     = "StringEquals"
+        variable = "aws:ResourceOrgID"
+        values   = var.access_log_delivery_policy_source_organizations
+      }
+    }
 
   }
 }
