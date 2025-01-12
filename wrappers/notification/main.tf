@@ -6,6 +6,7 @@ module "wrapper" {
   bucket               = try(each.value.bucket, var.defaults.bucket, "")
   bucket_arn           = try(each.value.bucket_arn, var.defaults.bucket_arn, null)
   create               = try(each.value.create, var.defaults.create, true)
+  create_lambda_policy = try(each.value.create_lambda_policy, var.defaults.create_lambda_policy, true)
   create_sns_policy    = try(each.value.create_sns_policy, var.defaults.create_sns_policy, true)
   create_sqs_policy    = try(each.value.create_sqs_policy, var.defaults.create_sqs_policy, true)
   eventbridge          = try(each.value.eventbridge, var.defaults.eventbridge, null)
