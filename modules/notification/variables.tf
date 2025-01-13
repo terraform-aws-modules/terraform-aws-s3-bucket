@@ -16,8 +16,8 @@ variable "create_sqs_policy" {
   default     = true
 }
 
-variable "create_lambda_policy" {
-  description = "Whether to create a policy for Lambda permissions or not?"
+variable "create_lambda_permission" {
+  description = "Whether to create Lambda permissions or not?"
   type        = bool
   default     = true
 }
