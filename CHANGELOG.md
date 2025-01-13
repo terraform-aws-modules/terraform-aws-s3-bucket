@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.4.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.3.0...v4.4.0) (2025-01-13)
+
+
+### Features
+
+* Add variable create_lambda_permission in notification module ([#302](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/302)) ([5b71671](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/5b71671533487eec264152701a8e1d11a3113ea9))
+
 ## [4.3.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.2.2...v4.3.0) (2024-12-21)
 
 
