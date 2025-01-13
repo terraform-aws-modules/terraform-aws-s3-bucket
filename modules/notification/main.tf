@@ -60,7 +60,7 @@ resource "aws_s3_bucket_notification" "this" {
 
 # Lambda
 resource "aws_lambda_permission" "allow" {
-  for_each = var.lambda_notifications
+  for_each = { for k, v in var.lambda_notifications : k => v if var.create_lambda_permission }
 
   statement_id_prefix = "AllowLambdaS3BucketNotification-"
   action              = "lambda:InvokeFunction"
