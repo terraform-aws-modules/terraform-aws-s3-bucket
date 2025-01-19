@@ -191,9 +191,32 @@ variable "transition_default_minimum_object_size" {
 }
 
 variable "lifecycle_rule" {
-  description = "List of maps containing configuration of object lifecycle management."
+  description = "List of maps containing configuration of object lifecycle management. Each lifecycle rule must contain 'id' and either 'enabled' or 'status', and may contain: 'filter', 'abort_incomplete_multipart_upload_days', 'expiration', 'transition', 'noncurrent_version_expiration', or 'noncurrent_version_transition'."
   type        = any
   default     = []
+
+  validation {
+    condition = alltrue([
+      for rule in var.lifecycle_rule : (
+        contains(keys(rule), "id") &&
+        (contains(keys(rule), "enabled") || contains(keys(rule), "status")) &&
+        alltrue([
+          for key in keys(rule) : contains([
+            "id",
+            "enabled",
+            "status",
+            "filter",
+            "abort_incomplete_multipart_upload_days",
+            "expiration",
+            "transition",
+            "noncurrent_version_expiration",
+            "noncurrent_version_transition"
+          ], key)
+        ])
+      )
+    ])
+    error_message = "Each lifecycle rule must contain 'id' and either 'enabled' or 'status', and may contain: 'filter', 'abort_incomplete_multipart_upload_days', 'expiration', 'transition', 'noncurrent_version_expiration', or 'noncurrent_version_transition'."
+  }
 }
 
 variable "replication_configuration" {
