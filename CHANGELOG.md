@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.5.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.4.0...v4.5.0) (2025-01-23)
+
+
+### Features
+
+* Add optional policy to deny ssec encrypted uploads ([#307](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/307)) ([cfd1452](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/cfd14526fc7f063a43bced5be7db1e4ed3c6f276))
+
 ## [4.4.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.3.0...v4.4.0) (2025-01-13)
 
 
