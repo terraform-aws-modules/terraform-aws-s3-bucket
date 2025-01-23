@@ -12,7 +12,7 @@ locals {
 
   create_bucket_acl = (var.acl != null && var.acl != "null") || length(local.grants) > 0
 
-  attach_policy = var.attach_require_latest_tls_policy || var.attach_access_log_delivery_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_policy
+  attach_policy = var.attach_require_latest_tls_policy || var.attach_access_log_delivery_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_deny_ssec_encrypted_object_uploads || var.attach_policy
 
   # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
   grants               = try(jsondecode(var.grant), var.grant)
@@ -558,6 +558,7 @@ data "aws_iam_policy_document" "combined" {
     var.attach_require_latest_tls_policy ? data.aws_iam_policy_document.require_latest_tls[0].json : "",
     var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
     var.attach_deny_unencrypted_object_uploads ? data.aws_iam_policy_document.deny_unencrypted_object_uploads[0].json : "",
+    var.attach_deny_ssec_encrypted_object_uploads ? data.aws_iam_policy_document.deny_ssec_encrypted_object_uploads[0].json : "",
     var.attach_deny_incorrect_kms_key_sse ? data.aws_iam_policy_document.deny_incorrect_kms_key_sse[0].json : "",
     var.attach_deny_incorrect_encryption_headers ? data.aws_iam_policy_document.deny_incorrect_encryption_headers[0].json : "",
     var.attach_inventory_destination_policy || var.attach_analytics_destination_policy ? data.aws_iam_policy_document.inventory_and_analytics_destination_policy[0].json : "",
@@ -904,6 +905,34 @@ data "aws_iam_policy_document" "deny_unencrypted_object_uploads" {
       test     = "Null"
       variable = "s3:x-amz-server-side-encryption"
       values   = [true]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "deny_ssec_encrypted_object_uploads" {
+  count = local.create_bucket && var.attach_deny_ssec_encrypted_object_uploads ? 1 : 0
+
+  statement {
+    sid    = "denySSECEncryptedObjectUploads"
+    effect = "Deny"
+
+    actions = [
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "${aws_s3_bucket.this[0].arn}/*"
+    ]
+
+    principals {
+      identifiers = ["*"]
+      type        = "*"
+    }
+
+    condition {
+      test     = "Null"
+      variable = "s3:x-amz-server-side-encryption-customer-algorithm"
+      values   = [false]
     }
   }
 }

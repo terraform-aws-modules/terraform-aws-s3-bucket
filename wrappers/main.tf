@@ -17,6 +17,7 @@ module "wrapper" {
   attach_deny_incorrect_encryption_headers   = try(each.value.attach_deny_incorrect_encryption_headers, var.defaults.attach_deny_incorrect_encryption_headers, false)
   attach_deny_incorrect_kms_key_sse          = try(each.value.attach_deny_incorrect_kms_key_sse, var.defaults.attach_deny_incorrect_kms_key_sse, false)
   attach_deny_insecure_transport_policy      = try(each.value.attach_deny_insecure_transport_policy, var.defaults.attach_deny_insecure_transport_policy, false)
+  attach_deny_ssec_encrypted_object_uploads  = try(each.value.attach_deny_ssec_encrypted_object_uploads, var.defaults.attach_deny_ssec_encrypted_object_uploads, false)
   attach_deny_unencrypted_object_uploads     = try(each.value.attach_deny_unencrypted_object_uploads, var.defaults.attach_deny_unencrypted_object_uploads, false)
   attach_elb_log_delivery_policy             = try(each.value.attach_elb_log_delivery_policy, var.defaults.attach_elb_log_delivery_policy, false)
   attach_inventory_destination_policy        = try(each.value.attach_inventory_destination_policy, var.defaults.attach_inventory_destination_policy, false)
