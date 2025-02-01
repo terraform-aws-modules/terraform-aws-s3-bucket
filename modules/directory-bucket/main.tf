@@ -61,7 +61,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
         }
       }
 
-      # Max 1 block - filter - with one key argument or a single tag
+      # Max 1 block - filter - with one key argument
       dynamic "filter" {
         for_each = [for v in try(flatten([rule.value.filter]), []) : v if max(length(keys(v))) == 1]
 
@@ -72,7 +72,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
         }
       }
 
-      # Max 1 block - filter - with more than one key arguments or multiple tags
+      # Max 1 block - filter - with more than one key arguments
       dynamic "filter" {
         for_each = [for v in try(flatten([rule.value.filter]), []) : v if max(length(keys(v))) > 1]
 
