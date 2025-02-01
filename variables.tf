@@ -82,6 +82,12 @@ variable "attach_deny_unencrypted_object_uploads" {
   default     = false
 }
 
+variable "attach_deny_ssec_encrypted_object_uploads" {
+  description = "Controls if S3 bucket should deny SSEC encrypted object uploads."
+  type        = bool
+  default     = false
+}
+
 variable "bucket" {
   description = "(Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name."
   type        = string
