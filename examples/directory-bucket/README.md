@@ -34,7 +34,8 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_directory_bucket"></a> [directory\_bucket](#module\_directory\_bucket) | ../../modules/directory-bucket | n/a |
+| <a name="module_complete"></a> [complete](#module\_complete) | ../../ | n/a |
+| <a name="module_simple"></a> [simple](#module\_simple) | ../../ | n/a |
 
 ## Resources
 
@@ -43,6 +44,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_kms_key.objects](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_iam_policy_document.bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 
@@ -50,8 +52,5 @@ No inputs.
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_directory_bucket_arn"></a> [directory\_bucket\_arn](#output\_directory\_bucket\_arn) | ARN of the directory bucket. |
-| <a name="output_directory_bucket_name"></a> [directory\_bucket\_name](#output\_directory\_bucket\_name) | Name of the directory bucket. |
+No outputs.
 <!-- END_TF_DOCS -->
