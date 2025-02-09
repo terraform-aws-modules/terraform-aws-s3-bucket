@@ -52,5 +52,8 @@ No inputs.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_directory_bucket_arn"></a> [directory\_bucket\_arn](#output\_directory\_bucket\_arn) | ARN of the directory bucket. |
+| <a name="output_directory_bucket_name"></a> [directory\_bucket\_name](#output\_directory\_bucket\_name) | Name of the directory bucket. |
 <!-- END_TF_DOCS -->
