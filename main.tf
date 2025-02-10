@@ -534,13 +534,13 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 }
 
 resource "aws_s3_bucket_policy" "this" {
-  count = local.create_bucket && local.attach_policy ? 1 : 0
+  count = local.attach_policy ? 1 : 0
 
   # Chain resources (s3_bucket -> s3_bucket_public_access_block -> s3_bucket_policy )
   # to prevent "A conflicting conditional operation is currently in progress against this resource."
   # Ref: https://github.com/hashicorp/terraform-provider-aws/issues/7628
 
-  bucket = aws_s3_bucket.this[0].id
+  bucket = local.create_bucket ? aws_s3_bucket.this[0].id : var.bucket
   policy = data.aws_iam_policy_document.combined[0].json
 
   depends_on = [
@@ -549,7 +549,7 @@ resource "aws_s3_bucket_policy" "this" {
 }
 
 data "aws_iam_policy_document" "combined" {
-  count = local.create_bucket && local.attach_policy ? 1 : 0
+  count = local.attach_policy ? 1 : 0
 
   source_policy_documents = compact([
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
