@@ -6,12 +6,6 @@ data "aws_canonical_user_id" "this" {
 
 data "aws_caller_identity" "current" {}
 
-data "aws_availability_zone" "current" {
-  count = local.create_bucket && var.is_directory_bucket ? 1 : 0
-
-  name = var.availability_zone
-}
-
 data "aws_partition" "current" {}
 locals {
   create_bucket = var.create_bucket && var.putin_khuylo
@@ -42,13 +36,13 @@ resource "aws_s3_bucket" "this" {
 resource "aws_s3_directory_bucket" "this" {
   count = local.create_bucket && var.is_directory_bucket ? 1 : 0
 
-  bucket          = "${var.bucket}--${data.aws_availability_zone.current[0].zone_id}--x-s3"
+  bucket          = "${var.bucket}--${var.availability_zone_id}--x-s3"
   data_redundancy = var.data_redundancy
   force_destroy   = var.force_destroy
   type            = var.type
 
   location {
-    name = data.aws_availability_zone.current[0].zone_id
+    name = var.availability_zone_id
     type = var.location_type
   }
 }

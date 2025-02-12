@@ -13,12 +13,17 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 module "simple" {
   source = "../../"
 
   is_directory_bucket = true
   bucket              = random_pet.this.id
-  availability_zone   = "${local.region}b"
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-Endpoints.html
+  availability_zone_id = data.aws_availability_zones.available.zone_ids[1]
 }
 
 module "complete" {
@@ -26,7 +31,8 @@ module "complete" {
 
   is_directory_bucket = true
   bucket              = "${random_pet.this.id}-complete"
-  availability_zone   = "${local.region}b"
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-Endpoints.html
+  availability_zone_id = data.aws_availability_zones.available.zone_ids[1]
   server_side_encryption_configuration = {
     rule = {
       bucket_key_enabled = true # required for directory buckets

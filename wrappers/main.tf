@@ -25,7 +25,7 @@ module "wrapper" {
   attach_policy                              = try(each.value.attach_policy, var.defaults.attach_policy, false)
   attach_public_policy                       = try(each.value.attach_public_policy, var.defaults.attach_public_policy, true)
   attach_require_latest_tls_policy           = try(each.value.attach_require_latest_tls_policy, var.defaults.attach_require_latest_tls_policy, false)
-  availability_zone                          = try(each.value.availability_zone, var.defaults.availability_zone, null)
+  availability_zone_id                       = try(each.value.availability_zone_id, var.defaults.availability_zone_id, null)
   block_public_acls                          = try(each.value.block_public_acls, var.defaults.block_public_acls, true)
   block_public_policy                        = try(each.value.block_public_policy, var.defaults.block_public_policy, true)
   bucket                                     = try(each.value.bucket, var.defaults.bucket, null)

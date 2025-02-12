@@ -341,7 +341,7 @@ variable "type" {
   default     = "Directory"
 }
 
-variable "availability_zone" {
+variable "availability_zone_id" {
   description = "Availability Zone ID or Local Zone ID"
   type        = string
   default     = null
