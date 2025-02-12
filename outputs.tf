@@ -47,3 +47,13 @@ output "s3_bucket_website_domain" {
   description = "The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records."
   value       = try(aws_s3_bucket_website_configuration.this[0].website_domain, "")
 }
+
+output "s3_directory_bucket_name" {
+  description = "Name of the directory bucket."
+  value       = try(aws_s3_directory_bucket.this[0].bucket, null)
+}
+
+output "s3_directory_bucket_arn" {
+  description = "ARN of the directory bucket."
+  value       = try(aws_s3_directory_bucket.this[0].arn, null)
+}
