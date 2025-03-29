@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.6.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.5.0...v4.6.0) (2025-02-12)
+
+
+### Features
+
+* Support S3 Directory Bucket ([#310](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/310)) ([0700a07](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/0700a0753cbc9846a6746b921f5eb7817a6d5749))
+
 ## [4.5.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.4.0...v4.5.0) (2025-01-23)
 
 

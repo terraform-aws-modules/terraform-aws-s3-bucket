@@ -322,6 +322,37 @@ variable "object_ownership" {
   default     = "BucketOwnerEnforced"
 }
 
+# Directory Bucket
+variable "is_directory_bucket" {
+  description = "If the s3 bucket created is a directory bucket"
+  type        = bool
+  default     = false
+}
+
+variable "data_redundancy" {
+  description = "Data redundancy. Valid values: `SingleAvailabilityZone`"
+  type        = string
+  default     = null
+}
+
+variable "type" {
+  description = "Bucket type. Valid values: `Directory`"
+  type        = string
+  default     = "Directory"
+}
+
+variable "availability_zone_id" {
+  description = "Availability Zone ID or Local Zone ID"
+  type        = string
+  default     = null
+}
+
+variable "location_type" {
+  description = "Location type. Valid values: `AvailabilityZone` or `LocalZone`"
+  type        = string
+  default     = null
+}
+
 variable "putin_khuylo" {
   description = "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!"
   type        = bool
