@@ -276,7 +276,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - expiration
       dynamic "expiration" {
-        for_each = try(flatten([rule.value.expiration]), [])
+        for_each = try(compact(flatten([rule.value.expiration])), [])
 
         content {
           date                         = try(expiration.value.date, null)
@@ -287,7 +287,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Several blocks - transition
       dynamic "transition" {
-        for_each = try(flatten([rule.value.transition]), [])
+        for_each = try(compact(flatten([rule.value.transition])), [])
 
         content {
           date          = try(transition.value.date, null)
@@ -298,7 +298,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - noncurrent_version_expiration
       dynamic "noncurrent_version_expiration" {
-        for_each = try(flatten([rule.value.noncurrent_version_expiration]), [])
+        for_each = try(compact(flatten([rule.value.noncurrent_version_expiration])), [])
 
         content {
           newer_noncurrent_versions = try(noncurrent_version_expiration.value.newer_noncurrent_versions, null)
@@ -308,7 +308,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Several blocks - noncurrent_version_transition
       dynamic "noncurrent_version_transition" {
-        for_each = try(flatten([rule.value.noncurrent_version_transition]), [])
+        for_each = try(compact(flatten([rule.value.noncurrent_version_transition])), [])
 
         content {
           newer_noncurrent_versions = try(noncurrent_version_transition.value.newer_noncurrent_versions, null)
@@ -319,7 +319,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - filter - without any key arguments or tags
       dynamic "filter" {
-        for_each = length(try(flatten([rule.value.filter]), [])) == 0 ? [true] : []
+        for_each = one(try(flatten([rule.value.filter]), [])) == null ? [true] : []
 
         content {
           #          prefix = ""
@@ -328,7 +328,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - filter - with one key argument or a single tag
       dynamic "filter" {
-        for_each = [for v in try(flatten([rule.value.filter]), []) : v if max(length(keys(v)), length(try(rule.value.filter.tags, rule.value.filter.tag, []))) == 1]
+        for_each = [for v in try(rule.value.filter == null ? [] : flatten([rule.value.filter]), []) : v if max(length(keys(v)), try(length(rule.value.filter.tags), length(rule.value.filter.tag), 0)) == 1]
 
         content {
           object_size_greater_than = try(filter.value.object_size_greater_than, null)
@@ -336,7 +336,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
           prefix                   = try(filter.value.prefix, null)
 
           dynamic "tag" {
-            for_each = try(filter.value.tags, filter.value.tag, [])
+            for_each = try(coalesce(filter.value.tags, {}), coalesce(filter.value.tag, {}), [])
 
             content {
               key   = tag.key
@@ -348,7 +348,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - filter - with more than one key arguments or multiple tags
       dynamic "filter" {
-        for_each = [for v in try(flatten([rule.value.filter]), []) : v if max(length(keys(v)), length(try(rule.value.filter.tags, rule.value.filter.tag, []))) > 1]
+        for_each = [for v in try(rule.value.filter == null ? [] : flatten([rule.value.filter]), []) : v if max(length(keys(v)), try(length(rule.value.filter.tags), length(rule.value.filter.tag), 0)) > 1]
 
         content {
           and {
