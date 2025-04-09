@@ -81,6 +81,8 @@ data "aws_arn" "queue" {
 data "aws_iam_policy_document" "sqs" {
   for_each = { for k, v in var.sqs_notifications : k => v if var.create_sqs_policy }
 
+  version = "2012-10-17"
+
   statement {
     sid = "AllowSQSS3BucketNotification"
 
