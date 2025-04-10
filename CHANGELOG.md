@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.6.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.6.0...v4.6.1) (2025-04-10)
+
+
+### Bug Fixes
+
+* Timeout if SQS policy created without explicit version in notification module ([#321](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/321)) ([1b1ca55](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/1b1ca553669bbca0a0c42378a1bab3af5302df4f))
+
 ## [4.6.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.5.0...v4.6.0) (2025-02-12)
 
 
