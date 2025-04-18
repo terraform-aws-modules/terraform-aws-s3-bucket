@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.7.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.6.1...v4.7.0) (2025-04-18)
+
+
+### Features
+
+* Add log delivery source organization variables ([#322](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/322)) ([6731ac2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/6731ac2d77637179cdb048064ea02955485a7c6b))
+
 ## [4.6.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.6.0...v4.6.1) (2025-04-10)
 
 
