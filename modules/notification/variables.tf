@@ -16,6 +16,12 @@ variable "create_sqs_policy" {
   default     = true
 }
 
+variable "create_lambda_permission" {
+  description = "Whether to create Lambda permissions or not?"
+  type        = bool
+  default     = true
+}
+
 variable "bucket" {
   description = "Name of S3 bucket to use"
   type        = string

@@ -141,14 +141,15 @@ module "s3_bucket" {
   }
 
   # Bucket policies
-  attach_policy                            = true
-  policy                                   = data.aws_iam_policy_document.bucket_policy.json
-  attach_deny_insecure_transport_policy    = true
-  attach_require_latest_tls_policy         = true
-  attach_deny_incorrect_encryption_headers = true
-  attach_deny_incorrect_kms_key_sse        = true
-  allowed_kms_key_arn                      = aws_kms_key.objects.arn
-  attach_deny_unencrypted_object_uploads   = true
+  attach_policy                             = true
+  policy                                    = data.aws_iam_policy_document.bucket_policy.json
+  attach_deny_insecure_transport_policy     = true
+  attach_require_latest_tls_policy          = true
+  attach_deny_incorrect_encryption_headers  = true
+  attach_deny_incorrect_kms_key_sse         = true
+  allowed_kms_key_arn                       = aws_kms_key.objects.arn
+  attach_deny_unencrypted_object_uploads    = true
+  attach_deny_ssec_encrypted_object_uploads = true
 
   # S3 bucket-level Public Access Block configuration (by default now AWS has made this default as true for S3 bucket-level block public access)
   # block_public_acls       = true
