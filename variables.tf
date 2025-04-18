@@ -172,6 +172,18 @@ variable "access_log_delivery_policy_source_accounts" {
   default     = []
 }
 
+variable "access_log_delivery_policy_source_organizations" {
+  description = "(Optional) List of AWS Organization IDs should be allowed to deliver access logs to this bucket."
+  type        = list(string)
+  default     = []
+}
+
+variable "lb_log_delivery_policy_source_organizations" {
+  description = "(Optional) List of AWS Organization IDs should be allowed to deliver ALB/NLB logs to this bucket."
+  type        = list(string)
+  default     = []
+}
+
 variable "grant" {
   description = "An ACL policy grant. Conflicts with `acl`"
   type        = any
