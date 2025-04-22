@@ -18,6 +18,7 @@ These features of S3 bucket configurations are supported:
 - ALB/NLB log delivery bucket policy
 - Account-level Public Access Block
 - S3 Directory Bucket
+- S3 Table Bucket
 
 ## Usage
 
@@ -124,6 +125,7 @@ Users of Terragrunt can achieve similar results by using modules provided in the
 - [S3 Inventory](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/s3-inventory) - S3 bucket Inventory configuration.
 - [S3 Account-level Public Access Block](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/account-public-access) - Manage S3 account-level Public Access Block.
 - [S3 Directory Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/directory-bucket) - S3 Directory Bucket configuration.
+- [S3 Table Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/table-bucket) - S3 Table Bucket configuration.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
