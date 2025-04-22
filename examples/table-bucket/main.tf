@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1" # CloudFront expects ACM resources in us-east-1 region only
+  region = "eu-west-1"
 
   # Make it faster by skipping something
   skip_metadata_api_check     = true
@@ -12,10 +12,6 @@ locals {
 }
 
 data "aws_caller_identity" "this" {}
-
-resource "random_pet" "this" {
-  length = 2
-}
 
 module "table_bucket" {
   source = "../../modules/table-bucket"
@@ -34,7 +30,6 @@ module "table_bucket" {
   }
 
   create_table_bucket_policy = true
-
   table_bucket_policy_statements = [
     {
       effect = "Allow"
@@ -46,10 +41,8 @@ module "table_bucket" {
         "s3tables:GetTableData",
         "s3tables:GetTableMetadataLocation"
       ]
-      s3_paths = ["table/*"]
     }
   ]
-
 
   tables = {
     table1 = {
@@ -100,6 +93,10 @@ module "table_bucket" {
       namespace = aws_s3tables_namespace.namespace.namespace
     }
   }
+}
+
+resource "random_pet" "this" {
+  length = 2
 }
 
 resource "aws_s3tables_namespace" "namespace" {

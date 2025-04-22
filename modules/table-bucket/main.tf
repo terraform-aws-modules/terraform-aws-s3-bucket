@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "table_bucket_policy" {
       actions       = try(statement.value.actions, null)
       not_actions   = try(statement.value.not_actions, null)
       effect        = try(statement.value.effect, null)
-      resources     = try(statement.value.resources, [for path in try(statement.value.s3_paths, ["*"]) : "${aws_s3tables_table_bucket.this[0].arn}/${path}"])
+      resources     = try(statement.value.resources, ["${aws_s3tables_table_bucket.this[0].arn}/table/*"])
       not_resources = try(statement.value.not_resources, null)
 
       dynamic "principals" {
@@ -98,6 +98,15 @@ data "aws_iam_policy_document" "table_policy" {
         content {
           type        = principals.value.type
           identifiers = principals.value.identifiers
+        }
+      }
+
+      dynamic "not_principals" {
+        for_each = try(statement.value.not_principals, [])
+
+        content {
+          type        = not_principals.value.type
+          identifiers = not_principals.value.identifiers
         }
       }
 
