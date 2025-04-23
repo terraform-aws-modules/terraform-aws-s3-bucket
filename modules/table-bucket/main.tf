@@ -80,7 +80,7 @@ resource "aws_s3tables_table_policy" "this" {
 }
 
 data "aws_iam_policy_document" "table_policy" {
-  for_each = { for k, v in var.tables : k => v.policy_statements if var.create && try(v.create_table_policy, false) && can(v.policy_statements) }
+  for_each = { for k, v in var.tables : k => v.policy_statements if var.create && try(v.create_table_policy, false) }
 
   dynamic "statement" {
     for_each = each.value
