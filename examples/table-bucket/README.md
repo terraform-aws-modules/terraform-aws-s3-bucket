@@ -1,8 +1,6 @@
-# S3 bucket with Cross-Region Replication (CRR) enabled
+# S3 Table Bucket
 
-Configuration in this directory creates S3 bucket in one region and configures CRR to another bucket in another region.
-
-Please check [complete example](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete) to see all other features supported by this module.
+Configuration in this directory creates S3 table bucket with bucket policy and S3 Tables with table policies.
 
 ## Usage
 
