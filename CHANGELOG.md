@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.8.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.7.0...v4.8.0) (2025-05-01)
+
+
+### Features
+
+* S3 Table Bucket Support ([#323](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/323)) ([64d61a4](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/64d61a477685c154017543480feee46a2abf3cd5))
+
 ## [4.7.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.6.1...v4.7.0) (2025-04-18)
 
 
