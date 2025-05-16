@@ -19,7 +19,7 @@ variable "encryption_configuration" {
 variable "maintenance_configuration" {
   description = "Map of table bucket maintenance configurations"
   type        = any
-  default     = {}
+  default     = null
 }
 
 variable "create_table_bucket_policy" {

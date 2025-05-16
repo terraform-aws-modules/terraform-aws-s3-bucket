@@ -123,6 +123,7 @@ module "kms" {
   description             = "Key example for s3 table buckets"
   deletion_window_in_days = 7
 
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-kms-permissions.html
   key_statements = [
     {
       sid = "s3TablesMaintenancePolicy"
