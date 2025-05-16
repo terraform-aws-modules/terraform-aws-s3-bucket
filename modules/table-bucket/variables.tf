@@ -10,6 +10,12 @@ variable "table_bucket_name" {
   default     = null
 }
 
+variable "encryption_configuration" {
+  description = "Map of encryption configurations"
+  type        = any
+  default     = null
+}
+
 variable "maintenance_configuration" {
   description = "Map of table bucket maintenance configurations"
   type        = any

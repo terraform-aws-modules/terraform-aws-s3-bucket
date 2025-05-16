@@ -8,13 +8,13 @@ Creates S3 Table Bucket and Tables with various configurations.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.83 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.98 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.83 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.98 |
 
 ## Modules
 
@@ -37,6 +37,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_create"></a> [create](#input\_create) | Whether to create s3 table resources | `bool` | `true` | no |
 | <a name="input_create_table_bucket_policy"></a> [create\_table\_bucket\_policy](#input\_create\_table\_bucket\_policy) | Whether to create s3 table bucket policy | `bool` | `false` | no |
+| <a name="input_encryption_configuration"></a> [encryption\_configuration](#input\_encryption\_configuration) | Map of encryption configurations | `any` | `null` | no |
 | <a name="input_maintenance_configuration"></a> [maintenance\_configuration](#input\_maintenance\_configuration) | Map of table bucket maintenance configurations | `any` | `{}` | no |
 | <a name="input_table_bucket_name"></a> [table\_bucket\_name](#input\_table\_bucket\_name) | Name of the table bucket. Must be between 3 and 63 characters in length. Can consist of lowercase letters, numbers, and hyphens, and must begin and end with a lowercase letter or number | `string` | `null` | no |
 | <a name="input_table_bucket_override_policy_documents"></a> [table\_bucket\_override\_policy\_documents](#input\_table\_bucket\_override\_policy\_documents) | List of IAM policy documents that are merged together into the exported document. In merging, statements with non-blank `sid`s will override statements with the same `sid` | `list(string)` | `[]` | no |
