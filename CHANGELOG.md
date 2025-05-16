@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.9.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.8.0...v4.9.0) (2025-05-16)
+
+
+### Features
+
+* S3 table and table bucket CMK encryption support ([#327](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/327)) ([541232b](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/541232b78c11a51f150d49a9a8167c8b828aa4b5))
+
 ## [4.8.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.7.0...v4.8.0) (2025-05-01)
 
 
