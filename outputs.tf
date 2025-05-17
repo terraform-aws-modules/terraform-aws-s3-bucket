@@ -1,6 +1,6 @@
 output "s3_bucket_id" {
   description = "The name of the bucket."
-  value       = try(aws_s3_bucket_policy.this[0].id, aws_s3_bucket.this[0].id, "")
+  value       = try(aws_s3_bucket.this[0].id, aws_s3_directory_bucket.this[0].bucket, "")
 }
 
 output "s3_bucket_arn" {
