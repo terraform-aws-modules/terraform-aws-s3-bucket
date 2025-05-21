@@ -13,10 +13,17 @@ locals {
 
 data "aws_caller_identity" "this" {}
 
+data "aws_region" "this" {}
+
 module "table_bucket" {
   source = "../../modules/table-bucket"
 
   table_bucket_name = local.bucket_name
+
+  encryption_configuration = {
+    kms_key_arn   = module.kms.key_arn
+    sse_algorithm = "aws:kms"
+  }
 
   maintenance_configuration = {
     iceberg_unreferenced_file_removal = {
@@ -48,6 +55,11 @@ module "table_bucket" {
     table1 = {
       format    = "ICEBERG"
       namespace = aws_s3tables_namespace.namespace.namespace
+
+      encryption_configuration = {
+        kms_key_arn   = module.kms.key_arn
+        sse_algorithm = "aws:kms"
+      }
 
       maintenance_configuration = {
         iceberg_compaction = {
@@ -102,4 +114,48 @@ resource "random_pet" "this" {
 resource "aws_s3tables_namespace" "namespace" {
   namespace        = "example_namespace"
   table_bucket_arn = module.table_bucket.s3_table_bucket_arn
+}
+
+module "kms" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "~> 2.0"
+
+  description             = "Key example for s3 table buckets"
+  deletion_window_in_days = 7
+
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-kms-permissions.html
+  key_statements = [
+    {
+      sid = "s3TablesMaintenancePolicy"
+      actions = [
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["maintenance.s3tables.amazonaws.com"]
+        }
+      ]
+
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values = [
+            data.aws_caller_identity.this.id,
+          ]
+        },
+        {
+          test     = "StringLike"
+          variable = "kms:EncryptionContext:aws:s3:arn"
+          values = [
+            "arn:aws:s3tables:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:bucket/${local.bucket_name}/table/*"
+          ]
+        }
+      ]
+    }
+  ]
 }

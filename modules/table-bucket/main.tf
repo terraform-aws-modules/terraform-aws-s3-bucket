@@ -2,6 +2,7 @@ resource "aws_s3tables_table_bucket" "this" {
   count = var.create ? 1 : 0
 
   name                      = var.table_bucket_name
+  encryption_configuration  = var.encryption_configuration
   maintenance_configuration = var.maintenance_configuration
 }
 
@@ -67,6 +68,7 @@ resource "aws_s3tables_table" "this" {
   name                      = try(each.value.table_name, each.key)
   namespace                 = each.value.namespace
   table_bucket_arn          = aws_s3tables_table_bucket.this[0].arn
+  encryption_configuration  = try(each.value.encryption_configuration, null)
   maintenance_configuration = try(each.value.maintenance_configuration, null)
 }
 
