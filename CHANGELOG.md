@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.10.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.9.0...v4.10.0) (2025-05-30)
+
+
+### Features
+
+* Add WAF log delivery policy ([#328](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/328)) ([98210a2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/98210a2f1bcbfee6bfb13a15dd883e76a17ba0a2))
+
 ## [4.9.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.8.0...v4.9.0) (2025-05-16)
 
 
