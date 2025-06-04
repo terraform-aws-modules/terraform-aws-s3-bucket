@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.10.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.10.0...v4.10.1) (2025-06-04)
+
+
+### Bug Fixes
+
+* Include `aws_s3_directory_bucket` ID in `s3_bucket_id` output ([#325](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/325)) ([0d8fc54](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/0d8fc540fef6303c4b6527927152c6f69954579a))
+
 ## [4.10.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.9.0...v4.10.0) (2025-05-30)
 
 
