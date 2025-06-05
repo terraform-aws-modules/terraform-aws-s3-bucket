@@ -36,6 +36,7 @@ module "wrapper" {
   cors_rule                                       = try(each.value.cors_rule, var.defaults.cors_rule, [])
   create_bucket                                   = try(each.value.create_bucket, var.defaults.create_bucket, true)
   data_redundancy                                 = try(each.value.data_redundancy, var.defaults.data_redundancy, null)
+  elb_log_delivery_policy_source_organizations    = try(each.value.elb_log_delivery_policy_source_organizations, var.defaults.elb_log_delivery_policy_source_organizations, [])
   expected_bucket_owner                           = try(each.value.expected_bucket_owner, var.defaults.expected_bucket_owner, null)
   force_destroy                                   = try(each.value.force_destroy, var.defaults.force_destroy, false)
   grant                                           = try(each.value.grant, var.defaults.grant, [])

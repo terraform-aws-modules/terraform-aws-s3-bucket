@@ -5,13 +5,13 @@ variable "create_bucket" {
 }
 
 variable "attach_elb_log_delivery_policy" {
-  description = "Controls if S3 bucket should have ELB log delivery policy attached"
+  description = "Controls if S3 bucket should have ALB log delivery policy attached"
   type        = bool
   default     = false
 }
 
 variable "attach_lb_log_delivery_policy" {
-  description = "Controls if S3 bucket should have ALB/NLB log delivery policy attached"
+  description = "Controls if S3 bucket should have NLB and VPC flow logs delivery policy attached"
   type        = bool
   default     = false
 }
@@ -184,8 +184,14 @@ variable "access_log_delivery_policy_source_organizations" {
   default     = []
 }
 
+variable "elb_log_delivery_policy_source_organizations" {
+  description = "(Optional) List of AWS Organization IDs should be allowed to deliver ALB logs to this bucket."
+  type        = list(string)
+  default     = []
+}
+
 variable "lb_log_delivery_policy_source_organizations" {
-  description = "(Optional) List of AWS Organization IDs should be allowed to deliver ALB/NLB logs to this bucket."
+  description = "(Optional) List of AWS Organization IDs should be allowed to deliver NLB and VPC flow logs to this bucket."
   type        = list(string)
   default     = []
 }
