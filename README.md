@@ -14,8 +14,8 @@ These features of S3 bucket configurations are supported:
 - server-side encryption
 - object locking
 - Cross-Region Replication (CRR)
-- ELB log delivery bucket policy
-- ALB/NLB log delivery bucket policy
+- ALB log delivery bucket policy
+- NLB and VPC flow logs delivery bucket policy
 - WAF log delivery bucket policy
 - Account-level Public Access Block
 - S3 Directory Bucket
@@ -60,7 +60,7 @@ module "s3_bucket_for_logs" {
 }
 ```
 
-### Bucket with ALB/NLB access log delivery policy attached
+### Bucket with ALB/NLB/VPC flow logs delivery policy attached
 
 ```hcl
 module "s3_bucket_for_logs" {
@@ -75,7 +75,7 @@ module "s3_bucket_for_logs" {
   object_ownership         = "ObjectWriter"
 
   attach_elb_log_delivery_policy = true  # Required for ALB logs
-  attach_lb_log_delivery_policy  = true  # Required for ALB/NLB logs
+  attach_lb_log_delivery_policy  = true  # Required for NLB/VPC flow logs logs
 }
 ```
 
@@ -226,9 +226,9 @@ No modules.
 | <a name="input_attach_deny_insecure_transport_policy"></a> [attach\_deny\_insecure\_transport\_policy](#input\_attach\_deny\_insecure\_transport\_policy) | Controls if S3 bucket should have deny non-SSL transport policy attached | `bool` | `false` | no |
 | <a name="input_attach_deny_ssec_encrypted_object_uploads"></a> [attach\_deny\_ssec\_encrypted\_object\_uploads](#input\_attach\_deny\_ssec\_encrypted\_object\_uploads) | Controls if S3 bucket should deny SSEC encrypted object uploads. | `bool` | `false` | no |
 | <a name="input_attach_deny_unencrypted_object_uploads"></a> [attach\_deny\_unencrypted\_object\_uploads](#input\_attach\_deny\_unencrypted\_object\_uploads) | Controls if S3 bucket should deny unencrypted object uploads policy attached. | `bool` | `false` | no |
-| <a name="input_attach_elb_log_delivery_policy"></a> [attach\_elb\_log\_delivery\_policy](#input\_attach\_elb\_log\_delivery\_policy) | Controls if S3 bucket should have ELB log delivery policy attached | `bool` | `false` | no |
+| <a name="input_attach_elb_log_delivery_policy"></a> [attach\_elb\_log\_delivery\_policy](#input\_attach\_elb\_log\_delivery\_policy) | Controls if S3 bucket should have ALB log delivery policy attached | `bool` | `false` | no |
 | <a name="input_attach_inventory_destination_policy"></a> [attach\_inventory\_destination\_policy](#input\_attach\_inventory\_destination\_policy) | Controls if S3 bucket should have bucket inventory destination policy attached. | `bool` | `false` | no |
-| <a name="input_attach_lb_log_delivery_policy"></a> [attach\_lb\_log\_delivery\_policy](#input\_attach\_lb\_log\_delivery\_policy) | Controls if S3 bucket should have ALB/NLB log delivery policy attached | `bool` | `false` | no |
+| <a name="input_attach_lb_log_delivery_policy"></a> [attach\_lb\_log\_delivery\_policy](#input\_attach\_lb\_log\_delivery\_policy) | Controls if S3 bucket should have NLB and VPC flow logs delivery policy attached | `bool` | `false` | no |
 | <a name="input_attach_policy"></a> [attach\_policy](#input\_attach\_policy) | Controls if S3 bucket should have bucket policy attached (set to `true` to use value of `policy` as bucket policy) | `bool` | `false` | no |
 | <a name="input_attach_public_policy"></a> [attach\_public\_policy](#input\_attach\_public\_policy) | Controls if a user defined public bucket policy will be attached (set to `false` to allow upstream to apply defaults to the bucket) | `bool` | `true` | no |
 | <a name="input_attach_require_latest_tls_policy"></a> [attach\_require\_latest\_tls\_policy](#input\_attach\_require\_latest\_tls\_policy) | Controls if S3 bucket should require the latest version of TLS | `bool` | `false` | no |
@@ -242,6 +242,7 @@ No modules.
 | <a name="input_cors_rule"></a> [cors\_rule](#input\_cors\_rule) | List of maps containing rules for Cross-Origin Resource Sharing. | `any` | `[]` | no |
 | <a name="input_create_bucket"></a> [create\_bucket](#input\_create\_bucket) | Controls if S3 bucket should be created | `bool` | `true` | no |
 | <a name="input_data_redundancy"></a> [data\_redundancy](#input\_data\_redundancy) | Data redundancy. Valid values: `SingleAvailabilityZone` | `string` | `null` | no |
+| <a name="input_elb_log_delivery_policy_source_organizations"></a> [elb\_log\_delivery\_policy\_source\_organizations](#input\_elb\_log\_delivery\_policy\_source\_organizations) | (Optional) List of AWS Organization IDs should be allowed to deliver ALB logs to this bucket. | `list(string)` | `[]` | no |
 | <a name="input_expected_bucket_owner"></a> [expected\_bucket\_owner](#input\_expected\_bucket\_owner) | The account ID of the expected bucket owner | `string` | `null` | no |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | (Optional, Default:false ) A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `false` | no |
 | <a name="input_grant"></a> [grant](#input\_grant) | An ACL policy grant. Conflicts with `acl` | `any` | `[]` | no |
@@ -252,7 +253,7 @@ No modules.
 | <a name="input_inventory_source_account_id"></a> [inventory\_source\_account\_id](#input\_inventory\_source\_account\_id) | The inventory source account id. | `string` | `null` | no |
 | <a name="input_inventory_source_bucket_arn"></a> [inventory\_source\_bucket\_arn](#input\_inventory\_source\_bucket\_arn) | The inventory source bucket ARN. | `string` | `null` | no |
 | <a name="input_is_directory_bucket"></a> [is\_directory\_bucket](#input\_is\_directory\_bucket) | If the s3 bucket created is a directory bucket | `bool` | `false` | no |
-| <a name="input_lb_log_delivery_policy_source_organizations"></a> [lb\_log\_delivery\_policy\_source\_organizations](#input\_lb\_log\_delivery\_policy\_source\_organizations) | (Optional) List of AWS Organization IDs should be allowed to deliver ALB/NLB logs to this bucket. | `list(string)` | `[]` | no |
+| <a name="input_lb_log_delivery_policy_source_organizations"></a> [lb\_log\_delivery\_policy\_source\_organizations](#input\_lb\_log\_delivery\_policy\_source\_organizations) | (Optional) List of AWS Organization IDs should be allowed to deliver NLB and VPC flow logs to this bucket. | `list(string)` | `[]` | no |
 | <a name="input_lifecycle_rule"></a> [lifecycle\_rule](#input\_lifecycle\_rule) | List of maps containing configuration of object lifecycle management. | `any` | `[]` | no |
 | <a name="input_location_type"></a> [location\_type](#input\_location\_type) | Location type. Valid values: `AvailabilityZone` or `LocalZone` | `string` | `null` | no |
 | <a name="input_logging"></a> [logging](#input\_logging) | Map containing access bucket logging configuration. | `any` | `{}` | no |

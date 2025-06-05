@@ -80,6 +80,7 @@ module "log_bucket" {
   access_log_delivery_policy_source_accounts      = [data.aws_caller_identity.current.account_id]
   access_log_delivery_policy_source_buckets       = ["arn:aws:s3:::${local.bucket_name}"]
   access_log_delivery_policy_source_organizations = ["o-123456"]
+  elb_log_delivery_policy_source_organizations    = ["o-123456"]
   lb_log_delivery_policy_source_organizations     = ["o-123456"]
 }
 
