@@ -919,7 +919,7 @@ data "aws_iam_policy_document" "cloudtrail_log_delivery" {
       "s3:PutObject",
     ]
     resources = [
-      "${aws_s3_bucket.this[0].arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+      "${aws_s3_bucket.this[0].arn}/AWSLogs/*",
     ]
     condition {
       test     = "StringEquals"
