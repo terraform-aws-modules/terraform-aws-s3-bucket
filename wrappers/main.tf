@@ -15,6 +15,7 @@ module "wrapper" {
   analytics_source_bucket_arn                     = try(each.value.analytics_source_bucket_arn, var.defaults.analytics_source_bucket_arn, null)
   attach_access_log_delivery_policy               = try(each.value.attach_access_log_delivery_policy, var.defaults.attach_access_log_delivery_policy, false)
   attach_analytics_destination_policy             = try(each.value.attach_analytics_destination_policy, var.defaults.attach_analytics_destination_policy, false)
+  attach_cloudtrail_log_delivery_policy           = try(each.value.attach_cloudtrail_log_delivery_policy, var.defaults.attach_cloudtrail_log_delivery_policy, false)
   attach_deny_incorrect_encryption_headers        = try(each.value.attach_deny_incorrect_encryption_headers, var.defaults.attach_deny_incorrect_encryption_headers, false)
   attach_deny_incorrect_kms_key_sse               = try(each.value.attach_deny_incorrect_kms_key_sse, var.defaults.attach_deny_incorrect_kms_key_sse, false)
   attach_deny_insecure_transport_policy           = try(each.value.attach_deny_insecure_transport_policy, var.defaults.attach_deny_insecure_transport_policy, false)

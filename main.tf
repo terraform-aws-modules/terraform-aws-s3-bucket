@@ -12,7 +12,7 @@ locals {
 
   create_bucket_acl = (var.acl != null && var.acl != "null") || length(local.grants) > 0
 
-  attach_policy = var.attach_require_latest_tls_policy || var.attach_access_log_delivery_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_deny_ssec_encrypted_object_uploads || var.attach_policy || var.attach_waf_log_delivery_policy
+  attach_policy = var.attach_require_latest_tls_policy || var.attach_access_log_delivery_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_cloudtrail_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_deny_ssec_encrypted_object_uploads || var.attach_policy || var.attach_waf_log_delivery_policy
 
   # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
   grants               = try(jsondecode(var.grant), var.grant)
@@ -569,6 +569,7 @@ data "aws_iam_policy_document" "combined" {
     var.attach_elb_log_delivery_policy ? data.aws_iam_policy_document.elb_log_delivery[0].json : "",
     var.attach_lb_log_delivery_policy ? data.aws_iam_policy_document.lb_log_delivery[0].json : "",
     var.attach_access_log_delivery_policy ? data.aws_iam_policy_document.access_log_delivery[0].json : "",
+    var.attach_cloudtrail_log_delivery_policy ? data.aws_iam_policy_document.cloudtrail_log_delivery[0].json : "",
     var.attach_require_latest_tls_policy ? data.aws_iam_policy_document.require_latest_tls[0].json : "",
     var.attach_deny_insecure_transport_policy ? data.aws_iam_policy_document.deny_insecure_transport[0].json : "",
     var.attach_deny_unencrypted_object_uploads ? data.aws_iam_policy_document.deny_unencrypted_object_uploads[0].json : "",
@@ -667,7 +668,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
   count = local.create_bucket && var.attach_lb_log_delivery_policy && !var.is_directory_bucket ? 1 : 0
 
   statement {
-    sid = "AWSLogDeliveryWrite"
+    sid = "AlbNlbLogDeliveryWrite"
 
     principals {
       type        = "Service"
@@ -702,7 +703,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
   }
 
   statement {
-    sid = "AWSLogDeliveryAclCheck"
+    sid = "AlbNlbLogDeliveryAclCheck"
 
     effect = "Allow"
 
@@ -822,7 +823,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
   count = local.create_bucket && var.attach_waf_log_delivery_policy && !var.is_directory_bucket ? 1 : 0
 
   statement {
-    sid = "AWSLogDeliveryWrite"
+    sid = "WafLogDeliveryWrite"
 
     effect = "Allow"
 
@@ -859,7 +860,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
   }
 
   statement {
-    sid = "AWSLogDeliveryAclCheck"
+    sid = "WafLogDeliveryAclCheck"
 
     effect = "Allow"
 
@@ -886,6 +887,46 @@ data "aws_iam_policy_document" "waf_log_delivery" {
       test     = "ArnLike"
       values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:*"]
       variable = "aws:SourceArn"
+    }
+  }
+}
+
+# CloudTrail
+data "aws_iam_policy_document" "cloudtrail_log_delivery" {
+  count = local.create_bucket && var.attach_cloudtrail_log_delivery_policy && !var.is_directory_bucket ? 1 : 0
+
+  statement {
+    sid = "AWSCloudTrailAclCheck"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+    actions = [
+      "s3:GetBucketAcl",
+    ]
+    resources = [
+      aws_s3_bucket.this[0].arn,
+    ]
+  }
+
+  statement {
+    sid = "AWSCloudTrailWrite"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+    actions = [
+      "s3:PutObject",
+    ]
+    resources = [
+      "${aws_s3_bucket.this[0].arn}/AWSLogs/*",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values = [
+        "bucket-owner-full-control",
+      ]
     }
   }
 }
