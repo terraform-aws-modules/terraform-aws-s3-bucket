@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.11.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.10.1...v4.11.0) (2025-06-17)
+
+
+### Features
+
+* Enable CloudTrail log delivery bucket policy option ([#332](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/332)) ([1a431dd](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/1a431dd0ccc2478399fce247a75caf40a109bb10))
+
 ## [4.10.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.10.0...v4.10.1) (2025-06-04)
 
 
