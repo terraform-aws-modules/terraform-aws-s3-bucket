@@ -582,7 +582,7 @@ data "aws_iam_policy_document" "combined" {
   ])
 }
 
-# AWS Load Balancer access log delivery policy
+# ALB access and connection log delivery policy
 locals {
   # List of AWS regions where permissions should be granted to the specified Elastic Load Balancing account ID ( https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html#attach-bucket-policy )
   elb_service_accounts = {
@@ -623,7 +623,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
     for_each = { for k, v in local.elb_service_accounts : k => v if k == data.aws_region.current.name }
 
     content {
-      sid = format("ELBRegion%s", title(statement.key))
+      sid = format("ALBRegion%s", title(statement.key))
 
       principals {
         type        = "AWS"
@@ -639,6 +639,26 @@ data "aws_iam_policy_document" "elb_log_delivery" {
       resources = [
         "${aws_s3_bucket.this[0].arn}/*",
       ]
+
+      dynamic "condition" {
+        for_each = length(var.elb_log_delivery_policy_source_organizations) > 0 ? [] : [true]
+
+        content {
+          test     = "ArnLike"
+          variable = "aws:SourceArn"
+          values   = ["arn:aws:elasticloadbalancing:*:${data.aws_caller_identity.current.id}:loadbalancer/*"]
+        }
+      }
+
+      dynamic "condition" {
+        for_each = length(var.elb_log_delivery_policy_source_organizations) > 0 ? [true] : []
+
+        content {
+          test     = "StringEquals"
+          variable = "aws:SourceOrgId"
+          values   = var.elb_log_delivery_policy_source_organizations
+        }
+      }
     }
   }
 
@@ -660,10 +680,30 @@ data "aws_iam_policy_document" "elb_log_delivery" {
     resources = [
       "${aws_s3_bucket.this[0].arn}/*",
     ]
+
+    dynamic "condition" {
+      for_each = length(var.elb_log_delivery_policy_source_organizations) > 0 ? [] : [true]
+
+      content {
+        test     = "ArnLike"
+        variable = "aws:SourceArn"
+        values   = ["arn:aws:elasticloadbalancing:*:${data.aws_caller_identity.current.id}:loadbalancer/*"]
+      }
+    }
+
+    dynamic "condition" {
+      for_each = length(var.elb_log_delivery_policy_source_organizations) > 0 ? [true] : []
+
+      content {
+        test     = "StringEquals"
+        variable = "aws:SourceOrgId"
+        values   = var.elb_log_delivery_policy_source_organizations
+      }
+    }
   }
 }
 
-# ALB/NLB
+# NLB and VPC flow logs
 data "aws_iam_policy_document" "lb_log_delivery" {
   count = local.create_bucket && var.attach_lb_log_delivery_policy && !var.is_directory_bucket ? 1 : 0
 
@@ -689,6 +729,26 @@ data "aws_iam_policy_document" "lb_log_delivery" {
       test     = "StringEquals"
       variable = "s3:x-amz-acl"
       values   = ["bucket-owner-full-control"]
+    }
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_policy_source_organizations) > 0 ? [] : [true]
+
+      content {
+        test     = "StringEquals"
+        variable = "aws:SourceAccount"
+        values   = [data.aws_caller_identity.current.id]
+      }
+    }
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_policy_source_organizations) > 0 ? [] : [true]
+
+      content {
+        test     = "ArnLike"
+        variable = "aws:SourceArn"
+        values   = ["arn:aws:logs:*:${data.aws_caller_identity.current.id}:*"]
+      }
     }
 
     dynamic "condition" {
@@ -720,6 +780,26 @@ data "aws_iam_policy_document" "lb_log_delivery" {
     resources = [
       aws_s3_bucket.this[0].arn,
     ]
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_policy_source_organizations) > 0 ? [] : [true]
+
+      content {
+        test     = "StringEquals"
+        variable = "aws:SourceAccount"
+        values   = [data.aws_caller_identity.current.id]
+      }
+    }
+
+    dynamic "condition" {
+      for_each = length(var.lb_log_delivery_policy_source_organizations) > 0 ? [] : [true]
+
+      content {
+        test     = "ArnLike"
+        variable = "aws:SourceArn"
+        values   = ["arn:aws:logs:*:${data.aws_caller_identity.current.id}:*"]
+      }
+    }
 
     dynamic "condition" {
       for_each = length(var.lb_log_delivery_policy_source_organizations) > 0 ? [true] : []
