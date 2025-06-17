@@ -73,6 +73,7 @@ module "log_bucket" {
   attach_elb_log_delivery_policy        = true
   attach_lb_log_delivery_policy         = true
   attach_access_log_delivery_policy     = true
+  attach_cloudtrail_log_delivery_policy = true
   attach_deny_insecure_transport_policy = true
   attach_require_latest_tls_policy      = true
   attach_waf_log_delivery_policy        = true
