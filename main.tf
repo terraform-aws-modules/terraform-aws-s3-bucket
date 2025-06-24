@@ -620,7 +620,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 
   # Policy for AWS Regions created before August 2022 (e.g. US East (N. Virginia), Asia Pacific (Singapore), Asia Pacific (Sydney), Asia Pacific (Tokyo), Europe (Ireland))
   dynamic "statement" {
-    for_each = { for k, v in local.elb_service_accounts : k => v if k == data.aws_region.current.name }
+    for_each = { for k, v in local.elb_service_accounts : k => v if k == data.aws_region.current.id }
 
     content {
       sid = format("ELBRegion%s", title(statement.key))
@@ -854,7 +854,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:*"]
+      values   = ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.id}:*"]
       variable = "aws:SourceArn"
     }
   }
@@ -885,7 +885,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:*"]
+      values   = ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.id}:*"]
       variable = "aws:SourceArn"
     }
   }
