@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.0.0...v5.0.1) (2025-06-25)
+
+
+### Bug Fixes
+
+* Lower minimum Terraform version to 1.5.7 ([#342](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/342)) ([0392b0f](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/0392b0faa8eb232e859e33eaca25dc43fd9a3646))
+
 ## [5.0.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v4.11.0...v5.0.0) (2025-06-25)
 
 
