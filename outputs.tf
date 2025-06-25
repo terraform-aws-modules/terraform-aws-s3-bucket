@@ -35,7 +35,7 @@ output "s3_bucket_policy" {
 
 output "s3_bucket_region" {
   description = "The AWS region this bucket resides in."
-  value       = try(aws_s3_bucket.this[0].region, "")
+  value       = try(aws_s3_bucket.this[0].bucket_region, "")
 }
 
 output "s3_bucket_website_endpoint" {
