@@ -152,7 +152,7 @@ module "kms" {
           test     = "StringLike"
           variable = "kms:EncryptionContext:aws:s3:arn"
           values = [
-            "arn:aws:s3tables:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:bucket/${local.bucket_name}/table/*"
+            "arn:aws:s3tables:${data.aws_region.this.region}:${data.aws_caller_identity.this.account_id}:bucket/${local.bucket_name}/table/*"
           ]
         }
       ]

@@ -22,6 +22,12 @@ variable "attach_access_log_delivery_policy" {
   default     = false
 }
 
+variable "attach_cloudtrail_log_delivery_policy" {
+  description = "Controls if S3 bucket should have CloudTrail log delivery policy attached"
+  type        = bool
+  default     = false
+}
+
 variable "attach_deny_insecure_transport_policy" {
   description = "Controls if S3 bucket should have deny non-SSL transport policy attached"
   type        = bool
@@ -92,6 +98,12 @@ variable "attach_waf_log_delivery_policy" {
   description = "Controls if S3 bucket should have WAF log delivery policy attached"
   type        = bool
   default     = false
+}
+
+variable "region" {
+  description = "Region where the resource(s) will be managed. Defaults to the region set in the provider configuration"
+  type        = string
+  default     = null
 }
 
 variable "bucket" {
