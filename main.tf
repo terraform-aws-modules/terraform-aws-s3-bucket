@@ -25,6 +25,8 @@ locals {
 resource "aws_s3_bucket" "this" {
   count = local.create_bucket && !var.is_directory_bucket ? 1 : 0
 
+  region = var.region
+
   bucket        = var.bucket
   bucket_prefix = var.bucket_prefix
 
@@ -35,6 +37,8 @@ resource "aws_s3_bucket" "this" {
 
 resource "aws_s3_directory_bucket" "this" {
   count = local.create_bucket && var.is_directory_bucket ? 1 : 0
+
+  region = var.region
 
   bucket          = "${var.bucket}--${var.availability_zone_id}--x-s3"
   data_redundancy = var.data_redundancy
@@ -49,6 +53,8 @@ resource "aws_s3_directory_bucket" "this" {
 
 resource "aws_s3_bucket_logging" "this" {
   count = local.create_bucket && length(keys(var.logging)) > 0 && !var.is_directory_bucket ? 1 : 0
+
+  region = var.region
 
   bucket = aws_s3_bucket.this[0].id
 
@@ -78,6 +84,8 @@ resource "aws_s3_bucket_logging" "this" {
 
 resource "aws_s3_bucket_acl" "this" {
   count = local.create_bucket && local.create_bucket_acl && !var.is_directory_bucket ? 1 : 0
+
+  region = var.region
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -117,6 +125,8 @@ resource "aws_s3_bucket_acl" "this" {
 
 resource "aws_s3_bucket_website_configuration" "this" {
   count = local.create_bucket && length(keys(var.website)) > 0 && !var.is_directory_bucket ? 1 : 0
+
+  region = var.region
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -173,6 +183,8 @@ resource "aws_s3_bucket_website_configuration" "this" {
 resource "aws_s3_bucket_versioning" "this" {
   count = local.create_bucket && length(keys(var.versioning)) > 0 && !var.is_directory_bucket ? 1 : 0
 
+  region = var.region
+
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
   mfa                   = try(var.versioning["mfa"], null)
@@ -188,6 +200,8 @@ resource "aws_s3_bucket_versioning" "this" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
   count = local.create_bucket && length(keys(var.server_side_encryption_configuration)) > 0 ? 1 : 0
+
+  region = var.region
 
   bucket                = var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -213,6 +227,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 resource "aws_s3_bucket_accelerate_configuration" "this" {
   count = local.create_bucket && var.acceleration_status != null && !var.is_directory_bucket ? 1 : 0
 
+  region = var.region
+
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
 
@@ -223,6 +239,8 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
 resource "aws_s3_bucket_request_payment_configuration" "this" {
   count = local.create_bucket && var.request_payer != null && !var.is_directory_bucket ? 1 : 0
 
+  region = var.region
+
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
 
@@ -232,6 +250,8 @@ resource "aws_s3_bucket_request_payment_configuration" "this" {
 
 resource "aws_s3_bucket_cors_configuration" "this" {
   count = local.create_bucket && length(local.cors_rules) > 0 && !var.is_directory_bucket ? 1 : 0
+
+  region = var.region
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
@@ -252,6 +272,8 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
   count = local.create_bucket && length(local.lifecycle_rules) > 0 ? 1 : 0
+
+  region = var.region
 
   bucket                                 = var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id
   expected_bucket_owner                  = var.expected_bucket_owner
@@ -369,6 +391,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 resource "aws_s3_bucket_object_lock_configuration" "this" {
   count = local.create_bucket && var.object_lock_enabled && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
 
+  region = var.region
+
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
   token                 = try(var.object_lock_configuration.token, null)
@@ -384,6 +408,8 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 
 resource "aws_s3_bucket_replication_configuration" "this" {
   count = local.create_bucket && length(keys(var.replication_configuration)) > 0 && !var.is_directory_bucket ? 1 : 0
+
+  region = var.region
 
   bucket = aws_s3_bucket.this[0].id
   role   = var.replication_configuration["role"]
@@ -550,6 +576,8 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 resource "aws_s3_bucket_policy" "this" {
   count = local.create_bucket && local.attach_policy ? 1 : 0
 
+  region = var.region
+
   # Chain resources (s3_bucket -> s3_bucket_public_access_block -> s3_bucket_policy )
   # to prevent "A conflicting conditional operation is currently in progress against this resource."
   # Ref: https://github.com/hashicorp/terraform-provider-aws/issues/7628
@@ -620,7 +648,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 
   # Policy for AWS Regions created before August 2022 (e.g. US East (N. Virginia), Asia Pacific (Singapore), Asia Pacific (Sydney), Asia Pacific (Tokyo), Europe (Ireland))
   dynamic "statement" {
-    for_each = { for k, v in local.elb_service_accounts : k => v if k == data.aws_region.current.name }
+    for_each = { for k, v in local.elb_service_accounts : k => v if k == data.aws_region.current.region }
 
     content {
       sid = format("ELBRegion%s", title(statement.key))
@@ -854,7 +882,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:*"]
+      values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:*"]
       variable = "aws:SourceArn"
     }
   }
@@ -885,7 +913,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:*"]
+      values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:*"]
       variable = "aws:SourceArn"
     }
   }
@@ -1108,6 +1136,8 @@ data "aws_iam_policy_document" "deny_ssec_encrypted_object_uploads" {
 resource "aws_s3_bucket_public_access_block" "this" {
   count = local.create_bucket && var.attach_public_policy && !var.is_directory_bucket ? 1 : 0
 
+  region = var.region
+
   bucket = aws_s3_bucket.this[0].id
 
   block_public_acls       = var.block_public_acls
@@ -1118,6 +1148,8 @@ resource "aws_s3_bucket_public_access_block" "this" {
 
 resource "aws_s3_bucket_ownership_controls" "this" {
   count = local.create_bucket && var.control_object_ownership && !var.is_directory_bucket ? 1 : 0
+
+  region = var.region
 
   bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
 
@@ -1135,6 +1167,8 @@ resource "aws_s3_bucket_ownership_controls" "this" {
 
 resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
   for_each = { for k, v in local.intelligent_tiering : k => v if local.create_bucket && !var.is_directory_bucket }
+
+  region = var.region
 
   name   = each.key
   bucket = aws_s3_bucket.this[0].id
@@ -1164,6 +1198,8 @@ resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
 resource "aws_s3_bucket_metric" "this" {
   for_each = { for k, v in local.metric_configuration : k => v if local.create_bucket && !var.is_directory_bucket }
 
+  region = var.region
+
   name   = each.value.name
   bucket = aws_s3_bucket.this[0].id
 
@@ -1178,6 +1214,8 @@ resource "aws_s3_bucket_metric" "this" {
 
 resource "aws_s3_bucket_inventory" "this" {
   for_each = { for k, v in var.inventory_configuration : k => v if local.create_bucket && !var.is_directory_bucket }
+
+  region = var.region
 
   name                     = each.key
   bucket                   = try(each.value.bucket, aws_s3_bucket.this[0].id)
@@ -1279,6 +1317,8 @@ data "aws_iam_policy_document" "inventory_and_analytics_destination_policy" {
 
 resource "aws_s3_bucket_analytics_configuration" "this" {
   for_each = { for k, v in var.analytics_configuration : k => v if local.create_bucket && !var.is_directory_bucket }
+
+  region = var.region
 
   bucket = aws_s3_bucket.this[0].id
   name   = each.key
