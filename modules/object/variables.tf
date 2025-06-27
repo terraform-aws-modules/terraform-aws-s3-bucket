@@ -4,6 +4,12 @@ variable "create" {
   default     = true
 }
 
+variable "region" {
+  description = "Region where the resource(s) will be managed. Defaults to the region set in the provider configuration"
+  type        = string
+  default     = null
+}
+
 variable "bucket" {
   description = "The name of the bucket to put the file in. Alternatively, an S3 access point ARN can be specified."
   type        = string

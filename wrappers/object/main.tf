@@ -24,6 +24,7 @@ module "wrapper" {
   object_lock_mode              = try(each.value.object_lock_mode, var.defaults.object_lock_mode, null)
   object_lock_retain_until_date = try(each.value.object_lock_retain_until_date, var.defaults.object_lock_retain_until_date, null)
   override_default_tags         = try(each.value.override_default_tags, var.defaults.override_default_tags, false)
+  region                        = try(each.value.region, var.defaults.region, null)
   server_side_encryption        = try(each.value.server_side_encryption, var.defaults.server_side_encryption, null)
   source_hash                   = try(each.value.source_hash, var.defaults.source_hash, null)
   storage_class                 = try(each.value.storage_class, var.defaults.storage_class, null)
