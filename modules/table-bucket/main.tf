@@ -1,6 +1,8 @@
 resource "aws_s3tables_table_bucket" "this" {
   count = var.create ? 1 : 0
 
+  region = var.region
+
   name                      = var.table_bucket_name
   encryption_configuration  = var.encryption_configuration
   maintenance_configuration = var.maintenance_configuration
@@ -8,6 +10,8 @@ resource "aws_s3tables_table_bucket" "this" {
 
 resource "aws_s3tables_table_bucket_policy" "this" {
   count = var.create && var.create_table_bucket_policy ? 1 : 0
+
+  region = var.region
 
   resource_policy  = var.table_bucket_policy != null ? var.table_bucket_policy : data.aws_iam_policy_document.table_bucket_policy[0].json
   table_bucket_arn = aws_s3tables_table_bucket.this[0].arn
@@ -64,6 +68,8 @@ data "aws_iam_policy_document" "table_bucket_policy" {
 resource "aws_s3tables_table" "this" {
   for_each = { for k, v in var.tables : k => v if var.create }
 
+  region = var.region
+
   format                    = each.value.format
   name                      = try(each.value.table_name, each.key)
   namespace                 = each.value.namespace
@@ -74,6 +80,8 @@ resource "aws_s3tables_table" "this" {
 
 resource "aws_s3tables_table_policy" "this" {
   for_each = { for k, v in var.tables : k => v if var.create && try(v.create_table_policy, false) }
+
+  region = var.region
 
   name             = aws_s3tables_table.this[each.key].name
   namespace        = each.value.namespace

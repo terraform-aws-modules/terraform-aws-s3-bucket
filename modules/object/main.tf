@@ -1,6 +1,8 @@
 resource "aws_s3_object" "this" {
   count = var.create ? 1 : 0
 
+  region = var.region
+
   bucket        = var.bucket
   key           = var.key
   force_destroy = var.force_destroy
