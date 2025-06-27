@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.1.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.0.2...v5.1.0) (2025-06-27)
+
+
+### Features
+
+* Added region variable to object and table-bucket submodules ([#344](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/344)) ([b37b7c9](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/b37b7c99da310beca21fdc4cde35d9feb454fd0c))
+
 ## [5.0.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.0.1...v5.0.2) (2025-06-25)
 
 
