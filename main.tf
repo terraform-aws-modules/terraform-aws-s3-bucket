@@ -31,7 +31,6 @@ resource "aws_s3_bucket" "this" {
   bucket_prefix = var.bucket_prefix
 
   force_destroy       = var.force_destroy
-  object_lock_enabled = var.object_lock_enabled
   tags                = var.tags
 }
 
@@ -391,6 +390,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 resource "aws_s3_bucket_object_lock_configuration" "this" {
   count = local.create_bucket && var.object_lock_enabled && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
 
+  # Must have bucket versionign enabled first
+  depends_on = [aws_s3_bucket_versioning.this]
   region = var.region
 
   bucket                = aws_s3_bucket.this[0].id
