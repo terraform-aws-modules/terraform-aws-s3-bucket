@@ -74,6 +74,10 @@ module "complete" {
   ]
   attach_policy = true
   policy        = data.aws_iam_policy_document.bucket_policy.json
+
+  tags = {
+    directory-bucket = true
+  }
 }
 
 resource "random_pet" "this" {

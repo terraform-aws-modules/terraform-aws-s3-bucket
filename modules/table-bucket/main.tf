@@ -76,6 +76,34 @@ resource "aws_s3tables_table" "this" {
   table_bucket_arn          = aws_s3tables_table_bucket.this[0].arn
   encryption_configuration  = try(each.value.encryption_configuration, null)
   maintenance_configuration = try(each.value.maintenance_configuration, null)
+
+  dynamic "metadata" {
+    for_each = try([each.value.metadata], [])
+    content {
+
+      dynamic "iceberg" {
+        for_each = try([metadata.value.iceberg], [])
+        content {
+
+          dynamic "schema" {
+            for_each = try([iceberg.value.schema], [])
+            content {
+
+              dynamic "field" {
+                for_each = try(schema.value.field, [])
+                content {
+
+                  name     = try(field.value.name, field.key)
+                  type     = field.value.type
+                  required = try(field.value.required, null)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 resource "aws_s3tables_table_policy" "this" {
