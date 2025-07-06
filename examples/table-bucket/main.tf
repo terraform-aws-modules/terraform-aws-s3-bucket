@@ -103,6 +103,24 @@ module "table_bucket" {
     table3 = {
       format    = "ICEBERG"
       namespace = aws_s3tables_namespace.namespace.namespace
+
+      metadata = {
+        iceberg = {
+          schema = {
+            field = {
+              created_at = {
+                name     = "created_at"
+                type     = "timestamp"
+                required = false
+              }
+              price = {
+                type     = "decimal(10,2)"
+                required = false
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -118,7 +136,7 @@ resource "aws_s3tables_namespace" "namespace" {
 
 module "kms" {
   source  = "terraform-aws-modules/kms/aws"
-  version = "~> 2.0"
+  version = "~> 3.0"
 
   description             = "Key example for s3 table buckets"
   deletion_window_in_days = 7

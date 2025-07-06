@@ -48,6 +48,8 @@ resource "aws_s3_directory_bucket" "this" {
     name = var.availability_zone_id
     type = var.location_type
   }
+
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_logging" "this" {

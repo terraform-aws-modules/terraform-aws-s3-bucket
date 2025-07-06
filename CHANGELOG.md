@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.2.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.1.0...v5.2.0) (2025-07-06)
+
+
+### Features
+
+* S3 Table Metadata and Directory Bucket Tags ([#346](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/346)) ([cc67d6c](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/cc67d6cfdcd1987e2864e452dad55e4a36a8b84e))
+
 ## [5.1.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.0.2...v5.1.0) (2025-06-27)
 
 
