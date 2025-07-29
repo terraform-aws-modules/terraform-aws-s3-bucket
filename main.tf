@@ -54,7 +54,7 @@ resource "aws_s3_directory_bucket" "this" {
 }
 
 resource "aws_s3_bucket_logging" "this" {
-  count = local.create_bucket && length(keys(var.logging)) > 0 && !var.is_directory_bucket ? 1 : 0
+  count = local.create_bucket && length(try(keys(var.logging), [])) > 0 && !var.is_directory_bucket ? 1 : 0
 
   region = var.region
 
