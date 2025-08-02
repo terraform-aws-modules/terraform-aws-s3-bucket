@@ -377,11 +377,12 @@ module "s3_bucket" {
   ]
 
   # metadata configuration example
-  create_metadata_configuration                 = true
-  metadata_inventory_table_configuration_state  = "ENABLED"
-  metadata_journal_table_record_expiration      = "ENABLED"
-  metadata_journal_table_record_expiration_days = 7
-  metadata_encryption_configuration = {
-    sse_algorithm = "AES256"
-  }
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/metadata-tables-configuring.html
+  # create_metadata_configuration                 = true
+  # metadata_inventory_table_configuration_state  = "ENABLED"
+  # metadata_journal_table_record_expiration      = "ENABLED"
+  # metadata_journal_table_record_expiration_days = 7
+  # metadata_encryption_configuration = {
+  #   sse_algorithm = "AES256"
+  # }
 }
