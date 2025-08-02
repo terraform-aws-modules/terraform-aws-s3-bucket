@@ -1364,7 +1364,7 @@ resource "aws_s3_bucket_metadata_configuration" "this" {
 
   metadata_configuration {
     inventory_table_configuration {
-      configuration_state = var.metadata_configuration_state
+      configuration_state = var.metadata_inventory_table_configuration_state
 
       dynamic "encryption_configuration" {
         for_each = var.metadata_encryption_configuration != null ? [var.metadata_encryption_configuration] : []
@@ -1377,8 +1377,8 @@ resource "aws_s3_bucket_metadata_configuration" "this" {
 
     journal_table_configuration {
       record_expiration {
-        days       = var.metadata_record_expiration_days
-        expiration = var.metadata_record_expiration
+        days       = var.metadata_journal_table_record_expiration_days
+        expiration = var.metadata_journal_table_record_expiration
       }
     }
   }

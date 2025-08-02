@@ -389,7 +389,7 @@ variable "create_metadata_configuration" {
   default     = false
 }
 
-variable "metadata_configuration_state" {
+variable "metadata_inventory_table_configuration_state" {
   description = "Configuration state of the inventory table, indicating whether the inventory table is enabled or disabled. Valid values: ENABLED, DISABLED"
   type        = string
   default     = null
@@ -401,13 +401,13 @@ variable "metadata_encryption_configuration" {
   default     = null
 }
 
-variable "metadata_record_expiration_days" {
+variable "metadata_journal_table_record_expiration_days" {
   description = "Number of days to retain journal table records"
   type        = number
   default     = null
 }
 
-variable "metadata_record_expiration" {
+variable "metadata_journal_table_record_expiration" {
   description = "Whether journal table record expiration is enabled or disabled. Valid values: ENABLED, DISABLED"
   type        = string
   default     = null
