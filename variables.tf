@@ -383,6 +383,36 @@ variable "location_type" {
   default     = null
 }
 
+variable "create_metadata_configuration" {
+  description = "Whether to create metadata configuration resource"
+  type        = bool
+  default     = false
+}
+
+variable "metadata_configuration_state" {
+  description = "Configuration state of the inventory table, indicating whether the inventory table is enabled or disabled. Valid values: ENABLED, DISABLED"
+  type        = string
+  default     = null
+}
+
+variable "metadata_encryption_configuration" {
+  description = "Encryption configuration block"
+  type        = any
+  default     = null
+}
+
+variable "metadata_record_expiration_days" {
+  description = "Number of days to retain journal table records"
+  type        = number
+  default     = null
+}
+
+variable "metadata_record_expiration" {
+  description = "Whether journal table record expiration is enabled or disabled. Valid values: ENABLED, DISABLED"
+  type        = string
+  default     = null
+}
+
 variable "putin_khuylo" {
   description = "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!"
   type        = bool

@@ -375,4 +375,13 @@ module "s3_bucket" {
       name = "all"
     }
   ]
+
+  # metadata configuration
+  # create_metadata_configuration   = true
+  # metadata_configuration_state    = "ENABLED"
+  # metadata_record_expiration      = "ENABLED"
+  # metadata_record_expiration_days = 7
+  # metadata_encryption_configuration = {
+  #   sse_algorithm = "AES256"
+  # }
 }
