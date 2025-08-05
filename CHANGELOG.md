@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.3.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.2.0...v5.3.0) (2025-08-05)
+
+
+### Features
+
+* Add bucket versioning status as an output ([#350](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/350)) ([525f43c](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/525f43c045a0fd141ef9573b83d4be5b9c266787))
+
 ## [5.2.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.1.0...v5.2.0) (2025-07-06)
 
 
