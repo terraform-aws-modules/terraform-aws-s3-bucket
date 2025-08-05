@@ -57,3 +57,8 @@ output "s3_directory_bucket_arn" {
   description = "ARN of the directory bucket."
   value       = try(aws_s3_directory_bucket.this[0].arn, null)
 }
+
+output "aws_s3_bucket_versioning_status" {
+  description = "The versioning status of the bucket. Will be 'Enabled', 'Suspended', or 'Disabled'."
+  value       = try(aws_s3_bucket_versioning.this[0].versioning_configuration[0].status, null)
+}
