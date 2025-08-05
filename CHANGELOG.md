@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.3.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.3.0...v5.3.1) (2025-08-05)
+
+
+### Bug Fixes
+
+* Use the specified region to retrieve the current AWS region ([#348](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/348)) ([453fcb9](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/453fcb9d7e6b38755c3f5262da042bf0c887c6b5))
+
 ## [5.3.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.2.0...v5.3.0) (2025-08-05)
 
 
