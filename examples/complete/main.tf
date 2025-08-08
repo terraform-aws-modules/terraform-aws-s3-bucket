@@ -375,4 +375,17 @@ module "s3_bucket" {
       name = "all"
     }
   ]
+
+  # metadata configuration example
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/metadata-tables-overview.html
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/metadata-tables-configuring.html
+  # only available in supported regions: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metadata-tables-restrictions.html
+
+  # create_metadata_configuration                 = true
+  # metadata_inventory_table_configuration_state  = "ENABLED"
+  # metadata_journal_table_record_expiration      = "ENABLED"
+  # metadata_journal_table_record_expiration_days = 7
+  # metadata_encryption_configuration = {
+  #   sse_algorithm = "AES256"
+  # }
 }
