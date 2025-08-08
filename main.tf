@@ -1359,7 +1359,7 @@ resource "aws_s3_bucket_analytics_configuration" "this" {
 }
 
 resource "aws_s3_bucket_metadata_configuration" "this" {
-  count = var.create_bucket && var.create_metadata_configuration ? 1 : 0
+  count = local.create_bucket && var.create_metadata_configuration ? 1 : 0
 
   bucket = aws_s3_bucket.this[0].bucket
   region = var.region
