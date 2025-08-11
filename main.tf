@@ -1357,3 +1357,31 @@ resource "aws_s3_bucket_analytics_configuration" "this" {
     }
   }
 }
+
+resource "aws_s3_bucket_metadata_configuration" "this" {
+  count = local.create_bucket && var.create_metadata_configuration ? 1 : 0
+
+  bucket = aws_s3_bucket.this[0].bucket
+  region = var.region
+
+  metadata_configuration {
+    inventory_table_configuration {
+      configuration_state = var.metadata_inventory_table_configuration_state
+
+      dynamic "encryption_configuration" {
+        for_each = var.metadata_encryption_configuration != null ? [var.metadata_encryption_configuration] : []
+        content {
+          kms_key_arn   = try(encryption_configuration.value.kms_key_arn, null)
+          sse_algorithm = encryption_configuration.value.sse_algorithm
+        }
+      }
+    }
+
+    journal_table_configuration {
+      record_expiration {
+        days       = var.metadata_journal_table_record_expiration_days
+        expiration = var.metadata_journal_table_record_expiration
+      }
+    }
+  }
+}
