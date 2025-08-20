@@ -11,6 +11,7 @@ module "wrapper" {
   create_sqs_policy        = try(each.value.create_sqs_policy, var.defaults.create_sqs_policy, true)
   eventbridge              = try(each.value.eventbridge, var.defaults.eventbridge, null)
   lambda_notifications     = try(each.value.lambda_notifications, var.defaults.lambda_notifications, {})
+  region                   = try(each.value.region, var.defaults.region, null)
   sns_notifications        = try(each.value.sns_notifications, var.defaults.sns_notifications, {})
   sqs_notifications        = try(each.value.sqs_notifications, var.defaults.sqs_notifications, {})
 }
