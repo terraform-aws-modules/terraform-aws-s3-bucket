@@ -22,6 +22,12 @@ variable "create_lambda_permission" {
   default     = true
 }
 
+variable "region" {
+  description = "Region where the resource(s) will be managed. Defaults to the region set in the provider configuration"
+  type        = string
+  default     = null
+}
+
 variable "bucket" {
   description = "Name of S3 bucket to use"
   type        = string

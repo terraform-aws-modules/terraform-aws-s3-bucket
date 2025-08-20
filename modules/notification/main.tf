@@ -13,6 +13,8 @@ resource "aws_s3_bucket_notification" "this" {
 
   bucket = var.bucket
 
+  region = var.region
+
   eventbridge = var.eventbridge
 
   dynamic "lambda_function" {
@@ -62,6 +64,8 @@ resource "aws_s3_bucket_notification" "this" {
 resource "aws_lambda_permission" "allow" {
   for_each = { for k, v in var.lambda_notifications : k => v if var.create_lambda_permission }
 
+  region = var.region
+
   statement_id_prefix = "AllowLambdaS3BucketNotification-"
   action              = "lambda:InvokeFunction"
   function_name       = each.value.function_name
@@ -110,6 +114,8 @@ data "aws_iam_policy_document" "sqs" {
 resource "aws_sqs_queue_policy" "allow" {
   for_each = { for k, v in var.sqs_notifications : k => v if var.create_sqs_policy }
 
+  region = var.region
+
   queue_url = try(each.value.queue_id, local.queue_ids[each.key], null)
   policy    = data.aws_iam_policy_document.sqs[each.key].json
 }
@@ -144,6 +150,8 @@ data "aws_iam_policy_document" "sns" {
 
 resource "aws_sns_topic_policy" "allow" {
   for_each = { for k, v in var.sns_notifications : k => v if var.create_sns_policy }
+
+  region = var.region
 
   arn    = each.value.topic_arn
   policy = data.aws_iam_policy_document.sns[each.key].json

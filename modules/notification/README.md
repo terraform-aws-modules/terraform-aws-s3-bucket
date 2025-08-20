@@ -39,6 +39,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_bucket"></a> [bucket](#input\_bucket) | Name of S3 bucket to use | `string` | `""` | no |
 | <a name="input_bucket_arn"></a> [bucket\_arn](#input\_bucket\_arn) | ARN of S3 bucket to use in policies | `string` | `null` | no |
+| <a name="input_region"></a> [region](#input\_region) | Region where the resource(s) will be managed. Defaults to the region set in the provider configuration | `string` | `null` | no |
 | <a name="input_create"></a> [create](#input\_create) | Whether to create this resource or not? | `bool` | `true` | no |
 | <a name="input_create_lambda_permission"></a> [create\_lambda\_permission](#input\_create\_lambda\_permission) | Whether to create Lambda permissions or not? | `bool` | `true` | no |
 | <a name="input_create_sns_policy"></a> [create\_sns\_policy](#input\_create\_sns\_policy) | Whether to create a policy for SNS permissions or not? | `bool` | `true` | no |
