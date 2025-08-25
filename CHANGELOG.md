@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.5.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.4.0...v5.5.0) (2025-08-20)
+
+
+### Features
+
+* Add region parameter to notification module ([#354](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/354)) ([2dd4364](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/2dd4364b67d89cb9c881be465e5e4196ef8dea8f))
+
 ## [5.4.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.3.1...v5.4.0) (2025-08-11)
 
 
