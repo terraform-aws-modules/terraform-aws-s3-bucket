@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.6.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.5.0...v5.6.0) (2025-08-25)
+
+
+### Features
+
+* Add skip_destroy argument in the aws_s3_bucket_public_access_bl… ([#352](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/352)) ([8833269](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/8833269e206a62030a259032cf039db5333e8160))
+
 ## [5.5.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.4.0...v5.5.0) (2025-08-20)
 
 
