@@ -68,6 +68,7 @@ module "wrapper" {
   request_payer                                   = try(each.value.request_payer, var.defaults.request_payer, null)
   restrict_public_buckets                         = try(each.value.restrict_public_buckets, var.defaults.restrict_public_buckets, true)
   server_side_encryption_configuration            = try(each.value.server_side_encryption_configuration, var.defaults.server_side_encryption_configuration, {})
+  skip_destroy_public_access_block                = try(each.value.skip_destroy_public_access_block, var.defaults.skip_destroy_public_access_block, true)
   tags                                            = try(each.value.tags, var.defaults.tags, {})
   transition_default_minimum_object_size          = try(each.value.transition_default_minimum_object_size, var.defaults.transition_default_minimum_object_size, null)
   type                                            = try(each.value.type, var.defaults.type, "Directory")
