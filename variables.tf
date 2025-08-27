@@ -328,6 +328,12 @@ variable "block_public_policy" {
   default     = true
 }
 
+variable "skip_destroy_public_access_block" {
+  description = "Whether to skip destroying the S3 Bucket Public Access Block configuration when destroying the bucket. Only used if `public_access_block` is set to true."
+  type        = bool
+  default     = true
+}
+
 variable "ignore_public_acls" {
   description = "Whether Amazon S3 should ignore public ACLs for this bucket."
   type        = bool
