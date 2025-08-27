@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.7.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.6.0...v5.7.0) (2025-08-27)
+
+
+### Features
+
+* Add tags in output.tf [#355](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/355) ([#357](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/357)) ([4586f12](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/4586f12bb5b00ae73907ab0067bc96c9ddde0009))
+
 ## [5.6.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.5.0...v5.6.0) (2025-08-25)
 
 
