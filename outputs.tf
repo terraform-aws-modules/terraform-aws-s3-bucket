@@ -63,7 +63,7 @@ output "aws_s3_bucket_versioning_status" {
   value       = try(aws_s3_bucket_versioning.this[0].versioning_configuration[0].status, null)
 }
 
-output "s3_bucket_tags_all" {
+output "s3_bucket_tags" {
   description = "Tags of the bucket."
-  value       = try(aws_s3_bucket.this[0].tags_all, {})
+  value       = try(aws_s3_bucket.this[0].tags, {})
 }
