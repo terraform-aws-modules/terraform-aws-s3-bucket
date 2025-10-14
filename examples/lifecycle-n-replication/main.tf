@@ -49,16 +49,16 @@ module "bucket_source" {
         delete_marker_replication = true
 
         destination = {
-          bucket = "arn:aws:s3:::${local.replica_bucket_name}"
+          bucket             = "arn:aws:s3:::${local.replica_bucket_name}"
           replica_kms_key_id = aws_kms_key.replica.arn
 
           metrics = {
-            status = "Enabled"
+            status  = "Enabled"
             minutes = 15
           }
 
           replication_time = {
-            status = "Enabled"
+            status  = "Enabled"
             minutes = 15
           }
         }
@@ -69,16 +69,16 @@ module "bucket_source" {
           }
         }
       },
-      
+
       {
-        id = "custom-additional-rule",
-        priority = 15,
+        id                        = "custom-additional-rule",
+        priority                  = 15,
         delete_marker_replication = true
 
         destination = {
           bucket             = "arn:aws:s3:::${local.replica_bucket_name}"
           replica_kms_key_id = aws_kms_key.replica.arn
-          storage_class      =  "STANDARD_IA"
+          storage_class      = "STANDARD_IA"
         }
 
         filter = {
@@ -101,16 +101,16 @@ module "bucket_source" {
         delete_marker_replication = true
 
         destination = {
-          bucket = "arn:aws:s3:::${local.replica_bucket_name}"
+          bucket             = "arn:aws:s3:::${local.replica_bucket_name}"
           replica_kms_key_id = aws_kms_key.replica.arn
 
           metrics = {
-            status = "Enabled"
+            status  = "Enabled"
             minutes = 15
           }
 
           replication_time = {
-            status = "Enabled"
+            status  = "Enabled"
             minutes = 15
           }
         }
@@ -127,52 +127,52 @@ module "bucket_source" {
   # Lifecycle
   lifecycle_rule = [
     {
-        id     = "abort-incomplete-multipart-upload"
-        status = "Enabled"
+      id     = "abort-incomplete-multipart-upload"
+      status = "Enabled"
 
-        abort_incomplete_multipart_upload = {
-            days_after_initiation = 35
-        }
+      abort_incomplete_multipart_upload = {
+        days_after_initiation = 35
+      }
 
-        filter = {
-        }
+      filter = {
+      }
 
-        noncurrent_version_expiration = {
-            noncurrent_days = 35
-        }
+      noncurrent_version_expiration = {
+        noncurrent_days = 35
+      }
     },
 
     {
-        id     = "log1"
-        status = "Enabled"
+      id     = "log1"
+      status = "Enabled"
 
-        abort_incomplete_multipart_upload = {
-            days_after_initiation = 7
-        }
+      abort_incomplete_multipart_upload = {
+        days_after_initiation = 7
+      }
 
-        filter = {
-        }
+      filter = {
+      }
 
-        noncurrent_version_expiration = {
-            noncurrent_days = 300
-        }
+      noncurrent_version_expiration = {
+        noncurrent_days = 300
+      }
 
-        noncurrent_version_transition = {
-            noncurrent_days = 30
-            storage_class   = "STANDARD_IA"
-        }
-        noncurrent_version_transition = {
-            noncurrent_days = 60
-            storage_class   = "ONEZONE_IA"
-        }
-        noncurrent_version_transition = {
-            noncurrent_days = 90
-            storage_class   = "GLACIER"
-        }
+      noncurrent_version_transition = {
+        noncurrent_days = 30
+        storage_class   = "STANDARD_IA"
+      }
+      noncurrent_version_transition = {
+        noncurrent_days = 60
+        storage_class   = "ONEZONE_IA"
+      }
+      noncurrent_version_transition = {
+        noncurrent_days = 90
+        storage_class   = "GLACIER"
+      }
     }
   ]
 
-  depends_on = [ module.bucket_replica ]
+  depends_on = [module.bucket_replica]
 }
 
 resource "aws_kms_key" "replica" {
