@@ -42,35 +42,6 @@ module "s3_bucket" {
 
     rules = [
       {
-        id       = "built-in-rule-repl1"
-        priority = 10
-        status   = true
-
-        delete_marker_replication = true
-
-        destination = {
-          bucket             = "arn:aws:s3:::${local.replica_bucket_name}"
-          replica_kms_key_id = aws_kms_key.replica.arn
-
-          metrics = {
-            status  = "Enabled"
-            minutes = 15
-          }
-
-          replication_time = {
-            status  = "Enabled"
-            minutes = 15
-          }
-        }
-
-        source_selection_criteria = {
-          sse_kms_encrypted_objects = {
-            enabled = true
-          }
-        }
-      },
-
-      {
         id                        = "custom-additional-rule",
         priority                  = 15,
         delete_marker_replication = true
@@ -92,35 +63,6 @@ module "s3_bucket" {
         }
 
       },
-
-      {
-        id       = "built-in-rule-repl2"
-        priority = 20
-        status   = true
-
-        delete_marker_replication = true
-
-        destination = {
-          bucket             = "arn:aws:s3:::${local.replica_bucket_name}"
-          replica_kms_key_id = aws_kms_key.replica.arn
-
-          metrics = {
-            status  = "Enabled"
-            minutes = 15
-          }
-
-          replication_time = {
-            status  = "Enabled"
-            minutes = 15
-          }
-        }
-
-        source_selection_criteria = {
-          sse_kms_encrypted_objects = {
-            enabled = true
-          }
-        }
-      }
     ]
   }
 
@@ -141,35 +83,6 @@ module "s3_bucket" {
         noncurrent_days = 35
       }
     },
-
-    {
-      id     = "log1"
-      status = "Enabled"
-
-      abort_incomplete_multipart_upload = {
-        days_after_initiation = 7
-      }
-
-      filter = {
-      }
-
-      noncurrent_version_expiration = {
-        noncurrent_days = 300
-      }
-
-      noncurrent_version_transition = {
-        noncurrent_days = 30
-        storage_class   = "STANDARD_IA"
-      }
-      noncurrent_version_transition = {
-        noncurrent_days = 60
-        storage_class   = "ONEZONE_IA"
-      }
-      noncurrent_version_transition = {
-        noncurrent_days = 90
-        storage_class   = "GLACIER"
-      }
-    }
   ]
 
   depends_on = [module.bucket_replica]
