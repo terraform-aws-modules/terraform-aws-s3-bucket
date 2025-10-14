@@ -20,7 +20,7 @@ resource "random_pet" "this" {
   length = 2
 }
 
-module "bucket_source" {
+module "s3_bucket" {
   source = "../../"
 
   providers = {
