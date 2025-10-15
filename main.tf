@@ -406,8 +406,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
     }
   }
 
-  # Must have bucket versioning enabled first
-  depends_on = [aws_s3_bucket_versioning.this]
+  depends_on = [
+    # Must have bucket versioning enabled first
+    aws_s3_bucket_versioning.this,
+    # Must wait for replication configuration to propagate
+    aws_s3_bucket_replication_configuration.this
+  ]
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "this" {
