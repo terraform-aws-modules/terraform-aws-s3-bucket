@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.7.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.7.0...v5.7.1) (2025-10-15)
+
+
+### Bug Fixes
+
+* Adds replication config dependency to lifecycle config ([#361](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/361)) ([9bb3c53](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/9bb3c53cb37ea5f11d8b00c74804f9015452920f))
+
 ## [5.7.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.6.0...v5.7.0) (2025-08-27)
 
 
