@@ -97,6 +97,10 @@ module "s3_bucket_for_waf_logs" {
 }
 ```
 
+### Bucket with a custom policy attached
+
+When you need to attach a custom policy to the bucket, you can use the `policy` argument. To keep bucket policy with correct S3 bucket and AWS account properties, you can use the placeholders `_S3_BUCKET_ID_`, `_S3_BUCKET_ARN_`, and `_AWS_ACCOUNT_ID_` in the policy document. Those values will be replaced with the actual values during the policy attachment. This is especially useful when using bucket prefixes.
+
 ## Conditional creation
 
 Sometimes you need to have a way to create S3 resources conditionally but Terraform does not allow to use `count` inside `module` block, so the solution is to specify argument `create_bucket`.
