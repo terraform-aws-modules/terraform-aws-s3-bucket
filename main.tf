@@ -18,9 +18,9 @@ locals {
 
   # Placeholders in the policy document to be replaced with the actual values
   policy_placeholders = {
-    "_S3_BUCKET_ID_"   = var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id,
-    "_S3_BUCKET_ARN_"  = var.is_directory_bucket ? aws_s3_directory_bucket.this[0].arn : aws_s3_bucket.this[0].arn,
-    "_AWS_ACCOUNT_ID_" = data.aws_caller_identity.current.account_id
+    "_S3_BUCKET_ID_"   = try(var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id, null),
+    "_S3_BUCKET_ARN_"  = try(var.is_directory_bucket ? aws_s3_directory_bucket.this[0].arn : aws_s3_bucket.this[0].arn, null),
+    "_AWS_ACCOUNT_ID_" = try(data.aws_caller_identity.current.account_id, null)
   }
 
   policy = local.create_bucket && local.attach_policy ? replace(
