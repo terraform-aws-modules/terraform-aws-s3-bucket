@@ -410,3 +410,9 @@ module "s3_bucket" {
   #   sse_algorithm = "AES256"
   # }
 }
+
+module "disabled" {
+  source = "../../"
+
+  create_bucket = false
+}
