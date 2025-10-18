@@ -28,4 +28,9 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# Zip archive
 *.zip
+builds
+
+.DS_Store
+.idea
