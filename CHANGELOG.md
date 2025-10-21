@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.8.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.8.1...v5.8.2) (2025-10-21)
+
+### Bug Fixes
+
+* Update CI workflow versions to latest ([#366](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/366)) ([9acf3f7](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/9acf3f715ad1f9a7bf59cb655baf6ef9f8af26be))
+
 ## [5.8.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.8.0...v5.8.1) (2025-10-16)
 
 
