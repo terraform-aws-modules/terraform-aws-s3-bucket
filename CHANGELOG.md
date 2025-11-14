@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.8.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.8.1...v5.8.2) (2025-10-21)
+
+### Bug Fixes
+
+* Update CI workflow versions to latest ([#366](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/366)) ([9acf3f7](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/9acf3f715ad1f9a7bf59cb655baf6ef9f8af26be))
+
+## [5.8.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.8.0...v5.8.1) (2025-10-16)
+
+
+### Bug Fixes
+
+* Fixed placeholders for disabled buckets ([#365](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/365)) ([546db8b](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/546db8be245f7b3d98e17210a86dbadb4cec6139))
+
+## [5.8.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.7.1...v5.8.0) (2025-10-15)
+
+
+### Features
+
+* Added bucket policy placeholders ([#363](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/363)) ([f687342](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/f687342b73741bc38b538ea1bf36ea31204828d8))
+
 ## [5.7.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.7.0...v5.7.1) (2025-10-15)
 
 

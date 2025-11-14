@@ -16,6 +16,24 @@ locals {
 
   attach_policy = var.attach_require_latest_tls_policy || var.attach_access_log_delivery_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_cloudtrail_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_deny_ssec_encrypted_object_uploads || var.attach_policy || var.attach_waf_log_delivery_policy
 
+  # Placeholders in the policy document to be replaced with the actual values
+  policy_placeholders = {
+    "_S3_BUCKET_ID_"   = try(var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id, null),
+    "_S3_BUCKET_ARN_"  = try(var.is_directory_bucket ? aws_s3_directory_bucket.this[0].arn : aws_s3_bucket.this[0].arn, null),
+    "_AWS_ACCOUNT_ID_" = try(data.aws_caller_identity.current.account_id, null)
+  }
+
+  policy = local.create_bucket && local.attach_policy ? replace(
+    replace(
+      replace(
+        data.aws_iam_policy_document.combined[0].json,
+        "_S3_BUCKET_ID_", local.policy_placeholders["_S3_BUCKET_ID_"]
+      ),
+      "_S3_BUCKET_ARN_", local.policy_placeholders["_S3_BUCKET_ARN_"]
+    ),
+    "_AWS_ACCOUNT_ID_", local.policy_placeholders["_AWS_ACCOUNT_ID_"]
+  ) : ""
+
   # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
   grants               = try(jsondecode(var.grant), var.grant)
   cors_rules           = try(jsondecode(var.cors_rule), var.cors_rule)
@@ -591,7 +609,7 @@ resource "aws_s3_bucket_policy" "this" {
   # Ref: https://github.com/hashicorp/terraform-provider-aws/issues/7628
 
   bucket = var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id
-  policy = data.aws_iam_policy_document.combined[0].json
+  policy = local.policy
 
   depends_on = [
     aws_s3_bucket_public_access_block.this

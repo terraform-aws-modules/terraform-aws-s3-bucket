@@ -60,6 +60,27 @@ data "aws_iam_policy_document" "bucket_policy" {
       "arn:aws:s3:::${local.bucket_name}",
     ]
   }
+
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.this.arn]
+    }
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "_S3_BUCKET_ARN_",
+    ]
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:PrincipalAccount"
+      values   = ["_AWS_ACCOUNT_ID_"]
+    }
+  }
 }
 
 module "log_bucket" {
@@ -388,4 +409,10 @@ module "s3_bucket" {
   # metadata_encryption_configuration = {
   #   sse_algorithm = "AES256"
   # }
+}
+
+module "disabled" {
+  source = "../../"
+
+  create_bucket = false
 }
