@@ -241,6 +241,7 @@ module "s3_bucket" {
         kms_master_key_id = aws_kms_key.objects.arn
         sse_algorithm     = "aws:kms"
       }
+      blocked_encryption_types = ["SSE-C"]
     }
   }
 

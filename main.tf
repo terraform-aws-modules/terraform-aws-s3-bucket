@@ -242,6 +242,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
           kms_master_key_id = try(apply_server_side_encryption_by_default.value.kms_master_key_id, null)
         }
       }
+      blocked_encryption_types = try(rule.value.blocked_encryption_types, null)
     }
   }
 }

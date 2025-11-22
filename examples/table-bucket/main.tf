@@ -9,6 +9,10 @@ provider "aws" {
 
 locals {
   bucket_name = "s3-table-bucket-${random_pet.this.id}"
+
+  tags = {
+    bucket_name = local.bucket_name
+  }
 }
 
 data "aws_caller_identity" "this" {}
@@ -35,6 +39,8 @@ module "table_bucket" {
       }
     }
   }
+
+  tags = local.tags
 
   create_table_bucket_policy = true
   table_bucket_policy_statements = [
@@ -94,6 +100,10 @@ module "table_bucket" {
           ]
         }
       ]
+
+      tags = {
+        table_name = "table1"
+      }
     }
     table2 = {
       format    = "ICEBERG"
