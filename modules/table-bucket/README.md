@@ -46,7 +46,7 @@ No modules.
 | <a name="input_table_bucket_policy_statements"></a> [table\_bucket\_policy\_statements](#input\_table\_bucket\_policy\_statements) | A map of IAM policy [statements](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#statement) for custom permission usage | `any` | `{}` | no |
 | <a name="input_table_bucket_source_policy_documents"></a> [table\_bucket\_source\_policy\_documents](#input\_table\_bucket\_source\_policy\_documents) | List of IAM policy documents that are merged together into the exported document. Statements must have unique `sid`s | `list(string)` | `[]` | no |
 | <a name="input_tables"></a> [tables](#input\_tables) | Map of table configurations | `any` | `{}` | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | Key-value map of resource tags | `map(string)` | `null` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Key-value map of resource tags | `map(string)` | `{}` | no |
 
 ## Outputs
 
