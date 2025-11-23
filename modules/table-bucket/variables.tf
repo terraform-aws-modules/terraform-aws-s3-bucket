@@ -67,5 +67,5 @@ variable "tables" {
 variable "tags" {
   description = "Key-value map of resource tags"
   type        = map(string)
-  default     = null
+  default     = {}
 }
