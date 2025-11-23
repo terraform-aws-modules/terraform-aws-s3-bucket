@@ -74,7 +74,7 @@ resource "aws_s3_directory_bucket" "this" {
 }
 
 resource "aws_s3_bucket_logging" "this" {
-  count = local.create_bucket && length(keys(var.logging)) > 0 && !var.is_directory_bucket ? 1 : 0
+  count = local.create_bucket && var.logging != null && length(keys(var.logging)) > 0 && !var.is_directory_bucket ? 1 : 0
 
   region = var.region
 
@@ -433,7 +433,7 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 }
 
 resource "aws_s3_bucket_replication_configuration" "this" {
-  count = local.create_bucket && length(keys(var.replication_configuration)) > 0 && !var.is_directory_bucket ? 1 : 0
+  count = local.create_bucket && var.replication_configuration != null && length(keys(var.replication_configuration)) > 0 && !var.is_directory_bucket ? 1 : 0
 
   region = var.region
 
@@ -1240,7 +1240,7 @@ resource "aws_s3_bucket_metric" "this" {
 }
 
 resource "aws_s3_bucket_inventory" "this" {
-  for_each = { for k, v in var.inventory_configuration : k => v if local.create_bucket && !var.is_directory_bucket }
+  for_each = local.create_bucket && !var.is_directory_bucket && var.inventory_configuration != null && length(keys(var.inventory_configuration)) > 0 ? var.inventory_configuration : {}
 
   region = var.region
 
