@@ -14,4 +14,5 @@ module "wrapper" {
   table_bucket_policy_statements         = try(each.value.table_bucket_policy_statements, var.defaults.table_bucket_policy_statements, {})
   table_bucket_source_policy_documents   = try(each.value.table_bucket_source_policy_documents, var.defaults.table_bucket_source_policy_documents, [])
   tables                                 = try(each.value.tables, var.defaults.tables, {})
+  tags                                   = try(each.value.tags, var.defaults.tags, {})
 }

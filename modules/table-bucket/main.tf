@@ -6,6 +6,8 @@ resource "aws_s3tables_table_bucket" "this" {
   name                      = var.table_bucket_name
   encryption_configuration  = var.encryption_configuration
   maintenance_configuration = var.maintenance_configuration
+
+  tags = var.tags
 }
 
 resource "aws_s3tables_table_bucket_policy" "this" {
@@ -76,6 +78,7 @@ resource "aws_s3tables_table" "this" {
   table_bucket_arn          = aws_s3tables_table_bucket.this[0].arn
   encryption_configuration  = try(each.value.encryption_configuration, null)
   maintenance_configuration = try(each.value.maintenance_configuration, null)
+  tags                      = merge(var.tags, try(each.value.tags, {}))
 
   dynamic "metadata" {
     for_each = try([each.value.metadata], [])
