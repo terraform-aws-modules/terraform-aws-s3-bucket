@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.9.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.8.2...v5.9.0) (2025-11-23)
+
+### Features
+
+* Support `blocked_encryption_types` and table bucket tags ([#367](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/367)) ([2fb1c33](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/2fb1c33b99d485e29470cc0c0ba2faf3931d1ecc))
+
 ## [5.8.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.8.1...v5.8.2) (2025-10-21)
 
 ### Bug Fixes
