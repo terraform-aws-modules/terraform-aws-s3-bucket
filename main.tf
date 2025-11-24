@@ -751,7 +751,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
 
       content {
         test     = "StringEquals"
-        variable = "aws:ResourceOrgID"
+        variable = "aws:SourceOrgID"
         values   = var.lb_log_delivery_policy_source_organizations
       }
     }
@@ -781,7 +781,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
 
       content {
         test     = "StringEquals"
-        variable = "aws:ResourceOrgID"
+        variable = "aws:SourceOrgID"
         values   = var.lb_log_delivery_policy_source_organizations
       }
     }
@@ -835,7 +835,7 @@ data "aws_iam_policy_document" "access_log_delivery" {
 
       content {
         test     = "StringEquals"
-        variable = "aws:ResourceOrgID"
+        variable = "aws:SourceOrgID"
         values   = var.access_log_delivery_policy_source_organizations
       }
     }
@@ -865,7 +865,7 @@ data "aws_iam_policy_document" "access_log_delivery" {
 
       content {
         test     = "StringEquals"
-        variable = "aws:ResourceOrgID"
+        variable = "aws:SourceOrgID"
         values   = var.access_log_delivery_policy_source_organizations
       }
     }
