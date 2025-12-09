@@ -410,6 +410,10 @@ module "s3_bucket" {
   # metadata_encryption_configuration = {
   #   sse_algorithm = "AES256"
   # }
+
+  abac_status = {
+    status = "Enabled"
+  }
 }
 
 module "disabled" {
