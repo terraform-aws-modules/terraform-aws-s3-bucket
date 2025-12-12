@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.9.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.9.0...v5.9.1) (2025-12-12)
+
+### Bug Fixes
+
+* Replace static `aws` partition with dynamic data source ([#369](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/369)) ([77dfafa](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/77dfafa34609908796c42d14fe551a6eee0bc09a))
+
 ## [5.9.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.8.2...v5.9.0) (2025-11-23)
 
 ### Features
