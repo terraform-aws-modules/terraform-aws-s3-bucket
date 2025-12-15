@@ -419,6 +419,12 @@ variable "metadata_journal_table_record_expiration" {
   default     = null
 }
 
+variable "abac_status" {
+  description = "Map containing ABAC (Attribute Based Access Control) configuration"
+  type        = any
+  default     = {}
+}
+
 variable "putin_khuylo" {
   description = "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!"
   type        = bool
