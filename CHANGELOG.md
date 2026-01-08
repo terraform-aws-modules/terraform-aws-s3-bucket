@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.10.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.9.1...v5.10.0) (2026-01-08)
+
+### Features
+
+* Add provider meta user-agent ([#373](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/373)) ([8eecd4b](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/8eecd4bfe167b3606755a0f8150514e9dcb2bf67))
+
 ## [5.9.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.9.0...v5.9.1) (2025-12-12)
 
 ### Bug Fixes
