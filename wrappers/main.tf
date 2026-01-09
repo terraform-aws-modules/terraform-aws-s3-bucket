@@ -3,6 +3,7 @@ module "wrapper" {
 
   for_each = var.items
 
+  abac_status                                     = try(each.value.abac_status, var.defaults.abac_status, {})
   acceleration_status                             = try(each.value.acceleration_status, var.defaults.acceleration_status, null)
   access_log_delivery_policy_source_accounts      = try(each.value.access_log_delivery_policy_source_accounts, var.defaults.access_log_delivery_policy_source_accounts, [])
   access_log_delivery_policy_source_buckets       = try(each.value.access_log_delivery_policy_source_buckets, var.defaults.access_log_delivery_policy_source_buckets, [])
