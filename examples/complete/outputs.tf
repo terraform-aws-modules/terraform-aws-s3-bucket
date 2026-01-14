@@ -47,3 +47,8 @@ output "s3_bucket_website_domain" {
   description = "The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records. "
   value       = module.s3_bucket.s3_bucket_website_domain
 }
+
+output "s3_bucket_abac_status" {
+  description = "The ABAC status of the bucket."
+  value       = module.s3_bucket.s3_bucket_abac_status
+}

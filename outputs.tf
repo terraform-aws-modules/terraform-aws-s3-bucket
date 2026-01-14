@@ -67,3 +67,8 @@ output "s3_bucket_tags" {
   description = "Tags of the bucket."
   value       = try(aws_s3_bucket.this[0].tags, {})
 }
+
+output "s3_bucket_abac_status" {
+  description = "The ABAC status of the bucket."
+  value       = try(aws_s3_bucket_abac.this[0].abac_status[0].status, null)
+}
