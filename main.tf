@@ -332,7 +332,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Several blocks - transition
       dynamic "transition" {
-        for_each = try(flatten([rule.value.transition]), [])
+        for_each = [for v in try(flatten([rule.value.transition]), []) : v if v != null]
 
         content {
           date          = try(transition.value.date, null)
@@ -353,7 +353,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Several blocks - noncurrent_version_transition
       dynamic "noncurrent_version_transition" {
-        for_each = try(flatten([rule.value.noncurrent_version_transition]), [])
+        for_each = [for v in try(flatten([rule.value.noncurrent_version_transition]), []) : v if v != null]
 
         content {
           newer_noncurrent_versions = try(noncurrent_version_transition.value.newer_noncurrent_versions, null)
