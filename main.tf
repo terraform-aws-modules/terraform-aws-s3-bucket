@@ -51,7 +51,11 @@ resource "aws_s3_bucket" "this" {
   bucket_prefix = var.bucket_prefix
 
   force_destroy       = var.force_destroy
-  object_lock_enabled = var.object_lock_enabled
+  /* 
+  Stop using object lock in resource aws_s3_bucket to prevent resource deletion. 
+   newer versions of terraform handles object lock in aws_s3_bucket_object_lock_configuration
+  */
+  //object_lock_enabled = var.object_lock_enabled
   tags                = var.tags
 }
 
