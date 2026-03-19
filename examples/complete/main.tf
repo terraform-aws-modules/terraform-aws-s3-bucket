@@ -18,6 +18,8 @@ data "aws_canonical_user_id" "current" {}
 
 data "aws_cloudfront_log_delivery_canonical_user_id" "cloudfront" {}
 
+data "aws_region" "current" {}
+
 resource "random_pet" "this" {
   length = 2
 }
@@ -134,6 +136,15 @@ module "simple_bucket" {
   source = "../../"
 
   bucket = "simple-${random_pet.this.id}"
+
+  force_destroy = true
+}
+
+module "simple_account_regional_bucket" {
+  source = "../../"
+
+  bucket           = format("simple-%s-%s-an", data.aws_caller_identity.current.account_id, data.aws_region.current.name)
+  bucket_namespace = "account-regional"
 
   force_destroy = true
 }

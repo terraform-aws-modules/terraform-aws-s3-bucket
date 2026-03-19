@@ -118,6 +118,12 @@ variable "bucket_prefix" {
   default     = null
 }
 
+variable "bucket_namespace" {
+  description = "Namespace for the bucket. Determines bucket naming scope. Valid values: account-regional, global. Defaults to global (AWS)"
+  type        = string
+  default     = null
+}
+
 variable "acl" {
   description = "(Optional) The canned ACL to apply. Conflicts with `grant`"
   type        = string

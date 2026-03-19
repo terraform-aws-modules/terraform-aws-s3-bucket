@@ -32,6 +32,7 @@ module "wrapper" {
   block_public_acls                               = try(each.value.block_public_acls, var.defaults.block_public_acls, true)
   block_public_policy                             = try(each.value.block_public_policy, var.defaults.block_public_policy, true)
   bucket                                          = try(each.value.bucket, var.defaults.bucket, null)
+  bucket_namespace                                = try(each.value.bucket_namespace, var.defaults.bucket_namespace, null)
   bucket_prefix                                   = try(each.value.bucket_prefix, var.defaults.bucket_prefix, null)
   control_object_ownership                        = try(each.value.control_object_ownership, var.defaults.control_object_ownership, false)
   cors_rule                                       = try(each.value.cors_rule, var.defaults.cors_rule, [])
