@@ -251,7 +251,6 @@ No modules.
 | <a name="input_create_bucket"></a> [create\_bucket](#input\_create\_bucket) | Controls if S3 bucket should be created | `bool` | `true` | no |
 | <a name="input_create_metadata_configuration"></a> [create\_metadata\_configuration](#input\_create\_metadata\_configuration) | Whether to create metadata configuration resource | `bool` | `false` | no |
 | <a name="input_data_redundancy"></a> [data\_redundancy](#input\_data\_redundancy) | Data redundancy. Valid values: `SingleAvailabilityZone` | `string` | `null` | no |
-| <a name="input_expected_bucket_owner"></a> [expected\_bucket\_owner](#input\_expected\_bucket\_owner) | The account ID of the expected bucket owner | `string` | `null` | no |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | (Optional, Default:false ) A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `false` | no |
 | <a name="input_grant"></a> [grant](#input\_grant) | An ACL policy grant. Conflicts with `acl` | `any` | `[]` | no |
 | <a name="input_ignore_public_acls"></a> [ignore\_public\_acls](#input\_ignore\_public\_acls) | Whether Amazon S3 should ignore public ACLs for this bucket. | `bool` | `true` | no |

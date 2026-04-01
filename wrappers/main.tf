@@ -39,7 +39,6 @@ module "wrapper" {
   create_bucket                                   = try(each.value.create_bucket, var.defaults.create_bucket, true)
   create_metadata_configuration                   = try(each.value.create_metadata_configuration, var.defaults.create_metadata_configuration, false)
   data_redundancy                                 = try(each.value.data_redundancy, var.defaults.data_redundancy, null)
-  expected_bucket_owner                           = try(each.value.expected_bucket_owner, var.defaults.expected_bucket_owner, null)
   force_destroy                                   = try(each.value.force_destroy, var.defaults.force_destroy, false)
   grant                                           = try(each.value.grant, var.defaults.grant, [])
   ignore_public_acls                              = try(each.value.ignore_public_acls, var.defaults.ignore_public_acls, true)

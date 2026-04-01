@@ -220,12 +220,6 @@ variable "owner" {
   default     = {}
 }
 
-variable "expected_bucket_owner" {
-  description = "The account ID of the expected bucket owner"
-  type        = string
-  default     = null
-}
-
 variable "transition_default_minimum_object_size" {
   description = "The default minimum object size behavior applied to the lifecycle configuration. Valid values: all_storage_classes_128K (default), varies_by_storage_class"
   type        = string

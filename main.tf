@@ -110,8 +110,7 @@ resource "aws_s3_bucket_acl" "this" {
 
   region = var.region
 
-  bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner
+  bucket = aws_s3_bucket.this[0].id
 
   # hack when `null` value can't be used (eg, from terragrunt, https://github.com/gruntwork-io/terragrunt/pull/1367)
   acl = var.acl == "null" ? null : var.acl
@@ -151,8 +150,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
 
   region = var.region
 
-  bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner
+  bucket = aws_s3_bucket.this[0].id
 
   dynamic "index_document" {
     for_each = try([var.website["index_document"]], [])
@@ -208,9 +206,8 @@ resource "aws_s3_bucket_versioning" "this" {
 
   region = var.region
 
-  bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner
-  mfa                   = try(var.versioning["mfa"], null)
+  bucket = aws_s3_bucket.this[0].id
+  mfa    = try(var.versioning["mfa"], null)
 
   versioning_configuration {
     # Valid values: "Enabled" or "Suspended"
@@ -226,8 +223,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 
   region = var.region
 
-  bucket                = var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner
+  bucket = var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id
 
   dynamic "rule" {
     for_each = try(flatten([var.server_side_encryption_configuration["rule"]]), [])
@@ -253,8 +249,7 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
 
   region = var.region
 
-  bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner
+  bucket = aws_s3_bucket.this[0].id
 
   # Valid values: "Enabled" or "Suspended"
   status = title(lower(var.acceleration_status))
@@ -265,8 +260,7 @@ resource "aws_s3_bucket_request_payment_configuration" "this" {
 
   region = var.region
 
-  bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner
+  bucket = aws_s3_bucket.this[0].id
 
   # Valid values: "BucketOwner" or "Requester"
   payer = lower(var.request_payer) == "requester" ? "Requester" : "BucketOwner"
@@ -277,8 +271,7 @@ resource "aws_s3_bucket_cors_configuration" "this" {
 
   region = var.region
 
-  bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner
+  bucket = aws_s3_bucket.this[0].id
 
   dynamic "cors_rule" {
     for_each = local.cors_rules
@@ -300,7 +293,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
   region = var.region
 
   bucket                                 = var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id
-  expected_bucket_owner                  = var.expected_bucket_owner
   transition_default_minimum_object_size = var.transition_default_minimum_object_size
 
   dynamic "rule" {
@@ -421,9 +413,8 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 
   region = var.region
 
-  bucket                = aws_s3_bucket.this[0].id
-  expected_bucket_owner = var.expected_bucket_owner
-  token                 = try(var.object_lock_configuration.token, null)
+  bucket = aws_s3_bucket.this[0].id
+  token  = try(var.object_lock_configuration.token, null)
 
   rule {
     default_retention {
