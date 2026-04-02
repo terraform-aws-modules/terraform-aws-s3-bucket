@@ -75,6 +75,18 @@ module "complete" {
   attach_policy = true
   policy        = data.aws_iam_policy_document.bucket_policy.json
 
+  metric_configuration = {
+    all_objects = {
+      name = "AllObjects"
+    },
+    logs = {
+      name = "Logs"
+      filter = {
+        prefix = "logs/"
+      }
+    }
+  }
+
   tags = {
     directory-bucket = true
   }
