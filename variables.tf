@@ -239,7 +239,7 @@ variable "lifecycle_rule" {
 }
 
 variable "replication_configuration" {
-  description = "Map containing cross-region replication configuration."
+  description = "Map containing cross-region replication configuration. Set to `null` to disable replication (useful for conditional enabling)."
   type        = any
   default     = {}
 }
