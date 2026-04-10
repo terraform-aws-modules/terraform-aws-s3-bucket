@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.12.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.11.0...v5.12.0) (2026-04-02)
+
+### Features
+
+* Directory bucket metrics ([#384](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/384)) ([deeaa20](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/deeaa200f8241f641534520f11a5e488c6472991))
+
 ## [5.11.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.10.0...v5.11.0) (2026-03-19)
 
 ### Features
