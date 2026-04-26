@@ -20,14 +20,14 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.39 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.39 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.42 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
 
 ## Modules
@@ -35,6 +35,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_complete"></a> [complete](#module\_complete) | ../../ | n/a |
+| <a name="module_inventory_destination_bucket"></a> [inventory\_destination\_bucket](#module\_inventory\_destination\_bucket) | ../../ | n/a |
 | <a name="module_simple"></a> [simple](#module\_simple) | ../../ | n/a |
 
 ## Resources
@@ -46,6 +47,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.destination_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 

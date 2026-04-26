@@ -75,7 +75,8 @@ module "multi_inventory_configurations_bucket" {
       included_object_versions = "Current"
       bucket                   = module.inventory_source_bucket.s3_bucket_id
       destination = {
-        format = "ORC"
+        bucket_arn = module.inventory_source_bucket.s3_bucket_arn
+        format     = "ORC"
         encryption = {
           encryption_type = "sse_s3"
         }

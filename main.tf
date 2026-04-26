@@ -1243,12 +1243,12 @@ resource "aws_s3_bucket_metric" "this" {
 }
 
 resource "aws_s3_bucket_inventory" "this" {
-  for_each = { for k, v in var.inventory_configuration : k => v if local.create_bucket && !var.is_directory_bucket }
+  for_each = { for k, v in var.inventory_configuration : k => v if local.create_bucket }
 
   region = var.region
 
   name                     = each.key
-  bucket                   = try(each.value.bucket, aws_s3_bucket.this[0].id)
+  bucket                   = try(each.value.bucket, var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id)
   included_object_versions = each.value.included_object_versions
   enabled                  = try(each.value.enabled, true)
   optional_fields          = try(each.value.optional_fields, null)
