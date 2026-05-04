@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.13.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.12.0...v5.13.0) (2026-05-04)
+
+### Features
+
+* S3 Inventory for Directory buckets ([#387](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/387)) ([435595a](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/435595a0f33d275f645f3a5e7288a71dd9052d47))
+
 ## [5.12.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.11.0...v5.12.0) (2026-04-02)
 
 ### Features
