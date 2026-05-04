@@ -87,6 +87,24 @@ module "complete" {
     }
   }
 
+  inventory_configuration = {
+    weekly = {
+      included_object_versions = "All"
+      destination = {
+        bucket_arn = module.inventory_destination_bucket.s3_bucket_arn
+        format     = "Parquet"
+        encryption = {
+          encryption_type = "sse_s3"
+        }
+      }
+      filter = {
+        prefix = "documents/"
+      }
+      frequency       = "Weekly"
+      optional_fields = ["Size", "EncryptionStatus", "StorageClass", "ChecksumAlgorithm"]
+    }
+  }
+
   tags = {
     directory-bucket = true
   }
@@ -138,6 +156,61 @@ data "aws_iam_policy_document" "bucket_policy" {
       test     = "StringEquals"
       values   = ["ReadOnly"]
       variable = "s3express:SessionMode"
+    }
+  }
+}
+
+module "inventory_destination_bucket" {
+  source = "../../"
+
+  bucket = "${random_pet.this.id}-inventory-destination-bucket"
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-Endpoints.html
+  availability_zone_id = data.aws_availability_zones.available.zone_ids[1]
+  server_side_encryption_configuration = {
+    rule = {
+      bucket_key_enabled = true # required for directory buckets
+      apply_server_side_encryption_by_default = {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.destination_bucket_policy.json
+}
+
+data "aws_iam_policy_document" "destination_bucket_policy" {
+
+  statement {
+    sid    = "InventoryDestination"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = ["${module.inventory_destination_bucket.s3_bucket_arn}/*"]
+
+    principals {
+      identifiers = ["s3express.amazonaws.com"]
+      type        = "Service"
+    }
+
+    condition {
+      test     = "ArnLike"
+      values   = [module.complete.s3_directory_bucket_arn]
+      variable = "aws:SourceARN"
+    }
+
+    condition {
+      test     = "StringEquals"
+      values   = [data.aws_caller_identity.current.account_id]
+      variable = "aws:SourceAccount"
+    }
+
+    condition {
+      test     = "StringEquals"
+      values   = ["bucket-owner-full-control"]
+      variable = "s3:x-amz-acl"
     }
   }
 }
