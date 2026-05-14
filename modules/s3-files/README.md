@@ -7,6 +7,7 @@ This submodule creates:
 - `aws_s3files_file_system` — attaches the S3 Files file system to a versioned S3 bucket
 - `aws_s3files_mount_target` — one mount target per subnet, enabling multi-AZ deployments
 - `aws_s3files_file_system_policy` — a resource-based policy controlling NFS client access
+- `aws_s3files_access_point` — optional per-client access points with isolated POSIX identity and root directory
 
 ## Architecture
 
@@ -108,6 +109,56 @@ module "s3_files" {
   }
 }
 ```
+
+### Access points
+
+Access points give each NFS client an isolated POSIX identity and, optionally, a dedicated root directory with auto-created permissions.  Pass a map to `access_points`; each key becomes the map key in the `s3_files_access_points` output:
+
+```hcl
+module "s3_files" {
+  source = "terraform-aws-modules/s3-bucket/aws//modules/s3-files"
+
+  s3_uri   = "arn:aws:s3:::my-versioned-bucket"
+  role_arn = aws_iam_role.s3_files.arn
+
+  vpc_id             = "vpc-0a1b2c3d4e5f"
+  subnet_ids         = ["subnet-aaa111", "subnet-bbb222"]
+  security_group_ids = [aws_security_group.nfs.id]
+
+  access_points = {
+    # Minimal — POSIX identity only, no dedicated root directory
+    "app-readonly" = {
+      posix_user = {
+        uid = 1001
+        gid = 1001
+      }
+    }
+
+    # Full — dedicated root directory created with explicit permissions
+    "app-readwrite" = {
+      posix_user = {
+        uid            = 1000
+        gid            = 1000
+        secondary_gids = [2000, 3000]
+      }
+      root_directory = {
+        path = "/app-data"
+        creation_permissions = {
+          owner_uid   = 1000
+          owner_gid   = 1000
+          permissions = "0755"
+        }
+      }
+    }
+  }
+
+  tags = {
+    Environment = "production"
+  }
+}
+```
+
+The `s3_files_access_points` output returns a map of `{ id, arn, name }` for each created access point.
 
 ### Disable resource creation
 
