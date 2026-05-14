@@ -93,3 +93,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "access_points" {
+  description = "Map of S3 Files access point configurations to create"
+  type        = any
+  default     = {}
+}
