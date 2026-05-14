@@ -63,6 +63,16 @@ resource "aws_security_group" "s3_files" {
   description = "Security group for S3 Files mount targets"
   vpc_id      = aws_vpc.this.id
 
+  # Allow NFS traffic from within the VPC so that clients can mount the
+  # file system.  Without this rule mount targets are unreachable even
+  # though the Terraform apply succeeds.
+  ingress {
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.this.cidr_block]
+  }
+
   egress {
     from_port        = 0
     to_port          = 0
@@ -160,6 +170,23 @@ module "s3_files" {
   ]
 
   security_group_ids = [aws_security_group.s3_files.id]
+
+  access_points = {
+    "test-app-ap" = {
+      posix_user = {
+        uid = 1000
+        gid = 1000
+      }
+      root_directory = {
+        path = "/test-app-data"
+        creation_permissions = {
+          owner_uid   = 1000
+          owner_gid   = 1000
+          permissions = "0755"
+        }
+      }
+    }
+  }
 
   tags = local.tags
 

@@ -209,6 +209,52 @@ data "aws_iam_policy_document" "this" {
   }
 }
 
+# One access point per entry in var.access_points.  Access points allow
+# per-client path and POSIX identity isolation on top of the shared file system.
+# All fields except file_system_id are optional; dynamic blocks are skipped
+# when the corresponding key is absent from the entry map.
+resource "aws_s3files_access_point" "this" {
+  for_each = var.create ? var.access_points : {}
+
+  region = var.region
+
+  file_system_id = aws_s3files_file_system.this[0].id
+
+  tags = try(merge(var.tags, each.value.tags), var.tags)
+
+  # posix_user is required by the provider schema - it is a static block, not
+  # dynamic.  Using a static block here makes the requirement visible in HCL
+  # and avoids the null-access path that a dynamic block with try() introduces
+  # when the caller explicitly passes posix_user = null.
+  posix_user {
+    uid            = each.value.posix_user.uid
+    gid            = each.value.posix_user.gid
+    secondary_gids = try(each.value.posix_user.secondary_gids, null)
+  }
+
+  dynamic "root_directory" {
+    for_each = try([each.value.root_directory], [])
+
+    content {
+      path = try(root_directory.value.path, null)
+
+      dynamic "creation_permissions" {
+        # Filter explicit nulls: try() only catches missing keys; if the caller
+        # writes creation_permissions = null the list would be [null] and the
+        # content block would crash on .owner_uid.  The `if v != null` guard
+        # collapses that to an empty list, skipping the block entirely.
+        for_each = [for v in try([root_directory.value.creation_permissions], []) : v if v != null]
+
+        content {
+          owner_uid   = creation_permissions.value.owner_uid
+          owner_gid   = creation_permissions.value.owner_gid
+          permissions = creation_permissions.value.permissions
+        }
+      }
+    }
+  }
+}
+
 # Attaches either the caller-supplied policy JSON or the auto-generated
 # secure-default policy to the file system.  The precondition rejects
 # caller-supplied JSON that cannot be parsed, producing a clear error at plan
@@ -219,7 +265,13 @@ resource "aws_s3files_file_system_policy" "this" {
   region = var.region
 
   file_system_id = aws_s3files_file_system.this[0].id
-  policy         = var.file_system_policy != null ? var.file_system_policy : data.aws_iam_policy_document.this[0].json
+  # jsonencode(jsondecode(...)) normalises any caller-supplied JSON to the same
+  # compact canonical form that the AWS API returns on reads.  Without this
+  # round-trip, pretty-printed or differently-ordered policy strings cause a
+  # perpetual diff on every subsequent plan even though the policy has not
+  # changed.  data.aws_iam_policy_document already emits canonical JSON so the
+  # auto-generated path needs no normalisation.
+  policy = var.file_system_policy != null ? jsonencode(jsondecode(var.file_system_policy)) : data.aws_iam_policy_document.this[0].json
 
   lifecycle {
     # Validate that a custom policy string is parseable JSON before applying.
