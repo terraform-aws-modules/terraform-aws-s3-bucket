@@ -27,3 +27,8 @@ output "s3_files_mount_target_network_interface_ids" {
   description = "List of mount target network interface IDs."
   value       = module.s3_files.s3_files_mount_target_network_interface_ids
 }
+
+output "s3_files_access_points" {
+  description = "Map of S3 Files access points (id and arn) created by the example."
+  value       = module.s3_files.s3_files_access_points
+}
