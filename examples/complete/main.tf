@@ -158,6 +158,10 @@ module "s3_bucket" {
   acceleration_status = "Suspended"
   request_payer       = "BucketOwner"
 
+  abac_status = {
+    status = "Enabled"
+  }
+
   tags = {
     Owner = "Anton"
   }
