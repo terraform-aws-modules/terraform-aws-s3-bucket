@@ -23,5 +23,10 @@ output "vector_bucket_with_index_arn" {
 
 output "index_arns" {
   description = "ARNs of the vector indexes"
-  value       = module.vector_bucket_with_index.index_arn
+  value       = module.vector_bucket_with_index.index_arns
+}
+
+output "index_creation_times" {
+  description = "Date and time when the vector indexes were created"
+  value       = module.vector_bucket_with_index.index_creation_times
 }

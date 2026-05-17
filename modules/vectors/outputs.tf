@@ -21,12 +21,12 @@ output "creation_time" {
 # Vector Indexes
 ################################################################################
 
-output "index_arn" {
+output "index_arns" {
   description = "ARNs of the vector indexes"
   value       = { for k, v in aws_s3vectors_index.this : k => v.index_arn }
 }
 
-output "index_creation_time" {
+output "index_creation_times" {
   description = "Date and time when the vector indexes were created"
   value       = { for k, v in aws_s3vectors_index.this : k => v.creation_time }
 }

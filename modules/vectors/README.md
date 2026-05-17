@@ -126,8 +126,8 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_creation_time"></a> [creation\_time](#output\_creation\_time) | Date and time when the vector bucket was created |
-| <a name="output_index_arn"></a> [index\_arn](#output\_index\_arn) | ARNs of the vector indexes |
-| <a name="output_index_creation_time"></a> [index\_creation\_time](#output\_index\_creation\_time) | Date and time when the vector indexes were created |
+| <a name="output_index_arns"></a> [index\_arns](#output\_index\_arns) | ARNs of the vector indexes |
+| <a name="output_index_creation_times"></a> [index\_creation\_times](#output\_index\_creation\_times) | Date and time when the vector indexes were created |
 | <a name="output_vector_bucket_arn"></a> [vector\_bucket\_arn](#output\_vector\_bucket\_arn) | ARN of the S3 Vectors vector bucket |
 | <a name="output_vector_bucket_name"></a> [vector\_bucket\_name](#output\_vector\_bucket\_name) | Name of the S3 Vectors vector bucket |
 <!-- END_TF_DOCS -->
