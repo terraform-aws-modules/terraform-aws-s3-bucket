@@ -61,18 +61,25 @@ module "vector_bucket" {
 
   vector_bucket_name = "my-vector-bucket"
 
-  create_index  = true
-  index_name    = "my-index"
-  dimension     = 1536
-  distance_metric = "cosine"
+  indexes = {
+    my_index = {
+      index_name      = "my-index"
+      dimension       = 1536
+      distance_metric = "cosine"
 
-  index_encryption_configuration = {
-    sse_type    = "aws:kms"
-    kms_key_arn = aws_kms_key.this.arn
-  }
+      encryption_configuration = {
+        sse_type    = "aws:kms"
+        kms_key_arn = aws_kms_key.this.arn
+      }
 
-  metadata_configuration = {
-    non_filterable_metadata_keys = ["description", "notes"]
+      metadata_configuration = {
+        non_filterable_metadata_keys = ["description", "notes"]
+      }
+
+      tags = {
+        Environment = "dev"
+      }
+    }
   }
 
   tags = {

@@ -25,6 +25,7 @@ module "kms" {
       sid = "AllowS3VectorsServicePrincipal"
       actions = [
         "kms:Decrypt",
+        "kms:GenerateDataKey",
       ]
       resources = ["*"]
 
@@ -134,11 +135,18 @@ data "aws_iam_policy_document" "vector_bucket_policy" {
     effect = "Allow"
 
     actions = [
+      "s3vectors:CreateIndex",
+      "s3vectors:ListIndexes",
+      "s3vectors:QueryVectors",
       "s3vectors:PutVectors",
+      "s3vectors:DeleteIndex",
       "s3vectors:DeleteVectors",
     ]
 
-    resources = [module.vector_bucket.vector_bucket_arn]
+    resources = [
+      module.vector_bucket.vector_bucket_arn,
+      "${module.vector_bucket.vector_bucket_arn}/index/*",
+    ]
 
     principals {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
@@ -151,11 +159,15 @@ data "aws_iam_policy_document" "vector_bucket_policy" {
     effect = "Allow"
 
     actions = [
+      "s3vectors:ListIndexes",
       "s3vectors:GetVectors",
       "s3vectors:QueryVectors",
     ]
 
-    resources = [module.vector_bucket.vector_bucket_arn]
+    resources = [
+      module.vector_bucket.vector_bucket_arn,
+      "${module.vector_bucket.vector_bucket_arn}/index/*",
+    ]
 
     principals {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
