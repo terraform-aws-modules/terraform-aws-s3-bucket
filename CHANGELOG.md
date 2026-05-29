@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.14.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.13.0...v5.14.0) (2026-05-29)
+
+### Features
+
+* Support Vector Buckets ([#392](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/392)) ([7fd971d](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/7fd971d43bf320d8bf345e8f780877e48e88a4ce))
+
 ## [5.13.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.12.0...v5.13.0) (2026-05-04)
 
 ### Features
