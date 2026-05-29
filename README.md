@@ -20,6 +20,7 @@ These features of S3 bucket configurations are supported:
 - Account-level Public Access Block
 - S3 Directory Bucket
 - S3 Table Bucket
+- S3 Vectors
 
 ## Usage
 
@@ -149,6 +150,7 @@ Users of Terragrunt can achieve similar results by using modules provided in the
 - [S3 Account-level Public Access Block](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/account-public-access) - Manage S3 account-level Public Access Block.
 - [S3 Directory Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/directory-bucket) - S3 Directory Bucket configuration.
 - [S3 Table Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/table-bucket) - S3 Table Bucket configuration.
+- [S3 Vectors](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/vectors) - S3 Vectors vector bucket with indexes configuration.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
