@@ -32,7 +32,7 @@ resource "aws_s3files_file_system" "this" {
   # otherwise the provider's configured region is used automatically.
   region = var.region
 
-  bucket                = var.s3_uri
+  bucket                = var.bucket_arn
   role_arn              = var.role_arn
   accept_bucket_warning = var.accept_bucket_warning
   kms_key_id            = var.kms_key_id
@@ -41,17 +41,17 @@ resource "aws_s3files_file_system" "this" {
   tags = var.tags
 
   lifecycle {
-    # Guard 1 – s3_uri must be a well-formed S3 bucket ARN.
+    # Guard 1 – bucket_arn must be a well-formed S3 bucket ARN.
     # S3 ARNs take the form arn:<partition>:s3:::<bucket-name> with no region
-    # or account-id segments.  Bucket names are 3–63 characters and may only
-    # contain lowercase letters, numbers, hyphens, and dots.
+    # or account-id segments.  Standard bucket names are 3–63 characters;
+    # Account Regional buckets may be up to 255 characters.
     precondition {
       condition = (
-        var.s3_uri != null &&
-        trimspace(var.s3_uri) != "" &&
-        can(regex("^arn:[^:]+:s3:::[A-Za-z0-9][A-Za-z0-9.-]{1,61}[A-Za-z0-9]$", var.s3_uri))
+        var.bucket_arn != null &&
+        trimspace(var.bucket_arn) != "" &&
+        can(regex("^arn:[^:]+:s3:::[A-Za-z0-9][A-Za-z0-9.-]+[A-Za-z0-9]$", var.bucket_arn))
       )
-      error_message = "s3_uri must be a valid S3 bucket ARN, for example arn:aws:s3:::my-bucket."
+      error_message = "bucket_arn must be a valid S3 bucket ARN, for example arn:aws:s3:::my-bucket."
     }
 
     # Guard 2 – role_arn must be a well-formed IAM role ARN.
