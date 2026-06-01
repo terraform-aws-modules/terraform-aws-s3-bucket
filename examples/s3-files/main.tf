@@ -159,7 +159,7 @@ resource "aws_iam_role_policy" "s3_files_bucket_access" {
 module "s3_files" {
   source = "../../modules/s3-files"
 
-  s3_uri = module.s3_bucket.s3_bucket_arn
+  bucket_arn = module.s3_bucket.s3_bucket_arn
 
   role_arn = aws_iam_role.s3_files.arn
 

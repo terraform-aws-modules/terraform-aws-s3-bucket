@@ -16,8 +16,8 @@ variable "region" {
   default     = null
 }
 
-variable "s3_uri" {
-  description = "S3 bucket ARN to use for the file system (for example, arn:aws:s3:::my-bucket)"
+variable "bucket_arn" {
+  description = "ARN of the S3 bucket"
   type        = string
   default     = null
 }
