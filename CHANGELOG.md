@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.14.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.14.0...v5.14.1) (2026-06-23)
+
+### Bug Fixes
+
+* Prevent deprecation warning on lifecycle rules output (Fixes [#389](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/389)) ([#394](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/394)) ([0c0fb28](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/0c0fb28347cc253088fe3966dca67420d39fbbe9))
+
 ## [5.14.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.13.0...v5.14.0) (2026-05-29)
 
 ### Features
