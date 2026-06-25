@@ -173,4 +173,65 @@ module "s3_files" {
 ```
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.42 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_s3files_access_point.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_access_point) | resource |
+| [aws_s3files_file_system.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_file_system) | resource |
+| [aws_s3files_file_system_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_file_system_policy) | resource |
+| [aws_s3files_mount_target.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_mount_target) | resource |
+| [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_partition.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
+| [aws_security_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/security_group) | data source |
+| [aws_subnet.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_accept_bucket_warning"></a> [accept\_bucket\_warning](#input\_accept\_bucket\_warning) | Whether to acknowledge and accept bucket warnings during file system creation | `bool` | `null` | no |
+| <a name="input_access_points"></a> [access\_points](#input\_access\_points) | Map of S3 Files access point configurations to create | `any` | `{}` | no |
+| <a name="input_bucket_arn"></a> [bucket\_arn](#input\_bucket\_arn) | ARN of the S3 bucket | `string` | `null` | no |
+| <a name="input_create"></a> [create](#input\_create) | Whether to create s3 files resources | `bool` | `true` | no |
+| <a name="input_create_file_system_policy"></a> [create\_file\_system\_policy](#input\_create\_file\_system\_policy) | Whether to create an s3 files file system policy | `bool` | `true` | no |
+| <a name="input_file_system_policy"></a> [file\_system\_policy](#input\_file\_system\_policy) | Amazon Web Services resource-based policy document in JSON format for the file system. If null, a default policy allowing account-root mount scoped to the provided VPC is created | `string` | `null` | no |
+| <a name="input_ip_address_type"></a> [ip\_address\_type](#input\_ip\_address\_type) | IP address type for mount targets | `string` | `null` | no |
+| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key ID for encrypting data in the file system | `string` | `null` | no |
+| <a name="input_mount_target_ipv4_addresses"></a> [mount\_target\_ipv4\_addresses](#input\_mount\_target\_ipv4\_addresses) | Map of explicit IPv4 addresses for mount targets keyed by subnet ID | `map(string)` | `{}` | no |
+| <a name="input_mount_target_ipv6_addresses"></a> [mount\_target\_ipv6\_addresses](#input\_mount\_target\_ipv6\_addresses) | Map of explicit IPv6 addresses for mount targets keyed by subnet ID | `map(string)` | `{}` | no |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | S3 bucket prefix to scope the file system | `string` | `null` | no |
+| <a name="input_region"></a> [region](#input\_region) | Region where the resource(s) will be managed. Defaults to the region set in the provider configuration | `string` | `null` | no |
+| <a name="input_role_arn"></a> [role\_arn](#input\_role\_arn) | IAM role ARN used by S3 Files to access the S3 bucket | `string` | `null` | no |
+| <a name="input_security_group_ids"></a> [security\_group\_ids](#input\_security\_group\_ids) | List of security group IDs to attach to each mount target | `list(string)` | `[]` | no |
+| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | List of subnet IDs where mount targets will be created | `list(string)` | `[]` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Key-value map of resource tags | `map(string)` | `{}` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID where mount targets will be created | `string` | `null` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_s3_files_access_points"></a> [s3\_files\_access\_points](#output\_s3\_files\_access\_points) | Map of S3 Files access points, keyed by the user-defined map key, with id, arn, and name attributes |
+| <a name="output_s3_files_file_system_arn"></a> [s3\_files\_file\_system\_arn](#output\_s3\_files\_file\_system\_arn) | ARN of the S3 Files file system |
+| <a name="output_s3_files_file_system_id"></a> [s3\_files\_file\_system\_id](#output\_s3\_files\_file\_system\_id) | Identifier of the S3 Files file system |
+| <a name="output_s3_files_mount_target_network_interface_ids"></a> [s3\_files\_mount\_target\_network\_interface\_ids](#output\_s3\_files\_mount\_target\_network\_interface\_ids) | List of mount target network interface IDs |
 <!-- END_TF_DOCS -->
