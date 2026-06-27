@@ -1,5 +1,5 @@
 variable "create" {
-  description = "Whether to create s3 files resources"
+  description = "Whether to create this resource or not?"
   type        = bool
   default     = true
 }
@@ -98,4 +98,30 @@ variable "access_points" {
   description = "Map of S3 Files access point configurations to create"
   type        = any
   default     = {}
+}
+
+variable "synchronization_import_data_rules" {
+  description = "Import data rules for S3 Files synchronization. Note: size_less_than is in bytes (131072 bytes = 128KB)."
+  type = list(object({
+    prefix         = string
+    size_less_than = number
+    trigger        = string
+  }))
+  default = [
+    {
+      prefix         = ""
+      size_less_than = 131072
+      trigger        = "ON_FILE_ACCESS"
+    }
+  ]
+}
+
+variable "synchronization_expiration_data_rule" {
+  description = "Expiration rule for S3 Files synchronization."
+  type = object({
+    days_after_last_access = number
+  })
+  default = {
+    days_after_last_access = 30
+  }
 }

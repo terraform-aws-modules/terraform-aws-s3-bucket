@@ -49,7 +49,7 @@ resource "aws_s3files_file_system" "this" {
       condition = (
         var.bucket_arn != null &&
         trimspace(var.bucket_arn) != "" &&
-        can(regex("^arn:[^:]+:s3:::[A-Za-z0-9][A-Za-z0-9.-]+[A-Za-z0-9]$", var.bucket_arn))
+        can(regex("^arn:[^:]+:s3:::[a-z0-9][a-z0-9.-]+[a-z0-9]$", var.bucket_arn))
       )
       error_message = "bucket_arn must be a valid S3 bucket ARN, for example arn:aws:s3:::my-bucket."
     }
@@ -280,5 +280,26 @@ resource "aws_s3files_file_system_policy" "this" {
       condition     = var.file_system_policy == null || can(jsondecode(var.file_system_policy))
       error_message = "file_system_policy must be valid JSON when provided."
     }
+  }
+}
+
+resource "aws_s3files_synchronization_configuration" "this" {
+  count = var.create ? 1 : 0
+
+  region = var.region
+
+  file_system_id = aws_s3files_file_system.this[0].id
+
+  dynamic "import_data_rule" {
+    for_each = var.synchronization_import_data_rules
+    content {
+      prefix         = import_data_rule.value.prefix
+      size_less_than = import_data_rule.value.size_less_than
+      trigger        = import_data_rule.value.trigger
+    }
+  }
+
+  expiration_data_rule {
+    days_after_last_access = var.synchronization_expiration_data_rule.days_after_last_access
   }
 }

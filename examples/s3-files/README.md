@@ -37,7 +37,7 @@ Amazon S3 raises a `409 BucketHasS3FileSystemAttached` error if you attempt to d
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.39 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
@@ -45,21 +45,21 @@ Amazon S3 raises a `409 BucketHasS3FileSystemAttached` error if you attempt to d
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.39 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
 
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
 | <a name="module_s3_files"></a> [s3\_files](#module\_s3\_files) | ../../modules/s3-files | n/a |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_iam_role.s3_files](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.s3_files_bucket_access](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_security_group.s3_files](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
@@ -75,13 +75,13 @@ Amazon S3 raises a `409 BucketHasS3FileSystemAttached` error if you attempt to d
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_region"></a> [region](#input\_region) | AWS region to deploy the example resources | `string` | `"eu-west-1"` | no |
 
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | The ARN of the bucket. |
 | <a name="output_s3_bucket_id"></a> [s3\_bucket\_id](#output\_s3\_bucket\_id) | The name of the bucket. |
 | <a name="output_s3_bucket_versioning_status"></a> [s3\_bucket\_versioning\_status](#output\_s3\_bucket\_versioning\_status) | Versioning status of the example S3 bucket. |
