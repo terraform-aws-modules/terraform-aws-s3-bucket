@@ -18,6 +18,16 @@ module "wrapper" {
   role_arn                    = try(each.value.role_arn, var.defaults.role_arn, null)
   security_group_ids          = try(each.value.security_group_ids, var.defaults.security_group_ids, [])
   subnet_ids                  = try(each.value.subnet_ids, var.defaults.subnet_ids, [])
-  tags                        = try(each.value.tags, var.defaults.tags, {})
-  vpc_id                      = try(each.value.vpc_id, var.defaults.vpc_id, null)
+  synchronization_expiration_data_rule = try(each.value.synchronization_expiration_data_rule, var.defaults.synchronization_expiration_data_rule, {
+    days_after_last_access = 30
+  })
+  synchronization_import_data_rules = try(each.value.synchronization_import_data_rules, var.defaults.synchronization_import_data_rules, [
+    {
+      prefix         = ""
+      size_less_than = 131072
+      trigger        = "ON_FILE_ACCESS"
+    }
+  ])
+  tags   = try(each.value.tags, var.defaults.tags, {})
+  vpc_id = try(each.value.vpc_id, var.defaults.vpc_id, null)
 }
