@@ -176,14 +176,14 @@ module "s3_files" {
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.42 |
 
 ## Modules
@@ -193,7 +193,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [aws_s3files_access_point.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_access_point) | resource |
 | [aws_s3files_file_system.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_file_system) | resource |
 | [aws_s3files_file_system_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_file_system_policy) | resource |
@@ -208,7 +208,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_accept_bucket_warning"></a> [accept\_bucket\_warning](#input\_accept\_bucket\_warning) | Whether to acknowledge and accept bucket warnings during file system creation | `bool` | `null` | no |
 | <a name="input_access_points"></a> [access\_points](#input\_access\_points) | Map of S3 Files access point configurations to create | `any` | `{}` | no |
 | <a name="input_bucket_arn"></a> [bucket\_arn](#input\_bucket\_arn) | ARN of the S3 bucket | `string` | `null` | no |
@@ -232,7 +232,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_s3_files_access_points"></a> [s3\_files\_access\_points](#output\_s3\_files\_access\_points) | Map of S3 Files access points, keyed by the user-defined map key, with id, arn, and name attributes |
 | <a name="output_s3_files_file_system_arn"></a> [s3\_files\_file\_system\_arn](#output\_s3\_files\_file\_system\_arn) | ARN of the S3 Files file system |
 | <a name="output_s3_files_file_system_id"></a> [s3\_files\_file\_system\_id](#output\_s3\_files\_file\_system\_id) | Identifier of the S3 Files file system |
