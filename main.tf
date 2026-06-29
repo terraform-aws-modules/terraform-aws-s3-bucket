@@ -1151,41 +1151,56 @@ resource "aws_s3_bucket_policy" "b" {
   count  = local.create_logging_bucket ? 1 : 0
   bucket = aws_s3_bucket.accesslogbucket[0].id
 
-  policy = <<POLICY
-{
-    "Version": "2012-10-17",
-    "Statement": [
-            {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": [
-                "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.s3_logging_bucket_accessrole[0].name}"
-                ]
-            },
-            "Action": "s3:*",
-            "Resource": [
-                "${aws_s3_bucket.accesslogbucket[0].arn}",
-                "${aws_s3_bucket.accesslogbucket[0].arn}/*"
-            ]
-        },
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = concat(
+      [
         {
-            "Sid": "HttpsOnly",
-            "Effect": "Deny",
-            "Principal": "*",
-            "Action": "s3:*",
-            "Resource": [
-                "${aws_s3_bucket.accesslogbucket[0].arn}",
-                "${aws_s3_bucket.accesslogbucket[0].arn}/*"
-            ],
-            "Condition": {
-                "Bool": {
-                    "aws:SecureTransport": "false"
-                }
-            }
+          Effect = "Allow"
+          Principal = {
+            AWS = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.s3_logging_bucket_accessrole[0].name}"
+          }
+          Action = "s3:*"
+          Resource = [
+            aws_s3_bucket.accesslogbucket[0].arn,
+            "${aws_s3_bucket.accesslogbucket[0].arn}/*"
+          ]
         }
-    ]
-}
-POLICY
+      ],
+      var.attach_access_log_delivery_policy ? [
+        {
+          Sid       = "AllowS3LogDelivery"
+          Effect    = "Allow"
+          Principal = { Service = "logging.s3.amazonaws.com" }
+          Action    = "s3:PutObject"
+          Resource  = "${aws_s3_bucket.accesslogbucket[0].arn}/*"
+          Condition = length(var.access_log_delivery_policy_source_accounts) > 0 ? {
+            StringEquals = {
+              "aws:SourceAccount" = var.access_log_delivery_policy_source_accounts[0]
+            }
+          } : {}
+        }
+      ] : [],
+      [
+        {
+          Sid       = "HttpsOnly"
+          Effect    = "Deny"
+          Principal = "*"
+          Action    = "s3:*"
+          Resource = [
+            aws_s3_bucket.accesslogbucket[0].arn,
+            "${aws_s3_bucket.accesslogbucket[0].arn}/*"
+          ]
+          Condition = {
+            Bool = {
+              "aws:SecureTransport" = "false"
+            }
+          }
+        }
+      ]
+    )
+  })
+
   depends_on = [
     aws_s3_bucket.accesslogbucket
   ]
