@@ -26,42 +26,22 @@ resource "random_pet" "this" {
   length = 2
 }
 
-resource "aws_vpc" "this" {
-  cidr_block           = "10.42.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
 
-  tags = merge(local.tags, {
-    Name = "s3-files-example-vpc"
-  })
-}
+  name = "s3-files-example-vpc"
+  cidr = "10.42.0.0/16"
 
-resource "aws_subnet" "private_a" {
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = "10.42.1.0/24"
-  availability_zone       = data.aws_availability_zones.available.names[0]
-  map_public_ip_on_launch = false
+  azs             = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
+  private_subnets = ["10.42.1.0/24", "10.42.2.0/24"]
 
-  tags = merge(local.tags, {
-    Name = "s3-files-example-private-a"
-  })
-}
-
-resource "aws_subnet" "private_b" {
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = "10.42.2.0/24"
-  availability_zone       = data.aws_availability_zones.available.names[1]
-  map_public_ip_on_launch = false
-
-  tags = merge(local.tags, {
-    Name = "s3-files-example-private-b"
-  })
+  tags = local.tags
 }
 
 resource "aws_security_group" "s3_files" {
   name_prefix = "s3-files-example-"
   description = "Security group for S3 Files mount targets"
-  vpc_id      = aws_vpc.this.id
+  vpc_id      = module.vpc.vpc_id
 
   # Allow NFS traffic from within the VPC so that clients can mount the
   # file system.  Without this rule mount targets are unreachable even
@@ -70,7 +50,7 @@ resource "aws_security_group" "s3_files" {
     from_port   = 2049
     to_port     = 2049
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.this.cidr_block]
+    cidr_blocks = [module.vpc.vpc_cidr_block]
   }
 
   egress {
@@ -163,11 +143,8 @@ module "s3_files" {
 
   role_arn = aws_iam_role.s3_files.arn
 
-  vpc_id = aws_vpc.this.id
-  subnet_ids = [
-    aws_subnet.private_a.id,
-    aws_subnet.private_b.id
-  ]
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
 
   security_group_ids = [aws_security_group.s3_files.id]
 

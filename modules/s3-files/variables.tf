@@ -96,8 +96,23 @@ variable "tags" {
 
 variable "access_points" {
   description = "Map of S3 Files access point configurations to create"
-  type        = any
-  default     = {}
+  type = map(object({
+    tags = optional(map(string), {})
+    posix_user = object({
+      uid            = number
+      gid            = number
+      secondary_gids = optional(list(number), null)
+    })
+    root_directory = optional(object({
+      path = optional(string, null)
+      creation_permissions = optional(object({
+        owner_uid   = number
+        owner_gid   = number
+        permissions = string
+      }), null)
+    }), null)
+  }))
+  default = {}
 }
 
 variable "synchronization_import_data_rules" {

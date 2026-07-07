@@ -4,23 +4,6 @@ locals {
   subnet_ids = var.subnet_ids
 }
 
-# Fetched at plan-time so that the precondition on aws_s3files_file_system can
-# verify that every supplied subnet belongs to the declared vpc_id.  The lookup
-# is skipped entirely when create = false to avoid unnecessary API calls.
-data "aws_subnet" "this" {
-  count = var.create ? length(var.subnet_ids) : 0
-
-  id = var.subnet_ids[count.index]
-}
-
-# Fetched at plan-time for the same reason as aws_subnet.this: the precondition
-# asserts that all security groups reside in the same VPC as the mount targets.
-data "aws_security_group" "this" {
-  count = var.create ? length(var.security_group_ids) : 0
-
-  id = var.security_group_ids[count.index]
-}
-
 # The central S3 Files file system resource.  A single file system is created
 # per invocation of this module; mount targets (one per subnet) are managed
 # separately below.  The lifecycle preconditions run at plan-time and catch
@@ -39,97 +22,6 @@ resource "aws_s3files_file_system" "this" {
   prefix                = var.prefix
 
   tags = var.tags
-
-  lifecycle {
-    # Guard 1 – bucket_arn must be a well-formed S3 bucket ARN.
-    # S3 ARNs take the form arn:<partition>:s3:::<bucket-name> with no region
-    # or account-id segments.  Standard bucket names are 3–63 characters;
-    # Account Regional buckets may be up to 255 characters.
-    precondition {
-      condition = (
-        var.bucket_arn != null &&
-        trimspace(var.bucket_arn) != "" &&
-        can(regex("^arn:[^:]+:s3:::[a-z0-9][a-z0-9.-]+[a-z0-9]$", var.bucket_arn))
-      )
-      error_message = "bucket_arn must be a valid S3 bucket ARN, for example arn:aws:s3:::my-bucket."
-    }
-
-    # Guard 2 – role_arn must be a well-formed IAM role ARN.
-    # The IAM role is assumed by the S3 Files service to access the S3 bucket
-    # on behalf of NFS clients.
-    precondition {
-      condition = (
-        var.role_arn != null &&
-        trimspace(var.role_arn) != "" &&
-        can(regex("^arn:[^:]+:iam::[0-9]{12}:role\\/.+", var.role_arn))
-      )
-      error_message = "role_arn must be a valid IAM role ARN."
-    }
-
-    # Guard 3 – vpc_id must be a well-formed VPC identifier (vpc-<hex>).
-    # This is required because mount targets must be placed inside a VPC and
-    # the preconditions for subnet and security group membership depend on it.
-    precondition {
-      condition = (
-        var.vpc_id != null &&
-        trimspace(var.vpc_id) != "" &&
-        can(regex("^vpc-[0-9a-f]+$", var.vpc_id))
-      )
-      error_message = "vpc_id must be a valid VPC ID."
-    }
-
-    # Guard 4 – at least one subnet must be supplied.
-    # A file system with no mount targets is unreachable from VPC clients.
-    precondition {
-      condition     = length(var.subnet_ids) > 0
-      error_message = "At least one subnet ID must be provided in subnet_ids when create is true."
-    }
-
-    # Guard 5 – subnet IDs must be unique.
-    # AWS allows only one mount target per subnet per file system; duplicates
-    # would cause a 409 ConflictException on the second mount target creation.
-    precondition {
-      condition     = length(distinct(var.subnet_ids)) == length(var.subnet_ids)
-      error_message = "subnet_ids must not contain duplicates."
-    }
-
-    # Guard 6 – every subnet must belong to the declared VPC.
-    # Cross-VPC subnets are invalid; catching this early produces a clear error
-    # instead of a cryptic AWS API failure.
-    precondition {
-      condition     = alltrue([for subnet in data.aws_subnet.this : subnet.vpc_id == var.vpc_id])
-      error_message = "All subnet_ids must belong to the provided vpc_id."
-    }
-
-    # Guard 7 – every security group must belong to the declared VPC.
-    # Security groups are VPC-scoped; attaching one from a different VPC is an
-    # API error.  The check is skipped when no security groups are provided.
-    precondition {
-      condition = (
-        length(var.security_group_ids) == 0 ||
-        alltrue([for security_group in data.aws_security_group.this : security_group.vpc_id == var.vpc_id])
-      )
-      error_message = "All security_group_ids must belong to the provided vpc_id."
-    }
-
-    # Guard 8 – IPv4 address map keys must be a subset of subnet_ids.
-    # If a key does not match any subnet, the entry would be silently ignored;
-    # an explicit error is much easier to debug.
-    precondition {
-      condition = length(
-        setsubtract(toset(keys(var.mount_target_ipv4_addresses)), toset(var.subnet_ids))
-      ) == 0
-      error_message = "mount_target_ipv4_addresses keys must match values provided in subnet_ids."
-    }
-
-    # Guard 9 – IPv6 address map keys must be a subset of subnet_ids.
-    precondition {
-      condition = length(
-        setsubtract(toset(keys(var.mount_target_ipv6_addresses)), toset(var.subnet_ids))
-      ) == 0
-      error_message = "mount_target_ipv6_addresses keys must match values provided in subnet_ids."
-    }
-  }
 }
 
 # One mount target is created per subnet entry, enabling multi-AZ deployments
@@ -220,7 +112,7 @@ resource "aws_s3files_access_point" "this" {
 
   file_system_id = aws_s3files_file_system.this[0].id
 
-  tags = try(merge(var.tags, each.value.tags), var.tags)
+  tags = merge(var.tags, each.value.tags)
 
   # posix_user is required by the provider schema - it is a static block, not
   # dynamic.  Using a static block here makes the requirement visible in HCL
@@ -229,21 +121,21 @@ resource "aws_s3files_access_point" "this" {
   posix_user {
     uid            = each.value.posix_user.uid
     gid            = each.value.posix_user.gid
-    secondary_gids = try(each.value.posix_user.secondary_gids, null)
+    secondary_gids = each.value.posix_user.secondary_gids
   }
 
   dynamic "root_directory" {
-    for_each = try([each.value.root_directory], [])
+    for_each = each.value.root_directory != null ? [each.value.root_directory] : []
 
     content {
-      path = try(root_directory.value.path, null)
+      path = root_directory.value.path
 
       dynamic "creation_permissions" {
         # Filter explicit nulls: try() only catches missing keys; if the caller
         # writes creation_permissions = null the list would be [null] and the
         # content block would crash on .owner_uid.  The `if v != null` guard
         # collapses that to an empty list, skipping the block entirely.
-        for_each = [for v in try([root_directory.value.creation_permissions], []) : v if v != null]
+        for_each = root_directory.value.creation_permissions != null ? [root_directory.value.creation_permissions] : []
 
         content {
           owner_uid   = creation_permissions.value.owner_uid
@@ -271,16 +163,7 @@ resource "aws_s3files_file_system_policy" "this" {
   # perpetual diff on every subsequent plan even though the policy has not
   # changed.  data.aws_iam_policy_document already emits canonical JSON so the
   # auto-generated path needs no normalisation.
-  policy = var.file_system_policy != null ? jsonencode(jsondecode(var.file_system_policy)) : data.aws_iam_policy_document.this[0].json
-
-  lifecycle {
-    # Validate that a custom policy string is parseable JSON before applying.
-    # jsondecode() throws on invalid JSON; can() converts that to a bool.
-    precondition {
-      condition     = var.file_system_policy == null || can(jsondecode(var.file_system_policy))
-      error_message = "file_system_policy must be valid JSON when provided."
-    }
-  }
+  policy = var.file_system_policy != null ? var.file_system_policy : data.aws_iam_policy_document.this[0].json
 }
 
 resource "aws_s3files_synchronization_configuration" "this" {

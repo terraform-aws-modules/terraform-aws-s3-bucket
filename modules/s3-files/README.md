@@ -202,15 +202,13 @@ No modules.
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_partition.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
-| [aws_security_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/security_group) | data source |
-| [aws_subnet.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_accept_bucket_warning"></a> [accept\_bucket\_warning](#input\_accept\_bucket\_warning) | Whether to acknowledge and accept bucket warnings during file system creation | `bool` | `null` | no |
-| <a name="input_access_points"></a> [access\_points](#input\_access\_points) | Map of S3 Files access point configurations to create | `any` | `{}` | no |
+| <a name="input_access_points"></a> [access\_points](#input\_access\_points) | Map of S3 Files access point configurations to create | <pre>map(object({<br/>    tags = optional(map(string), {})<br/>    posix_user = object({<br/>      uid            = number<br/>      gid            = number<br/>      secondary_gids = optional(list(number), null)<br/>    })<br/>    root_directory = optional(object({<br/>      path = optional(string, null)<br/>      creation_permissions = optional(object({<br/>        owner_uid   = number<br/>        owner_gid   = number<br/>        permissions = string<br/>      }), null)<br/>    }), null)<br/>  }))</pre> | `{}` | no |
 | <a name="input_bucket_arn"></a> [bucket\_arn](#input\_bucket\_arn) | ARN of the S3 bucket | `string` | `null` | no |
 | <a name="input_create"></a> [create](#input\_create) | Whether to create this resource or not? | `bool` | `true` | no |
 | <a name="input_create_file_system_policy"></a> [create\_file\_system\_policy](#input\_create\_file\_system\_policy) | Whether to create an s3 files file system policy | `bool` | `true` | no |
