@@ -126,7 +126,7 @@ variable "synchronization_import_data_rules" {
     {
       prefix         = ""
       size_less_than = 131072
-      trigger        = "ON_FILE_ACCESS"
+      trigger        = "ON_DIRECTORY_FIRST_ACCESS"
     }
   ]
 }

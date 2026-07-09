@@ -25,7 +25,7 @@ module "wrapper" {
     {
       prefix         = ""
       size_less_than = 131072
-      trigger        = "ON_FILE_ACCESS"
+      trigger        = "ON_DIRECTORY_FIRST_ACCESS"
     }
   ])
   tags   = try(each.value.tags, var.defaults.tags, {})

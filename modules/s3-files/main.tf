@@ -1,13 +1,11 @@
-# Aliases subnet_ids into a local to allow future enrichment (e.g. sorting or
-# filtering) without touching the resource count expressions below.
+
 locals {
   subnet_ids = var.subnet_ids
 }
 
 # The central S3 Files file system resource.  A single file system is created
 # per invocation of this module; mount targets (one per subnet) are managed
-# separately below.  The lifecycle preconditions run at plan-time and catch
-# mis-configurations before any AWS API call is made.
+# separately below.
 resource "aws_s3files_file_system" "this" {
   count = var.create ? 1 : 0
 
@@ -86,9 +84,7 @@ data "aws_iam_policy_document" "this" {
 
     # The aws:SourceVpc condition is the primary network-layer guard: it prevents
     # mount requests that do not originate from inside the declared VPC, even if
-    # an identity policy would otherwise permit them.  The block is conditional so
-    # that the policy remains valid when vpc_id is somehow null (unlikely given
-    # the precondition above, but defensive programming is good practice).
+    # an identity policy would otherwise permit them.
     dynamic "condition" {
       for_each = var.vpc_id != null ? [var.vpc_id] : []
 
@@ -114,10 +110,6 @@ resource "aws_s3files_access_point" "this" {
 
   tags = merge(var.tags, each.value.tags)
 
-  # posix_user is required by the provider schema - it is a static block, not
-  # dynamic.  Using a static block here makes the requirement visible in HCL
-  # and avoids the null-access path that a dynamic block with try() introduces
-  # when the caller explicitly passes posix_user = null.
   posix_user {
     uid            = each.value.posix_user.uid
     gid            = each.value.posix_user.gid
@@ -131,10 +123,6 @@ resource "aws_s3files_access_point" "this" {
       path = root_directory.value.path
 
       dynamic "creation_permissions" {
-        # Filter explicit nulls: try() only catches missing keys; if the caller
-        # writes creation_permissions = null the list would be [null] and the
-        # content block would crash on .owner_uid.  The `if v != null` guard
-        # collapses that to an empty list, skipping the block entirely.
         for_each = root_directory.value.creation_permissions != null ? [root_directory.value.creation_permissions] : []
 
         content {
@@ -148,21 +136,14 @@ resource "aws_s3files_access_point" "this" {
 }
 
 # Attaches either the caller-supplied policy JSON or the auto-generated
-# secure-default policy to the file system.  The precondition rejects
-# caller-supplied JSON that cannot be parsed, producing a clear error at plan
-# time rather than a confusing AWS API error at apply time.
+# secure-default policy to the file system.
 resource "aws_s3files_file_system_policy" "this" {
   count = var.create && var.create_file_system_policy ? 1 : 0
 
   region = var.region
 
   file_system_id = aws_s3files_file_system.this[0].id
-  # jsonencode(jsondecode(...)) normalises any caller-supplied JSON to the same
-  # compact canonical form that the AWS API returns on reads.  Without this
-  # round-trip, pretty-printed or differently-ordered policy strings cause a
-  # perpetual diff on every subsequent plan even though the policy has not
-  # changed.  data.aws_iam_policy_document already emits canonical JSON so the
-  # auto-generated path needs no normalisation.
+
   policy = var.file_system_policy != null ? var.file_system_policy : data.aws_iam_policy_document.this[0].json
 }
 
