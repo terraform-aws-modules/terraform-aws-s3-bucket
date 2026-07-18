@@ -143,7 +143,7 @@ module "simple_bucket" {
 module "simple_account_regional_bucket" {
   source = "../../"
 
-  bucket           = format("simple-%s-%s-an", data.aws_caller_identity.current.account_id, data.aws_region.current.name)
+  bucket           = format("simple-%s-%s-an", data.aws_caller_identity.current.account_id, data.aws_region.current.region)
   bucket_namespace = "account-regional"
 
   force_destroy = true
