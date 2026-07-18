@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.15.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.0...v5.15.1) (2026-07-18)
+
+### Bug Fixes
+
+* Replace deprecated data.aws_region.current.name with .region in example ([#402](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/402)) ([d2f5642](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/d2f564255b22b7467550ed5bab189e571d7b9fb1))
+
 ## [5.15.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.14.1...v5.15.0) (2026-07-18)
 
 ### Features
