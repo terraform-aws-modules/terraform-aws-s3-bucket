@@ -14,7 +14,7 @@ locals {
 
   create_bucket_acl = (var.acl != null && var.acl != "null") || length(local.grants) > 0
 
-  attach_policy = var.attach_require_latest_tls_policy || var.attach_access_log_delivery_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_cloudtrail_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_deny_ssec_encrypted_object_uploads || var.attach_policy || var.attach_waf_log_delivery_policy
+  attach_policy = var.attach_require_latest_tls_policy || var.attach_access_log_delivery_policy || var.attach_elb_log_delivery_policy || var.attach_lb_log_delivery_policy || var.attach_cloudtrail_log_delivery_policy || var.attach_deny_insecure_transport_policy || var.attach_inventory_destination_policy || var.attach_analytics_destination_policy || var.attach_deny_incorrect_encryption_headers || var.attach_deny_incorrect_kms_key_sse || var.attach_deny_unencrypted_object_uploads || var.attach_deny_ssec_encrypted_object_uploads || var.attach_policy || var.attach_waf_log_delivery_policy
 
   # Placeholders in the policy document to be replaced with the actual values
   policy_placeholders = {
@@ -1300,7 +1300,7 @@ resource "aws_s3_bucket_inventory" "this" {
 # Inventory and analytics destination bucket requires a bucket policy to allow source to PutObjects
 # https://docs.aws.amazon.com/AmazonS3/latest/userguide/example-bucket-policies.html#example-bucket-policies-use-case-9
 data "aws_iam_policy_document" "inventory_and_analytics_destination_policy" {
-  count = local.create_bucket && !var.is_directory_bucket && var.attach_inventory_destination_policy || var.attach_analytics_destination_policy ? 1 : 0
+  count = local.create_bucket && !var.is_directory_bucket && (var.attach_inventory_destination_policy || var.attach_analytics_destination_policy) ? 1 : 0
 
   statement {
     sid    = "destinationInventoryAndAnalyticsPolicy"
