@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.15.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.14.1...v5.15.0) (2026-07-18)
+
+### Features
+
+* Expose bucket_namespace output (References [#390](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/390)) ([#395](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/395)) ([0645a50](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/0645a50559ccd7c69033cd86eef4989e6272a6af))
+
 ## [5.14.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.14.0...v5.14.1) (2026-06-23)
 
 ### Bug Fixes
