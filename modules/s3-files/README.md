@@ -11,7 +11,7 @@ This submodule creates:
 
 ## Architecture
 
-The submodule is intentionally **decoupled** from the root `terraform-aws-s3-bucket` module.  It accepts the ARN of an _existing_ S3 bucket via `s3_uri` rather than creating one itself, so teams can compose it with any bucket provisioning approach.
+The submodule is intentionally **decoupled** from the root `terraform-aws-s3-bucket` module.  It accepts the ARN of an _existing_ S3 bucket via `bucket_arn` rather than creating one itself, so teams can compose it with any bucket provisioning approach.
 
 ### Prerequisites
 
@@ -51,7 +51,7 @@ Minimum viable configuration — creates one mount target per subnet with a secu
 module "s3_files" {
   source = "terraform-aws-modules/s3-bucket/aws//modules/s3-files"
 
-  s3_uri   = "arn:aws:s3:::my-versioned-bucket"
+  bucket_arn = "arn:aws:s3:::my-versioned-bucket"
   role_arn = aws_iam_role.s3_files.arn
 
   vpc_id     = "vpc-0a1b2c3d4e5f"
@@ -73,7 +73,7 @@ Pin static IPv4 addresses to specific mount targets and provide a fully custom r
 module "s3_files" {
   source = "terraform-aws-modules/s3-bucket/aws//modules/s3-files"
 
-  s3_uri   = "arn:aws:s3:::my-versioned-bucket"
+  bucket_arn = "arn:aws:s3:::my-versioned-bucket"
   role_arn = aws_iam_role.s3_files.arn
 
   vpc_id     = "vpc-0a1b2c3d4e5f"
@@ -118,7 +118,7 @@ Access points give each NFS client an isolated POSIX identity and, optionally, a
 module "s3_files" {
   source = "terraform-aws-modules/s3-bucket/aws//modules/s3-files"
 
-  s3_uri   = "arn:aws:s3:::my-versioned-bucket"
+  bucket_arn = "arn:aws:s3:::my-versioned-bucket"
   role_arn = aws_iam_role.s3_files.arn
 
   vpc_id             = "vpc-0a1b2c3d4e5f"

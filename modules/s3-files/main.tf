@@ -1,16 +1,6 @@
-
-locals {
-  subnet_ids = var.subnet_ids
-}
-
-# The central S3 Files file system resource.  A single file system is created
-# per invocation of this module; mount targets (one per subnet) are managed
-# separately below.
 resource "aws_s3files_file_system" "this" {
   count = var.create ? 1 : 0
 
-  # Pass through the provider region only when the caller explicitly sets it;
-  # otherwise the provider's configured region is used automatically.
   region = var.region
 
   bucket                = var.bucket_arn
@@ -22,37 +12,18 @@ resource "aws_s3files_file_system" "this" {
   tags = var.tags
 }
 
-# One mount target is created per subnet entry, enabling multi-AZ deployments
-# from a single module invocation.  Using count with an index into local.subnet_ids
-# (rather than for_each) keeps the resource address stable when subnets are
-# reordered but preserves Terraform's predictable destroy-before-create ordering.
-#
-# Per-subnet IP addresses are looked up from the input maps; try() gracefully
-# falls back to null (AWS-assigned) when no explicit address is specified for a
-# particular subnet.
 resource "aws_s3files_mount_target" "this" {
-  count = var.create ? length(local.subnet_ids) : 0
+  count = var.create ? length(var.subnet_ids) : 0
 
   region = var.region
 
   file_system_id  = aws_s3files_file_system.this[0].id
-  subnet_id       = local.subnet_ids[count.index]
+  subnet_id       = var.subnet_ids[count.index]
   ip_address_type = var.ip_address_type
-  ipv4_address    = try(var.mount_target_ipv4_addresses[local.subnet_ids[count.index]], null)
-  ipv6_address    = try(var.mount_target_ipv6_addresses[local.subnet_ids[count.index]], null)
+  ipv4_address    = try(var.mount_target_ipv4_addresses[var.subnet_ids[count.index]], null)
+  ipv6_address    = try(var.mount_target_ipv6_addresses[var.subnet_ids[count.index]], null)
   security_groups = var.security_group_ids
 }
-
-# ---------------------------------------------------------------------------
-# Default file system policy (auto-generated when file_system_policy is null)
-# ---------------------------------------------------------------------------
-# These three data sources are only evaluated when a custom policy is NOT
-# supplied AND create_file_system_policy = true.  They build a secure-by-default
-# policy that:
-#   • grants s3files:ClientMount to the account root principal only
-#   • restricts access to requests originating from the declared VPC
-# This ensures NFS mounts are impossible from outside the VPC boundary even if
-# the caller omits an explicit policy.
 
 data "aws_partition" "this" {
   count = var.create && var.create_file_system_policy && var.file_system_policy == null ? 1 : 0
@@ -71,8 +42,6 @@ data "aws_iam_policy_document" "this" {
 
     actions = ["s3files:ClientMount"]
 
-    # Scope to the account root so that fine-grained permissions can be
-    # delegated through IAM identity policies attached to specific roles/users.
     principals {
       type = "AWS"
       identifiers = [
@@ -82,9 +51,6 @@ data "aws_iam_policy_document" "this" {
 
     resources = ["*"]
 
-    # The aws:SourceVpc condition is the primary network-layer guard: it prevents
-    # mount requests that do not originate from inside the declared VPC, even if
-    # an identity policy would otherwise permit them.
     dynamic "condition" {
       for_each = var.vpc_id != null ? [var.vpc_id] : []
 
@@ -97,10 +63,6 @@ data "aws_iam_policy_document" "this" {
   }
 }
 
-# One access point per entry in var.access_points.  Access points allow
-# per-client path and POSIX identity isolation on top of the shared file system.
-# All fields except file_system_id are optional; dynamic blocks are skipped
-# when the corresponding key is absent from the entry map.
 resource "aws_s3files_access_point" "this" {
   for_each = var.create ? var.access_points : {}
 
@@ -135,8 +97,6 @@ resource "aws_s3files_access_point" "this" {
   }
 }
 
-# Attaches either the caller-supplied policy JSON or the auto-generated
-# secure-default policy to the file system.
 resource "aws_s3files_file_system_policy" "this" {
   count = var.create && var.create_file_system_policy ? 1 : 0
 
