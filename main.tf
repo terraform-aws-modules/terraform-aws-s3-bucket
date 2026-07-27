@@ -417,7 +417,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "this" {
-  count = local.create_bucket && var.object_lock_enabled && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
+  count = local.create_bucket && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
 
   region = var.region
 
@@ -432,6 +432,9 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
       years = try(var.object_lock_configuration.rule.default_retention.years, null)
     }
   }
+
+  # Must have bucket versioning enabled first
+  depends_on = [aws_s3_bucket_versioning.this]
 }
 
 resource "aws_s3_bucket_replication_configuration" "this" {
