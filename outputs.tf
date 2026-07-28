@@ -18,6 +18,11 @@ output "s3_bucket_bucket_regional_domain_name" {
   value       = try(aws_s3_bucket.this[0].bucket_regional_domain_name, "")
 }
 
+output "s3_bucket_bucket_namespace" {
+  description = "The namespace of the bucket."
+  value       = try(aws_s3_bucket.this[0].bucket_namespace, null)
+}
+
 output "s3_bucket_hosted_zone_id" {
   description = "The Route 53 Hosted Zone ID for this bucket's region."
   value       = try(aws_s3_bucket.this[0].hosted_zone_id, "")

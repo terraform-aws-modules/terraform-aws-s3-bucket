@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.15.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.1...v5.15.2) (2026-07-28)
+
+### Bug Fixes
+
+* Correctly guard analytics/inventory destination policy ([#401](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/401)) ([84eac6c](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/84eac6ce110eddcd742cdfc2bccd344b3b802288))
+
+## [5.15.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.0...v5.15.1) (2026-07-18)
+
+### Bug Fixes
+
+* Replace deprecated data.aws_region.current.name with .region in example ([#402](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/402)) ([d2f5642](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/d2f564255b22b7467550ed5bab189e571d7b9fb1))
+
+## [5.15.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.14.1...v5.15.0) (2026-07-18)
+
+### Features
+
+* Expose bucket_namespace output (References [#390](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/390)) ([#395](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/395)) ([0645a50](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/0645a50559ccd7c69033cd86eef4989e6272a6af))
+
 ## [5.14.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.14.0...v5.14.1) (2026-06-23)
 
 ### Bug Fixes
