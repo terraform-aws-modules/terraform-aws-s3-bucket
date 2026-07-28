@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.15.3](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.2...v5.15.3) (2026-07-28)
+
+### Bug Fixes
+
+* Wildcard region in WAF/Log delivery policy to support CloudFront ([#397](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/397)) ([9e8dd5e](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/9e8dd5ed3206532eb85df2e3e6a1f04201d16726))
+
 ## [5.15.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.1...v5.15.2) (2026-07-28)
 
 ### Bug Fixes
