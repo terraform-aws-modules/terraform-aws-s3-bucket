@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.15.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.1...v5.15.2) (2026-07-28)
+
+### Bug Fixes
+
+* Correctly guard analytics/inventory destination policy ([#401](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/401)) ([84eac6c](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/84eac6ce110eddcd742cdfc2bccd344b3b802288))
+
 ## [5.15.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.0...v5.15.1) (2026-07-18)
 
 ### Bug Fixes
