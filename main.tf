@@ -1384,6 +1384,17 @@ resource "aws_s3_bucket_analytics_configuration" "this" {
   }
 }
 
+resource "aws_s3_bucket_abac" "this" {
+  count = local.create_bucket && length(keys(var.abac_status)) > 0 && !var.is_directory_bucket ? 1 : 0
+
+  bucket                = aws_s3_bucket.this[0].id
+  expected_bucket_owner = var.expected_bucket_owner
+
+  abac_status {
+    status = try(var.abac_status["status"], "Enabled")
+  }
+}
+
 resource "aws_s3_bucket_metadata_configuration" "this" {
   count = local.create_bucket && var.create_metadata_configuration ? 1 : 0
 
