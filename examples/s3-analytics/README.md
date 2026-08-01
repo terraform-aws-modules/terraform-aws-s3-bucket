@@ -8,7 +8,7 @@ Please check [complete example](https://github.com/terraform-aws-modules/terrafo
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
@@ -16,14 +16,14 @@ Please check [complete example](https://github.com/terraform-aws-modules/terrafo
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.42 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
 
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_analytics_and_inventory_destination_bucket"></a> [analytics\_and\_inventory\_destination\_bucket](#module\_analytics\_and\_inventory\_destination\_bucket) | ../../ | n/a |
 | <a name="module_analytics_configuration_bucket"></a> [analytics\_configuration\_bucket](#module\_analytics\_configuration\_bucket) | ../../ | n/a |
 | <a name="module_analytics_destination_bucket"></a> [analytics\_destination\_bucket](#module\_analytics\_destination\_bucket) | ../../ | n/a |
@@ -32,7 +32,7 @@ Please check [complete example](https://github.com/terraform-aws-modules/terrafo
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 
@@ -43,7 +43,7 @@ No inputs.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
 | <a name="output_s3_bucket_bucket_domain_name"></a> [s3\_bucket\_bucket\_domain\_name](#output\_s3\_bucket\_bucket\_domain\_name) | The bucket domain name. Will be of format bucketname.s3.amazonaws.com. |
 | <a name="output_s3_bucket_bucket_regional_domain_name"></a> [s3\_bucket\_bucket\_regional\_domain\_name](#output\_s3\_bucket\_bucket\_regional\_domain\_name) | The bucket region-specific domain name. The bucket domain name including the region name, please refer here for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoint when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL. |
