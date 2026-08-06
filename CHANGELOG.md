@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.15.4](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.3...v5.15.4) (2026-08-06)
+
+### Bug Fixes
+
+* Update GitHub Actions and pre-commit hook versions ([#404](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/404)) ([58a531d](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/58a531d293ab0fe3a06307f9c40c1bed7ef1239f))
+
 ## [5.15.3](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.2...v5.15.3) (2026-07-28)
 
 ### Bug Fixes
