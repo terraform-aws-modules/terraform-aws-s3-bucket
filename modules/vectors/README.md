@@ -92,14 +92,14 @@ module "vector_bucket" {
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.42 |
 
 ## Modules
@@ -109,7 +109,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_s3vectors_index.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3vectors_index) | resource |
 | [aws_s3vectors_vector_bucket.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3vectors_vector_bucket) | resource |
 | [aws_s3vectors_vector_bucket_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3vectors_vector_bucket_policy) | resource |
@@ -117,7 +117,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_create"></a> [create](#input\_create) | Whether to create the S3 Vectors vector bucket | `bool` | `true` | no |
 | <a name="input_create_policy"></a> [create\_policy](#input\_create\_policy) | Whether to create the S3 Vectors vector bucket policy | `bool` | `false` | no |
 | <a name="input_encryption_configuration"></a> [encryption\_configuration](#input\_encryption\_configuration) | Encryption configuration for the vector bucket | <pre>object({<br/>    sse_type    = string<br/>    kms_key_arn = optional(string)<br/>  })</pre> | `null` | no |
@@ -131,7 +131,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_creation_time"></a> [creation\_time](#output\_creation\_time) | Date and time when the vector bucket was created |
 | <a name="output_index_arns"></a> [index\_arns](#output\_index\_arns) | ARNs of the vector indexes |
 | <a name="output_index_creation_times"></a> [index\_creation\_times](#output\_index\_creation\_times) | Date and time when the vector indexes were created |
