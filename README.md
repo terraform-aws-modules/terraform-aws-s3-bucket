@@ -21,6 +21,7 @@ These features of S3 bucket configurations are supported:
 - S3 Directory Bucket
 - S3 Table Bucket
 - S3 Vectors
+- Amazon S3 Files support via an isolated submodule
 
 ## Usage
 
@@ -101,6 +102,10 @@ module "s3_bucket_for_waf_logs" {
 ### Bucket with a custom policy attached
 
 When you need to attach a custom policy to the bucket, you can use the `policy` argument. To keep bucket policy with correct S3 bucket and AWS account properties, you can use the placeholders `_S3_BUCKET_ID_`, `_S3_BUCKET_ARN_`, and `_AWS_ACCOUNT_ID_` in the policy document. Those values will be replaced with the actual values during the policy attachment. This is especially useful when using bucket prefixes.
+
+### S3 Files
+
+Amazon S3 Files can be provisioned using the `modules/s3-files` submodule. Please refer to [the submodule's README](modules/s3-files/README.md) for usage examples and detailed configuration.
 
 ## Conditional creation
 
