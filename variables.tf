@@ -457,13 +457,13 @@ variable "attach_public_policy" {
 }
 
 variable "attach_elb_log_delivery_policy" {
-  description = "Controls if S3 bucket should have ELB log delivery policy attached"
+  description = "Controls if S3 bucket should have the log delivery policy for Application and Classic Load Balancer access logs attached"
   type        = bool
   default     = false
 }
 
 variable "attach_lb_log_delivery_policy" {
-  description = "Controls if S3 bucket should have ALB/NLB log delivery policy attached"
+  description = "Controls if S3 bucket should have the log delivery policy for Network Load Balancer access logs attached"
   type        = bool
   default     = false
 }
