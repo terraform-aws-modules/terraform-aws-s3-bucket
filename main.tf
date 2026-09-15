@@ -1549,3 +1549,528 @@ resource "aws_s3_bucket_metadata_configuration" "this" {
     }
   }
 }
+
+################################################################################
+# File System(s)
+################################################################################
+
+locals {
+  # S3 Files supports general purpose buckets only
+  file_systems = { for k, v in var.file_systems : k => v if local.create_bucket && !var.is_directory_bucket && v.create }
+}
+
+resource "aws_s3files_file_system" "this" {
+  for_each = local.file_systems
+
+  region = var.region
+
+  bucket                = aws_s3_bucket.this[0].arn
+  prefix                = each.value.prefix
+  role_arn              = each.value.create_iam_role ? aws_iam_role.file_system[each.key].arn : each.value.iam_role_arn
+  kms_key_id            = each.value.kms_key_id
+  accept_bucket_warning = each.value.accept_bucket_warning
+
+  tags = merge(
+    var.tags,
+    { Name = coalesce(each.value.name, each.key) },
+    each.value.tags
+  )
+
+  dynamic "timeouts" {
+    for_each = each.value.timeouts != null ? [each.value.timeouts] : []
+
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+    }
+  }
+
+  depends_on = [
+    # S3 Files requires versioning, and the file system must be deleted before versioning is suspended
+    aws_s3_bucket_versioning.this,
+    # The role has to be able to reach the bucket for as long as the file system exists
+    aws_iam_role_policy.file_system,
+  ]
+}
+
+################################################################################
+# File System IAM Role(s)
+################################################################################
+
+locals {
+  file_system_iam_roles = { for k, v in local.file_systems : k => v if v.create_iam_role }
+}
+
+data "aws_iam_policy_document" "file_system_assume_role" {
+  count = length(local.file_system_iam_roles) > 0 ? 1 : 0
+
+  statement {
+    sid     = "S3FilesAssumeRole"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["elasticfilesystem.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+
+    # The role exists before its file system, so the trust cannot name one file system
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:${data.aws_partition.current.partition}:s3files:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:file-system/*"]
+    }
+  }
+}
+
+resource "aws_iam_role" "file_system" {
+  for_each = local.file_system_iam_roles
+
+  name        = each.value.iam_role_use_name_prefix ? null : coalesce(each.value.iam_role_name, "${coalesce(each.value.name, each.key)}-s3files")
+  name_prefix = each.value.iam_role_use_name_prefix ? "${coalesce(each.value.iam_role_name, "${coalesce(each.value.name, each.key)}-s3files")}-" : null
+  path        = each.value.iam_role_path
+  description = each.value.iam_role_description
+
+  assume_role_policy    = data.aws_iam_policy_document.file_system_assume_role[0].json
+  permissions_boundary  = each.value.iam_role_permissions_boundary
+  force_detach_policies = true
+
+  tags = merge(var.tags, each.value.iam_role_tags)
+}
+
+data "aws_iam_policy_document" "file_system" {
+  for_each = local.file_system_iam_roles
+
+  statement {
+    sid = "S3BucketPermissions"
+    actions = [
+      "s3:ListBucket",
+      "s3:ListBucketVersions",
+    ]
+    resources = [aws_s3_bucket.this[0].arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+
+  statement {
+    sid = "S3ObjectPermissions"
+    actions = [
+      "s3:AbortMultipartUpload",
+      "s3:DeleteObject*",
+      "s3:GetObject*",
+      "s3:List*",
+      "s3:PutObject*",
+    ]
+    resources = ["${aws_s3_bucket.this[0].arn}/${each.value.prefix != null ? each.value.prefix : ""}*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+
+  statement {
+    sid = "UseKmsKeyWithS3Files"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+      "kms:ReEncryptFrom",
+      "kms:ReEncryptTo",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:kms:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values   = ["s3.${data.aws_region.current.region}.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:s3:arn"
+      values = [
+        aws_s3_bucket.this[0].arn,
+        "${aws_s3_bucket.this[0].arn}/${each.value.prefix != null ? each.value.prefix : ""}*",
+      ]
+    }
+  }
+
+  # S3 Files manages its own EventBridge rule to detect changes in the bucket
+  statement {
+    sid = "EventBridgeManage"
+    actions = [
+      "events:DeleteRule",
+      "events:DisableRule",
+      "events:EnableRule",
+      "events:PutRule",
+      "events:PutTargets",
+      "events:RemoveTargets",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:events:*:*:rule/DO-NOT-DELETE-S3-Files*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "events:ManagedBy"
+      values   = ["elasticfilesystem.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid = "EventBridgeRead"
+    actions = [
+      "events:DescribeRule",
+      "events:ListRuleNamesByTarget",
+      "events:ListRules",
+      "events:ListTargetsByRule",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:events:*:*:rule/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "file_system" {
+  for_each = local.file_system_iam_roles
+
+  name   = "S3Files"
+  role   = aws_iam_role.file_system[each.key].id
+  policy = data.aws_iam_policy_document.file_system[each.key].json
+}
+
+################################################################################
+# File System Mount Target(s)
+################################################################################
+
+locals {
+  file_system_mount_targets = {
+    for mt in flatten([
+      for fs_key, fs in local.file_systems : [
+        for mt_key, mt in fs.mount_targets : merge(mt, {
+          file_system_key  = fs_key
+          mount_target_key = mt_key
+          security_groups  = fs.security_groups
+        })
+      ]
+    ]) : "${mt.file_system_key}/${mt.mount_target_key}" => mt
+  }
+}
+
+resource "aws_s3files_mount_target" "this" {
+  for_each = local.file_system_mount_targets
+
+  region = var.region
+
+  file_system_id  = aws_s3files_file_system.this[each.value.file_system_key].id
+  subnet_id       = each.value.subnet_id
+  ip_address_type = each.value.ip_address_type
+  ipv4_address    = each.value.ipv4_address
+  ipv6_address    = each.value.ipv6_address
+  security_groups = each.value.security_groups != null ? each.value.security_groups : (local.create_file_system_security_group ? [aws_security_group.file_system[0].id] : null)
+}
+
+################################################################################
+# File System Security Group
+################################################################################
+
+locals {
+  # Only created when at least one mount target relies on it rather than on its file system's own groups
+  create_file_system_security_group = var.create_file_system_security_group && anytrue([for mt in values(local.file_system_mount_targets) : mt.security_groups == null])
+
+  file_system_security_group_name = var.file_system_security_group_name != null ? var.file_system_security_group_name : "${try(aws_s3_bucket.this[0].id, "")}-s3files"
+}
+
+resource "aws_security_group" "file_system" {
+  count = local.create_file_system_security_group ? 1 : 0
+
+  region = var.region
+
+  name        = var.file_system_security_group_use_name_prefix ? null : local.file_system_security_group_name
+  name_prefix = var.file_system_security_group_use_name_prefix ? "${local.file_system_security_group_name}-" : null
+  description = var.file_system_security_group_description
+
+  revoke_rules_on_delete = true
+  vpc_id                 = var.file_system_security_group_vpc_id
+
+  tags = merge(
+    var.tags,
+    { Name = local.file_system_security_group_name },
+    var.file_system_security_group_tags
+  )
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "file_system" {
+  for_each = { for k, v in var.file_system_security_group_ingress_rules : k => v if local.create_file_system_security_group }
+
+  region = var.region
+
+  cidr_ipv4                    = each.value.cidr_ipv4
+  cidr_ipv6                    = each.value.cidr_ipv6
+  description                  = each.value.description
+  from_port                    = each.value.from_port
+  ip_protocol                  = each.value.ip_protocol
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.referenced_security_group_id == "self" ? aws_security_group.file_system[0].id : each.value.referenced_security_group_id
+  security_group_id            = aws_security_group.file_system[0].id
+  to_port                      = each.value.to_port
+
+  tags = merge(
+    var.tags,
+    { Name = coalesce(each.value.name, "${local.file_system_security_group_name}-${each.key}") },
+    each.value.tags
+  )
+}
+
+resource "aws_vpc_security_group_egress_rule" "file_system" {
+  for_each = { for k, v in var.file_system_security_group_egress_rules : k => v if local.create_file_system_security_group }
+
+  region = var.region
+
+  cidr_ipv4                    = each.value.cidr_ipv4
+  cidr_ipv6                    = each.value.cidr_ipv6
+  description                  = each.value.description
+  from_port                    = each.value.from_port
+  ip_protocol                  = each.value.ip_protocol
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.referenced_security_group_id == "self" ? aws_security_group.file_system[0].id : each.value.referenced_security_group_id
+  security_group_id            = aws_security_group.file_system[0].id
+  to_port                      = each.value.to_port
+
+  tags = merge(
+    var.tags,
+    { Name = coalesce(each.value.name, "${local.file_system_security_group_name}-${each.key}") },
+    each.value.tags
+  )
+}
+
+################################################################################
+# File System Access Point(s)
+################################################################################
+
+locals {
+  file_system_access_points = {
+    for ap in flatten([
+      for fs_key, fs in local.file_systems : [
+        for ap_key, ap in fs.access_points : merge(ap, {
+          file_system_key  = fs_key
+          access_point_key = ap_key
+        })
+      ]
+    ]) : "${ap.file_system_key}/${ap.access_point_key}" => ap
+  }
+}
+
+resource "aws_s3files_access_point" "this" {
+  for_each = local.file_system_access_points
+
+  region = var.region
+
+  file_system_id = aws_s3files_file_system.this[each.value.file_system_key].id
+
+  dynamic "posix_user" {
+    for_each = each.value.posix_user != null ? [each.value.posix_user] : []
+
+    content {
+      gid            = posix_user.value.gid
+      uid            = posix_user.value.uid
+      secondary_gids = posix_user.value.secondary_gids
+    }
+  }
+
+  dynamic "root_directory" {
+    for_each = each.value.root_directory != null ? [each.value.root_directory] : []
+
+    content {
+      path = root_directory.value.path
+
+      dynamic "creation_permissions" {
+        for_each = root_directory.value.creation_permissions != null ? [root_directory.value.creation_permissions] : []
+
+        content {
+          owner_gid   = creation_permissions.value.owner_gid
+          owner_uid   = creation_permissions.value.owner_uid
+          permissions = creation_permissions.value.permissions
+        }
+      }
+    }
+  }
+
+  tags = merge(
+    var.tags,
+    { Name = coalesce(each.value.name, each.value.access_point_key) },
+    each.value.tags
+  )
+}
+
+################################################################################
+# File System Policy
+################################################################################
+
+locals {
+  # Actions each access level grants through an access point
+  file_system_access_point_actions = {
+    read       = ["s3files:ClientMount"]
+    read_write = ["s3files:ClientMount", "s3files:ClientWrite"]
+  }
+
+  # One entry per access point and access level that names principals
+  file_system_access_point_grants = flatten([
+    for ap_key, ap in local.file_system_access_points : [
+      for level, principals in { read = ap.read_access_arns, read_write = ap.read_write_access_arns } : {
+        file_system_key               = ap.file_system_key
+        access_point                  = ap_key
+        actions                       = local.file_system_access_point_actions[level]
+        principals                    = principals
+      } if try(length(principals), 0) > 0
+    ]
+  ])
+
+  # A policy exists whenever there is something to put in it, so principals listed on an access point are never silently ignored
+  file_system_policies = {
+    for k, v in local.file_systems : k => v
+    if try(length(v.policy_statements), 0) > 0 || anytrue([for g in local.file_system_access_point_grants : g.file_system_key == k])
+  }
+}
+
+data "aws_iam_policy_document" "file_system_policy" {
+  for_each = local.file_system_policies
+
+  dynamic "statement" {
+    for_each = each.value.policy_statements != null ? each.value.policy_statements : []
+
+    content {
+      sid           = statement.value.sid
+      actions       = statement.value.actions
+      not_actions   = statement.value.not_actions
+      effect        = statement.value.effect
+      resources     = statement.value.resources != null ? statement.value.resources : [aws_s3files_file_system.this[each.key].arn]
+      not_resources = statement.value.not_resources
+
+      dynamic "principals" {
+        for_each = statement.value.principals != null ? statement.value.principals : []
+
+        content {
+          type        = principals.value.type
+          identifiers = principals.value.identifiers
+        }
+      }
+
+      dynamic "not_principals" {
+        for_each = statement.value.not_principals != null ? statement.value.not_principals : []
+
+        content {
+          type        = not_principals.value.type
+          identifiers = not_principals.value.identifiers
+        }
+      }
+
+      dynamic "condition" {
+        for_each = statement.value.conditions != null ? statement.value.conditions : []
+
+        content {
+          test     = condition.value.test
+          values   = condition.value.values
+          variable = condition.value.variable
+        }
+      }
+    }
+  }
+
+  # Allow each listed principal through its access point
+  dynamic "statement" {
+    for_each = [for g in local.file_system_access_point_grants : g if g.file_system_key == each.key]
+
+    content {
+      effect    = "Allow"
+      actions   = statement.value.actions
+      resources = [aws_s3files_file_system.this[each.key].arn]
+
+      principals {
+        type        = "AWS"
+        identifiers = statement.value.principals
+      }
+
+      condition {
+        test     = "StringEquals"
+        variable = "s3files:AccessPointArn"
+        values   = [aws_s3files_access_point.this[statement.value.access_point].arn]
+      }
+    }
+  }
+
+  # Deny each listed principal through every other access point. An allow alone does not restrict,
+  # because allows are additive across identity and resource policies
+  dynamic "statement" {
+    for_each = {
+      for pair in flatten([
+        for g in local.file_system_access_point_grants : [
+          for principal in g.principals : { principal = principal, access_point = g.access_point }
+        ] if g.file_system_key == each.key
+      ]) : pair.principal => pair.access_point...
+    }
+
+    content {
+      effect    = "Deny"
+      actions   = ["s3files:Client*"]
+      resources = [aws_s3files_file_system.this[each.key].arn]
+
+      principals {
+        type        = "AWS"
+        identifiers = [statement.key]
+      }
+
+      condition {
+        test     = "StringNotEquals"
+        variable = "s3files:AccessPointArn"
+        values   = [for ap in distinct(statement.value) : aws_s3files_access_point.this[ap].arn]
+      }
+    }
+  }
+}
+
+resource "aws_s3files_file_system_policy" "this" {
+  for_each = local.file_system_policies
+
+  region = var.region
+
+  file_system_id = aws_s3files_file_system.this[each.key].id
+  policy         = data.aws_iam_policy_document.file_system_policy[each.key].json
+}
+
+################################################################################
+# File System Synchronization Configuration(s)
+################################################################################
+
+resource "aws_s3files_synchronization_configuration" "this" {
+  for_each = { for k, v in local.file_systems : k => v.synchronization_configuration if v.synchronization_configuration != null }
+
+  region = var.region
+
+  file_system_id = aws_s3files_file_system.this[each.key].id
+
+  dynamic "import_data_rule" {
+    for_each = each.value.import_data_rule
+
+    content {
+      prefix         = import_data_rule.value.prefix
+      size_less_than = import_data_rule.value.size_less_than
+      trigger        = import_data_rule.value.trigger
+    }
+  }
+
+  expiration_data_rule {
+    days_after_last_access = each.value.expiration_data_rule.days_after_last_access
+  }
+}

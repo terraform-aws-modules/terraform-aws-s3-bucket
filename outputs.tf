@@ -103,3 +103,37 @@ output "s3_bucket_policy" {
   description = "The policy of the bucket, if the bucket is configured with a policy"
   value       = try(aws_s3_bucket_policy.this[0].policy, null)
 }
+
+################################################################################
+# File System(s)
+################################################################################
+
+output "file_systems" {
+  description = "Map of file systems created and their attributes"
+  value       = aws_s3files_file_system.this
+}
+
+output "file_system_iam_roles" {
+  description = "Map of file system IAM roles created and their attributes"
+  value       = aws_iam_role.file_system
+}
+
+output "file_system_mount_targets" {
+  description = "Map of file system mount targets created and their attributes, keyed `<file system>/<mount target>`"
+  value       = aws_s3files_mount_target.this
+}
+
+output "file_system_security_group_arn" {
+  description = "ARN of the security group shared by the file system mount targets"
+  value       = try(aws_security_group.file_system[0].arn, null)
+}
+
+output "file_system_security_group_id" {
+  description = "ID of the security group shared by the file system mount targets"
+  value       = try(aws_security_group.file_system[0].id, null)
+}
+
+output "file_system_access_points" {
+  description = "Map of file system access points created and their attributes, keyed `<file system>/<access point>`"
+  value       = aws_s3files_access_point.this
+}
