@@ -1,10 +1,6 @@
 provider "aws" {
   region = local.region
 
-  # Make it faster by skipping something
-  skip_metadata_api_check     = true
-  skip_region_validation      = true
-  skip_credentials_validation = true
 
   default_tags {
     tags = {
@@ -14,14 +10,31 @@ provider "aws" {
 }
 
 locals {
+  name   = "ex-${basename(path.cwd)}"
   region = "eu-west-1"
+
+  tags = {
+    Name       = local.name
+    Example    = local.name
+    Repository = "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
+  }
 }
+
+################################################################################
+# Objects
+################################################################################
 
 module "object" {
   source = "../../modules/object"
 
+  region = local.region
+
   bucket = module.s3_bucket.s3_bucket_id
-  key    = "${random_pet.this.id}-local"
+  key    = "${local.name}-local"
+
+  # Triggers an update when the file content changes, without relying on etag, which is not a
+  # content hash for multipart or SSE-KMS objects
+  source_hash = filemd5("${path.module}/versions.tf")
 
   file_source = "README.md"
   #  content = file("README.md")
@@ -32,16 +45,38 @@ module "object" {
   }
 }
 
+# content_base64 is mutually exclusive with content, so it gets its own object
+module "object_base64" {
+  source = "../../modules/object"
+
+  bucket = module.s3_bucket.s3_bucket_id
+  key    = "${local.name}-base64"
+
+  content_base64 = base64encode("some-base64-encoded-content")
+
+  # etag is the MD5 of the object content and triggers an update when it changes. Use
+  # source_hash instead where the etag is not a content hash, such as multipart or SSE-KMS
+  etag = md5("some-base64-encoded-content")
+
+  # For example only
+  force_destroy = true
+
+  tags = local.tags
+}
+
 module "object_complete" {
   source = "../../modules/object"
 
   bucket = module.s3_bucket.s3_bucket_id
-  key    = "${random_pet.this.id}-complete"
+  key    = "${local.name}-complete"
+
+  bucket_key_enabled = true
 
   content = jsonencode({ data : "value" })
 
-  # acl           = "public-read"
   storage_class = "ONEZONE_IA"
+
+  # For example only
   force_destroy = true
 
   cache_control       = "public; max-age=1200"
@@ -57,29 +92,34 @@ module "object_complete" {
   }
 
   server_side_encryption = "aws:kms"
-  kms_key_id             = aws_kms_key.this.arn
+  kms_key_id             = module.kms.key_arn
+
+  tags = local.tags
 }
 
 module "object_locked" {
   source = "../../modules/object"
 
   bucket = module.s3_bucket_with_object_lock.s3_bucket_id
-  key    = "${random_pet.this.id}-locked"
+  key    = "${local.name}-locked"
 
   content = "some-content-locked-by-governance"
 
+  # For example only
   force_destroy = true
 
   object_lock_legal_hold_status = true # boolean or string ("ON" or "OFF")
   object_lock_mode              = "GOVERNANCE"
   object_lock_retain_until_date = formatdate("YYYY-MM-DD'T'hh:00:00Z", timeadd(timestamp(), "1h")) # some time in the future
+
+  tags = local.tags
 }
 
 module "object_with_override_default_tags" {
   source = "../../modules/object"
 
   bucket = module.s3_bucket.s3_bucket_id
-  key    = "${random_pet.this.id}-local-override-default-tags"
+  key    = "${local.name}-local-override-default-tags"
 
   override_default_tags = true
 
@@ -90,32 +130,47 @@ module "object_with_override_default_tags" {
   }
 }
 
-##################
-# Extra resources
-##################
-resource "random_pet" "this" {
-  length = 2
+################################################################################
+# Disabled
+################################################################################
+
+module "disabled" {
+  source = "../../modules/object"
+
+  create = false
 }
 
-resource "aws_kms_key" "this" {
+################################################################################
+# Supporting Resources
+################################################################################
+
+module "kms" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "~> 4.0"
+
   description             = "KMS key for S3 object"
   deletion_window_in_days = 7
+
+  tags = local.tags
 }
 
-#############
-# S3 buckets
-#############
 module "s3_bucket" {
   source = "../../"
 
-  bucket        = random_pet.this.id
+  bucket_prefix = "${local.name}-"
+
+  # For example only
   force_destroy = true
+
+  tags = local.tags
 }
 
 module "s3_bucket_with_object_lock" {
   source = "../../"
 
-  bucket        = "${random_pet.this.id}-with-object-lock"
+  bucket_prefix = "${local.name}-lock-"
+
+  # For example only
   force_destroy = true
 
   object_lock_enabled = true
@@ -127,4 +182,6 @@ module "s3_bucket_with_object_lock" {
       }
     }
   }
+
+  tags = local.tags
 }

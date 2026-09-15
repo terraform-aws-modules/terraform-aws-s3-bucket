@@ -7,9 +7,9 @@ Configuration in this directory creates S3 bucket objects with different configu
 To run this example you need to execute:
 
 ```bash
-$ terraform init
-$ terraform plan
-$ terraform apply
+terraform init
+terraform plan
+terraform apply
 ```
 
 Note that this example may create resources which cost money. Run `terraform destroy` when you don't need these resources.
@@ -21,20 +21,19 @@ Note that this example may create resources which cost money. Run `terraform des
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 
 ## Providers
 
-| Name | Version |
-| ---- | ------- |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.42 |
-| <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
+No providers.
 
 ## Modules
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
+| <a name="module_disabled"></a> [disabled](#module\_disabled) | ../../modules/object | n/a |
+| <a name="module_kms"></a> [kms](#module\_kms) | terraform-aws-modules/kms/aws | ~> 4.0 |
 | <a name="module_object"></a> [object](#module\_object) | ../../modules/object | n/a |
+| <a name="module_object_base64"></a> [object\_base64](#module\_object\_base64) | ../../modules/object | n/a |
 | <a name="module_object_complete"></a> [object\_complete](#module\_object\_complete) | ../../modules/object | n/a |
 | <a name="module_object_locked"></a> [object\_locked](#module\_object\_locked) | ../../modules/object | n/a |
 | <a name="module_object_with_override_default_tags"></a> [object\_with\_override\_default\_tags](#module\_object\_with\_override\_default\_tags) | ../../modules/object | n/a |
@@ -43,10 +42,7 @@ Note that this example may create resources which cost money. Run `terraform des
 
 ## Resources
 
-| Name | Type |
-| ---- | ---- |
-| [aws_kms_key.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
-| [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
+No resources.
 
 ## Inputs
 
@@ -56,9 +52,9 @@ No inputs.
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
-| <a name="output_s3_bucket_id"></a> [s3\_bucket\_id](#output\_s3\_bucket\_id) | The name of the bucket. |
-| <a name="output_s3_object_etag"></a> [s3\_object\_etag](#output\_s3\_object\_etag) | The ETag generated for the object (an MD5 sum of the object content). |
+| <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname |
+| <a name="output_s3_bucket_id"></a> [s3\_bucket\_id](#output\_s3\_bucket\_id) | The name of the bucket |
+| <a name="output_s3_object_etag"></a> [s3\_object\_etag](#output\_s3\_object\_etag) | The ETag generated for the object (an MD5 sum of the object content) |
 | <a name="output_s3_object_id"></a> [s3\_object\_id](#output\_s3\_object\_id) | The key of S3 object |
-| <a name="output_s3_object_version_id"></a> [s3\_object\_version\_id](#output\_s3\_object\_version\_id) | A unique version ID value for the object, if bucket versioning is enabled. |
+| <a name="output_s3_object_version_id"></a> [s3\_object\_version\_id](#output\_s3\_object\_version\_id) | A unique version ID value for the object, if bucket versioning is enabled |
 <!-- END_TF_DOCS -->

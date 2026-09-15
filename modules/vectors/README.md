@@ -1,6 +1,6 @@
-# S3 Vectors Vector Bucket Submodule
+# S3 Vectors
 
-Submodule to manage [Amazon S3 Vectors](https://aws.amazon.com/s3-vectors/) vector buckets, bucket policies, and vector indexes.
+Submodule to manage [Amazon S3 Vectors](https://aws.amazon.com/s3/features/vectors/) vector buckets, bucket policies, and vector indexes.
 
 Amazon S3 Vectors is a vector embedding storage service built into Amazon S3 that enables you to store, query, and manage vector embeddings at scale directly in S3.
 
@@ -122,9 +122,9 @@ No modules.
 | <a name="input_create_policy"></a> [create\_policy](#input\_create\_policy) | Whether to create the S3 Vectors vector bucket policy | `bool` | `false` | no |
 | <a name="input_encryption_configuration"></a> [encryption\_configuration](#input\_encryption\_configuration) | Encryption configuration for the vector bucket | <pre>object({<br/>    sse_type    = string<br/>    kms_key_arn = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Boolean that indicates all indexes and vectors should be deleted from the vector bucket when the vector bucket is destroyed | `bool` | `false` | no |
-| <a name="input_indexes"></a> [indexes](#input\_indexes) | A map of vector indexes to create in the vector bucket. Each key is an arbitrary index name used for resource naming. | <pre>map(object({<br/>    index_name      = string<br/>    dimension       = number<br/>    distance_metric = string<br/>    data_type       = optional(string, "float32")<br/>    tags            = optional(map(string), {})<br/>    encryption_configuration = optional(object({<br/>      sse_type    = string<br/>      kms_key_arn = optional(string)<br/>    }), null)<br/>    metadata_configuration = optional(object({<br/>      non_filterable_metadata_keys = list(string)<br/>    }), null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_indexes"></a> [indexes](#input\_indexes) | A map of vector indexes to create in the vector bucket. Each key is an arbitrary index name used for resource naming | <pre>map(object({<br/>    index_name      = string<br/>    dimension       = number<br/>    distance_metric = string<br/>    data_type       = optional(string, "float32")<br/>    tags            = optional(map(string), {})<br/>    encryption_configuration = optional(object({<br/>      sse_type    = string<br/>      kms_key_arn = optional(string)<br/>    }), null)<br/>    metadata_configuration = optional(object({<br/>      non_filterable_metadata_keys = list(string)<br/>    }), null)<br/>  }))</pre> | `{}` | no |
 | <a name="input_policy"></a> [policy](#input\_policy) | The policy document as a JSON string | `string` | `null` | no |
-| <a name="input_region"></a> [region](#input\_region) | Region where the vector bucket will be managed. Defaults to the region set in the provider configuration | `string` | `null` | no |
+| <a name="input_region"></a> [region](#input\_region) | Region where the vector bucket will be managed. Defaults to the Region set in the provider configuration | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the vector bucket | `map(string)` | `{}` | no |
 | <a name="input_vector_bucket_name"></a> [vector\_bucket\_name](#input\_vector\_bucket\_name) | Name of the S3 Vectors vector bucket | `string` | `null` | no |
 

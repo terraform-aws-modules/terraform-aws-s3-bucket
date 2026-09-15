@@ -34,13 +34,32 @@ locals {
     "_AWS_ACCOUNT_ID_", local.policy_placeholders["_AWS_ACCOUNT_ID_"]
   ) : ""
 
-  # Variables with type `any` should be jsonencode()'d when value is coming from Terragrunt
-  grants               = try(jsondecode(var.grant), var.grant)
-  cors_rules           = try(jsondecode(var.cors_rule), var.cors_rule)
-  lifecycle_rules      = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
-  intelligent_tiering  = try(jsondecode(var.intelligent_tiering), var.intelligent_tiering)
-  metric_configuration = try(jsondecode(var.metric_configuration), var.metric_configuration)
+  # A website configuration is only created when the caller sets something in it; an object
+  # with every attribute null is equivalent to not configuring a website at all.
+  has_website = anytrue([
+    try(var.website.index_document, null) != null,
+    try(var.website.error_document, null) != null,
+    try(var.website.redirect_all_requests_to, null) != null,
+    try(var.website.routing_rules, null) != null,
+  ])
+
+  # Presence is tested on the attributes themselves, never on their contents: a rule's
+  # destination is normally a computed bucket ARN, and wrapping this in try()/coalesce()
+  # makes the whole expression unknown, which breaks the `count` below at plan time.
+  has_replication   = var.replication_configuration.rule != null || var.replication_configuration.rules != null
+  replication_rules = var.replication_configuration.rule != null ? var.replication_configuration.rule : (var.replication_configuration.rules != null ? var.replication_configuration.rules : [])
+
+  grants              = var.grant
+  cors_rules          = var.cors_rule
+  intelligent_tiering = var.intelligent_tiering
+
+  # Still `any`, so still reachable as a JSON string from Terragrunt. The hatch goes when the
+  # variables are typed; see their declarations for why they are not typed yet.
 }
+
+################################################################################
+# Bucket
+################################################################################
 
 resource "aws_s3_bucket" "this" {
   count = local.create_bucket && !var.is_directory_bucket ? 1 : 0
@@ -74,36 +93,44 @@ resource "aws_s3_directory_bucket" "this" {
   tags = var.tags
 }
 
+################################################################################
+# Logging
+################################################################################
+
 resource "aws_s3_bucket_logging" "this" {
-  count = local.create_bucket && length(keys(var.logging)) > 0 && !var.is_directory_bucket ? 1 : 0
+  count = local.create_bucket && var.logging != null && !var.is_directory_bucket ? 1 : 0
 
   region = var.region
 
   bucket = aws_s3_bucket.this[0].id
 
-  target_bucket = var.logging["target_bucket"]
-  target_prefix = var.logging["target_prefix"]
+  target_bucket = var.logging.target_bucket
+  target_prefix = var.logging.target_prefix
 
   dynamic "target_object_key_format" {
-    for_each = try([var.logging["target_object_key_format"]], [])
+    for_each = var.logging.target_object_key_format != null ? [var.logging.target_object_key_format] : []
 
     content {
       dynamic "partitioned_prefix" {
-        for_each = try(target_object_key_format.value["partitioned_prefix"], [])
+        for_each = target_object_key_format.value.partitioned_prefix != null ? [target_object_key_format.value.partitioned_prefix] : []
 
         content {
-          partition_date_source = try(partitioned_prefix.value, null)
+          partition_date_source = partitioned_prefix.value.partition_date_source
         }
       }
 
       dynamic "simple_prefix" {
-        for_each = length(try(target_object_key_format.value["partitioned_prefix"], [])) == 0 || can(target_object_key_format.value["simple_prefix"]) ? [true] : []
+        for_each = target_object_key_format.value.partitioned_prefix == null || target_object_key_format.value.simple_prefix != null ? [true] : []
 
         content {}
       }
     }
   }
 }
+
+################################################################################
+# ACL
+################################################################################
 
 resource "aws_s3_bucket_acl" "this" {
   count = local.create_bucket && local.create_bucket_acl && !var.is_directory_bucket ? 1 : 0
@@ -128,9 +155,9 @@ resource "aws_s3_bucket_acl" "this" {
 
           grantee {
             type          = grant.value.type
-            id            = try(grant.value.id, null)
-            uri           = try(grant.value.uri, null)
-            email_address = try(grant.value.email, null)
+            id            = grant.value.id
+            uri           = grant.value.uri
+            email_address = grant.value.email
           }
         }
       }
@@ -146,8 +173,12 @@ resource "aws_s3_bucket_acl" "this" {
   depends_on = [aws_s3_bucket_ownership_controls.this]
 }
 
+################################################################################
+# Website
+################################################################################
+
 resource "aws_s3_bucket_website_configuration" "this" {
-  count = local.create_bucket && length(keys(var.website)) > 0 && !var.is_directory_bucket ? 1 : 0
+  count = local.create_bucket && local.has_website && !var.is_directory_bucket ? 1 : 0
 
   region = var.region
 
@@ -155,7 +186,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
   expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "index_document" {
-    for_each = try([var.website["index_document"]], [])
+    for_each = var.website.index_document != null ? [var.website.index_document] : []
 
     content {
       suffix = index_document.value
@@ -163,7 +194,7 @@ resource "aws_s3_bucket_website_configuration" "this" {
   }
 
   dynamic "error_document" {
-    for_each = try([var.website["error_document"]], [])
+    for_each = var.website.error_document != null ? [var.website.error_document] : []
 
     content {
       key = error_document.value
@@ -171,37 +202,41 @@ resource "aws_s3_bucket_website_configuration" "this" {
   }
 
   dynamic "redirect_all_requests_to" {
-    for_each = try([var.website["redirect_all_requests_to"]], [])
+    for_each = var.website.redirect_all_requests_to != null ? [var.website.redirect_all_requests_to] : []
 
     content {
       host_name = redirect_all_requests_to.value.host_name
-      protocol  = try(redirect_all_requests_to.value.protocol, null)
+      protocol  = redirect_all_requests_to.value.protocol
     }
   }
 
   dynamic "routing_rule" {
-    for_each = try(flatten([var.website["routing_rules"]]), [])
+    for_each = coalesce(var.website.routing_rules, [])
 
     content {
       dynamic "condition" {
-        for_each = try([routing_rule.value.condition], [])
+        for_each = routing_rule.value.condition != null ? [routing_rule.value.condition] : []
 
         content {
-          http_error_code_returned_equals = try(routing_rule.value.condition["http_error_code_returned_equals"], null)
-          key_prefix_equals               = try(routing_rule.value.condition["key_prefix_equals"], null)
+          http_error_code_returned_equals = condition.value.http_error_code_returned_equals
+          key_prefix_equals               = condition.value.key_prefix_equals
         }
       }
 
       redirect {
-        host_name               = try(routing_rule.value.redirect["host_name"], null)
-        http_redirect_code      = try(routing_rule.value.redirect["http_redirect_code"], null)
-        protocol                = try(routing_rule.value.redirect["protocol"], null)
-        replace_key_prefix_with = try(routing_rule.value.redirect["replace_key_prefix_with"], null)
-        replace_key_with        = try(routing_rule.value.redirect["replace_key_with"], null)
+        host_name               = try(routing_rule.value.redirect.host_name, null)
+        http_redirect_code      = try(routing_rule.value.redirect.http_redirect_code, null)
+        protocol                = try(routing_rule.value.redirect.protocol, null)
+        replace_key_prefix_with = try(routing_rule.value.redirect.replace_key_prefix_with, null)
+        replace_key_with        = try(routing_rule.value.redirect.replace_key_with, null)
       }
     }
   }
 }
+
+################################################################################
+# Versioning
+################################################################################
 
 resource "aws_s3_bucket_versioning" "this" {
   count = local.create_bucket && length(keys(var.versioning)) > 0 && !var.is_directory_bucket ? 1 : 0
@@ -221,8 +256,12 @@ resource "aws_s3_bucket_versioning" "this" {
   }
 }
 
+################################################################################
+# Server-Side Encryption
+################################################################################
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
-  count = local.create_bucket && length(keys(var.server_side_encryption_configuration)) > 0 ? 1 : 0
+  count = local.create_bucket && var.server_side_encryption_configuration.rule != null ? 1 : 0
 
   region = var.region
 
@@ -230,23 +269,27 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
   expected_bucket_owner = var.expected_bucket_owner
 
   dynamic "rule" {
-    for_each = try(flatten([var.server_side_encryption_configuration["rule"]]), [])
+    for_each = var.server_side_encryption_configuration.rule != null ? [var.server_side_encryption_configuration.rule] : []
 
     content {
-      bucket_key_enabled = try(rule.value.bucket_key_enabled, null)
+      bucket_key_enabled = rule.value.bucket_key_enabled
 
       dynamic "apply_server_side_encryption_by_default" {
-        for_each = try([rule.value.apply_server_side_encryption_by_default], [])
+        for_each = rule.value.apply_server_side_encryption_by_default != null ? [rule.value.apply_server_side_encryption_by_default] : []
 
         content {
           sse_algorithm     = apply_server_side_encryption_by_default.value.sse_algorithm
-          kms_master_key_id = try(apply_server_side_encryption_by_default.value.kms_master_key_id, null)
+          kms_master_key_id = apply_server_side_encryption_by_default.value.kms_master_key_id
         }
       }
-      blocked_encryption_types = try(rule.value.blocked_encryption_types, null)
+      blocked_encryption_types = rule.value.blocked_encryption_types
     }
   }
 }
+
+################################################################################
+# Acceleration
+################################################################################
 
 resource "aws_s3_bucket_accelerate_configuration" "this" {
   count = local.create_bucket && var.acceleration_status != null && !var.is_directory_bucket ? 1 : 0
@@ -260,6 +303,10 @@ resource "aws_s3_bucket_accelerate_configuration" "this" {
   status = title(lower(var.acceleration_status))
 }
 
+################################################################################
+# Request Payment
+################################################################################
+
 resource "aws_s3_bucket_request_payment_configuration" "this" {
   count = local.create_bucket && var.request_payer != null && !var.is_directory_bucket ? 1 : 0
 
@@ -271,6 +318,10 @@ resource "aws_s3_bucket_request_payment_configuration" "this" {
   # Valid values: "BucketOwner" or "Requester"
   payer = lower(var.request_payer) == "requester" ? "Requester" : "BucketOwner"
 }
+
+################################################################################
+# CORS Rule(s)
+################################################################################
 
 resource "aws_s3_bucket_cors_configuration" "this" {
   count = local.create_bucket && length(local.cors_rules) > 0 && !var.is_directory_bucket ? 1 : 0
@@ -284,18 +335,22 @@ resource "aws_s3_bucket_cors_configuration" "this" {
     for_each = local.cors_rules
 
     content {
-      id              = try(cors_rule.value.id, null)
+      id              = cors_rule.value.id
       allowed_methods = cors_rule.value.allowed_methods
       allowed_origins = cors_rule.value.allowed_origins
-      allowed_headers = try(cors_rule.value.allowed_headers, null)
-      expose_headers  = try(cors_rule.value.expose_headers, null)
-      max_age_seconds = try(cors_rule.value.max_age_seconds, null)
+      allowed_headers = cors_rule.value.allowed_headers
+      expose_headers  = cors_rule.value.expose_headers
+      max_age_seconds = cors_rule.value.max_age_seconds
     }
   }
 }
 
+################################################################################
+# Lifecycle Rule(s)
+################################################################################
+
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
-  count = local.create_bucket && length(local.lifecycle_rules) > 0 ? 1 : 0
+  count = local.create_bucket && length(var.lifecycle_rule) > 0 ? 1 : 0
 
   region = var.region
 
@@ -304,68 +359,76 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
   transition_default_minimum_object_size = var.transition_default_minimum_object_size
 
   dynamic "rule" {
-    for_each = local.lifecycle_rules
+    for_each = var.lifecycle_rule
 
     content {
-      id     = try(rule.value.id, null)
-      status = try(rule.value.enabled ? "Enabled" : "Disabled", tobool(rule.value.status) ? "Enabled" : "Disabled", title(lower(rule.value.status)))
+      id     = rule.value.id
+      status = rule.value.enabled != null ? (rule.value.enabled ? "Enabled" : "Disabled") : try(tobool(rule.value.status) ? "Enabled" : "Disabled", title(lower(rule.value.status)))
 
       # Max 1 block - abort_incomplete_multipart_upload
       dynamic "abort_incomplete_multipart_upload" {
-        for_each = try([rule.value.abort_incomplete_multipart_upload_days], [])
+        for_each = rule.value.abort_incomplete_multipart_upload_days != null ? [rule.value.abort_incomplete_multipart_upload_days] : []
 
         content {
-          days_after_initiation = try(rule.value.abort_incomplete_multipart_upload_days, null)
+          days_after_initiation = abort_incomplete_multipart_upload.value
         }
       }
 
 
       # Max 1 block - expiration
       dynamic "expiration" {
-        for_each = try(flatten([rule.value.expiration]), [])
+        for_each = rule.value.expiration != null ? [rule.value.expiration] : []
 
         content {
-          date                         = try(expiration.value.date, null)
-          days                         = try(expiration.value.days, null)
-          expired_object_delete_marker = try(expiration.value.expired_object_delete_marker, null)
+          date                         = expiration.value.date
+          days                         = expiration.value.days
+          expired_object_delete_marker = expiration.value.expired_object_delete_marker
         }
       }
 
       # Several blocks - transition
       dynamic "transition" {
-        for_each = try(flatten([rule.value.transition]), [])
+        for_each = rule.value.transition
 
         content {
-          date          = try(transition.value.date, null)
-          days          = try(transition.value.days, null)
+          date          = transition.value.date
+          days          = transition.value.days
           storage_class = transition.value.storage_class
         }
       }
 
       # Max 1 block - noncurrent_version_expiration
       dynamic "noncurrent_version_expiration" {
-        for_each = try(flatten([rule.value.noncurrent_version_expiration]), [])
+        for_each = rule.value.noncurrent_version_expiration != null ? [rule.value.noncurrent_version_expiration] : []
 
         content {
-          newer_noncurrent_versions = try(noncurrent_version_expiration.value.newer_noncurrent_versions, null)
-          noncurrent_days           = try(noncurrent_version_expiration.value.days, noncurrent_version_expiration.value.noncurrent_days, null)
+          newer_noncurrent_versions = noncurrent_version_expiration.value.newer_noncurrent_versions
+          noncurrent_days           = noncurrent_version_expiration.value.days != null ? noncurrent_version_expiration.value.days : noncurrent_version_expiration.value.noncurrent_days
         }
       }
 
       # Several blocks - noncurrent_version_transition
       dynamic "noncurrent_version_transition" {
-        for_each = try(flatten([rule.value.noncurrent_version_transition]), [])
+        for_each = rule.value.noncurrent_version_transition
 
         content {
-          newer_noncurrent_versions = try(noncurrent_version_transition.value.newer_noncurrent_versions, null)
-          noncurrent_days           = try(noncurrent_version_transition.value.days, noncurrent_version_transition.value.noncurrent_days, null)
+          newer_noncurrent_versions = noncurrent_version_transition.value.newer_noncurrent_versions
+          noncurrent_days           = noncurrent_version_transition.value.days != null ? noncurrent_version_transition.value.days : noncurrent_version_transition.value.noncurrent_days
           storage_class             = noncurrent_version_transition.value.storage_class
         }
       }
 
       # Max 1 block - filter - without any key arguments or tags
       dynamic "filter" {
-        for_each = length(try(flatten([rule.value.filter]), [])) == 0 ? [true] : []
+        for_each = rule.value.filter == null || max(
+          length([for k, a in {
+            object_size_greater_than = rule.value.filter.object_size_greater_than
+            object_size_less_than    = rule.value.filter.object_size_less_than
+            prefix                   = rule.value.filter.prefix
+            tags                     = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
+          } : k if a != null]),
+          length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
+        ) == 0 ? [true] : []
 
         content {
           #          prefix = ""
@@ -374,15 +437,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - filter - with one key argument or a single tag
       dynamic "filter" {
-        for_each = [for v in try(flatten([rule.value.filter]), []) : v if max(length(keys(v)), length(try(rule.value.filter.tags, rule.value.filter.tag, []))) == 1]
+        for_each = rule.value.filter != null && max(
+          length([for k, a in {
+            object_size_greater_than = rule.value.filter.object_size_greater_than
+            object_size_less_than    = rule.value.filter.object_size_less_than
+            prefix                   = rule.value.filter.prefix
+            tags                     = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
+          } : k if a != null]),
+          length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
+        ) == 1 ? [rule.value.filter] : []
 
         content {
-          object_size_greater_than = try(filter.value.object_size_greater_than, null)
-          object_size_less_than    = try(filter.value.object_size_less_than, null)
-          prefix                   = try(filter.value.prefix, null)
+          object_size_greater_than = filter.value.object_size_greater_than
+          object_size_less_than    = filter.value.object_size_less_than
+          prefix                   = filter.value.prefix
 
           dynamic "tag" {
-            for_each = try(filter.value.tags, filter.value.tag, [])
+            for_each = filter.value.tags != null ? filter.value.tags : filter.value.tag != null ? filter.value.tag : {}
 
             content {
               key   = tag.key
@@ -394,14 +465,22 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - filter - with more than one key arguments or multiple tags
       dynamic "filter" {
-        for_each = [for v in try(flatten([rule.value.filter]), []) : v if max(length(keys(v)), length(try(rule.value.filter.tags, rule.value.filter.tag, []))) > 1]
+        for_each = rule.value.filter != null && max(
+          length([for k, a in {
+            object_size_greater_than = rule.value.filter.object_size_greater_than
+            object_size_less_than    = rule.value.filter.object_size_less_than
+            prefix                   = rule.value.filter.prefix
+            tags                     = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
+          } : k if a != null]),
+          length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
+        ) > 1 ? [rule.value.filter] : []
 
         content {
           and {
-            object_size_greater_than = try(filter.value.object_size_greater_than, null)
-            object_size_less_than    = try(filter.value.object_size_less_than, null)
-            prefix                   = try(filter.value.prefix, null)
-            tags                     = try(filter.value.tags, filter.value.tag, null)
+            object_size_greater_than = filter.value.object_size_greater_than
+            object_size_less_than    = filter.value.object_size_less_than
+            prefix                   = filter.value.prefix
+            tags                     = filter.value.tags != null ? filter.value.tags : filter.value.tag
           }
         }
       }
@@ -416,6 +495,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
   ]
 }
 
+################################################################################
+# Object Lock
+################################################################################
+
 resource "aws_s3_bucket_object_lock_configuration" "this" {
   count = local.create_bucket && var.object_lock_enabled && try(var.object_lock_configuration.rule.default_retention, null) != null ? 1 : 0
 
@@ -423,35 +506,39 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 
   bucket                = aws_s3_bucket.this[0].id
   expected_bucket_owner = var.expected_bucket_owner
-  token                 = try(var.object_lock_configuration.token, null)
+  token                 = var.object_lock_configuration.token
 
   rule {
     default_retention {
       mode  = var.object_lock_configuration.rule.default_retention.mode
-      days  = try(var.object_lock_configuration.rule.default_retention.days, null)
-      years = try(var.object_lock_configuration.rule.default_retention.years, null)
+      days  = var.object_lock_configuration.rule.default_retention.days
+      years = var.object_lock_configuration.rule.default_retention.years
     }
   }
 }
 
+################################################################################
+# Replication
+################################################################################
+
 resource "aws_s3_bucket_replication_configuration" "this" {
-  count = local.create_bucket && length(keys(var.replication_configuration)) > 0 && !var.is_directory_bucket ? 1 : 0
+  count = local.create_bucket && local.has_replication && !var.is_directory_bucket ? 1 : 0
 
   region = var.region
 
   bucket = aws_s3_bucket.this[0].id
-  role   = var.replication_configuration["role"]
+  role   = var.replication_configuration.role
 
   dynamic "rule" {
-    for_each = flatten(try([var.replication_configuration["rule"]], [var.replication_configuration["rules"]], []))
+    for_each = local.replication_rules
 
     content {
-      id       = try(rule.value.id, null)
-      priority = try(rule.value.priority, null)
-      status   = try(tobool(rule.value.status) ? "Enabled" : "Disabled", title(lower(rule.value.status)), "Enabled")
+      id       = rule.value.id
+      priority = rule.value.priority
+      status   = rule.value.status == null ? "Enabled" : try(tobool(rule.value.status) ? "Enabled" : "Disabled", title(lower(rule.value.status)))
 
       dynamic "delete_marker_replication" {
-        for_each = flatten(try([rule.value.delete_marker_replication_status], [rule.value.delete_marker_replication], []))
+        for_each = compact([rule.value.delete_marker_replication_status != null ? rule.value.delete_marker_replication_status : rule.value.delete_marker_replication])
 
         content {
           # Valid values: "Enabled" or "Disabled"
@@ -464,7 +551,7 @@ resource "aws_s3_bucket_replication_configuration" "this" {
       # More infor about what does Amazon S3 replicate?
       # https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication-what-is-isnot-replicated.html
       dynamic "existing_object_replication" {
-        for_each = flatten(try([rule.value.existing_object_replication_status], [rule.value.existing_object_replication], []))
+        for_each = compact([rule.value.existing_object_replication_status != null ? rule.value.existing_object_replication_status : rule.value.existing_object_replication])
 
         content {
           # Valid values: "Enabled" or "Disabled"
@@ -473,15 +560,15 @@ resource "aws_s3_bucket_replication_configuration" "this" {
       }
 
       dynamic "destination" {
-        for_each = try(flatten([rule.value.destination]), [])
+        for_each = [rule.value.destination]
 
         content {
           bucket        = destination.value.bucket
-          storage_class = try(destination.value.storage_class, null)
-          account       = try(destination.value.account_id, destination.value.account, null)
+          storage_class = destination.value.storage_class
+          account       = destination.value.account_id != null ? destination.value.account_id : destination.value.account
 
           dynamic "access_control_translation" {
-            for_each = try(flatten([destination.value.access_control_translation]), [])
+            for_each = destination.value.access_control_translation != null ? [destination.value.access_control_translation] : []
 
             content {
               owner = title(lower(access_control_translation.value.owner))
@@ -489,7 +576,7 @@ resource "aws_s3_bucket_replication_configuration" "this" {
           }
 
           dynamic "encryption_configuration" {
-            for_each = flatten([try(destination.value.encryption_configuration.replica_kms_key_id, destination.value.replica_kms_key_id, [])])
+            for_each = compact([try(destination.value.encryption_configuration.replica_kms_key_id, null) != null ? destination.value.encryption_configuration.replica_kms_key_id : destination.value.replica_kms_key_id])
 
             content {
               replica_kms_key_id = encryption_configuration.value
@@ -497,14 +584,14 @@ resource "aws_s3_bucket_replication_configuration" "this" {
           }
 
           dynamic "replication_time" {
-            for_each = try(flatten([destination.value.replication_time]), [])
+            for_each = destination.value.replication_time != null ? [destination.value.replication_time] : []
 
             content {
               # Valid values: "Enabled" or "Disabled"
-              status = try(tobool(replication_time.value.status) ? "Enabled" : "Disabled", title(lower(replication_time.value.status)), "Disabled")
+              status = replication_time.value.status == null ? "Disabled" : try(tobool(replication_time.value.status) ? "Enabled" : "Disabled", title(lower(replication_time.value.status)))
 
               dynamic "time" {
-                for_each = try(flatten([replication_time.value.minutes]), [])
+                for_each = replication_time.value.minutes != null ? [replication_time.value.minutes] : []
 
                 content {
                   minutes = replication_time.value.minutes
@@ -515,14 +602,14 @@ resource "aws_s3_bucket_replication_configuration" "this" {
           }
 
           dynamic "metrics" {
-            for_each = try(flatten([destination.value.metrics]), [])
+            for_each = destination.value.metrics != null ? [destination.value.metrics] : []
 
             content {
               # Valid values: "Enabled" or "Disabled"
-              status = try(tobool(metrics.value.status) ? "Enabled" : "Disabled", title(lower(metrics.value.status)), "Disabled")
+              status = metrics.value.status == null ? "Disabled" : try(tobool(metrics.value.status) ? "Enabled" : "Disabled", title(lower(metrics.value.status)))
 
               dynamic "event_threshold" {
-                for_each = try(flatten([metrics.value.minutes]), [])
+                for_each = metrics.value.minutes != null ? [metrics.value.minutes] : []
 
                 content {
                   minutes = metrics.value.minutes
@@ -534,11 +621,11 @@ resource "aws_s3_bucket_replication_configuration" "this" {
       }
 
       dynamic "source_selection_criteria" {
-        for_each = try(flatten([rule.value.source_selection_criteria]), [])
+        for_each = rule.value.source_selection_criteria != null ? [rule.value.source_selection_criteria] : []
 
         content {
           dynamic "replica_modifications" {
-            for_each = flatten([try(source_selection_criteria.value.replica_modifications.enabled, source_selection_criteria.value.replica_modifications.status, [])])
+            for_each = source_selection_criteria.value.replica_modifications == null ? [] : compact([source_selection_criteria.value.replica_modifications.enabled != null ? source_selection_criteria.value.replica_modifications.enabled : source_selection_criteria.value.replica_modifications.status])
 
             content {
               # Valid values: "Enabled" or "Disabled"
@@ -547,7 +634,7 @@ resource "aws_s3_bucket_replication_configuration" "this" {
           }
 
           dynamic "sse_kms_encrypted_objects" {
-            for_each = flatten([try(source_selection_criteria.value.sse_kms_encrypted_objects.enabled, source_selection_criteria.value.sse_kms_encrypted_objects.status, [])])
+            for_each = source_selection_criteria.value.sse_kms_encrypted_objects == null ? [] : compact([source_selection_criteria.value.sse_kms_encrypted_objects.enabled != null ? source_selection_criteria.value.sse_kms_encrypted_objects.enabled : source_selection_criteria.value.sse_kms_encrypted_objects.status])
 
             content {
               # Valid values: "Enabled" or "Disabled"
@@ -559,7 +646,13 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 
       # Max 1 block - filter - without any key arguments or tags
       dynamic "filter" {
-        for_each = length(try(flatten([rule.value.filter]), [])) == 0 ? [true] : []
+        for_each = rule.value.filter == null || max(
+          length([for k, a in {
+            prefix = rule.value.filter.prefix
+            tags   = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
+          } : k if a != null]),
+          length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
+        ) == 0 ? [true] : []
 
         content {
         }
@@ -567,13 +660,19 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 
       # Max 1 block - filter - with one key argument or a single tag
       dynamic "filter" {
-        for_each = [for v in try(flatten([rule.value.filter]), []) : v if max(length(keys(v)), length(try(rule.value.filter.tags, rule.value.filter.tag, []))) == 1]
+        for_each = rule.value.filter != null && max(
+          length([for k, a in {
+            prefix = rule.value.filter.prefix
+            tags   = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
+          } : k if a != null]),
+          length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
+        ) == 1 ? [rule.value.filter] : []
 
         content {
-          prefix = try(filter.value.prefix, null)
+          prefix = filter.value.prefix
 
           dynamic "tag" {
-            for_each = try(filter.value.tags, filter.value.tag, [])
+            for_each = filter.value.tags != null ? filter.value.tags : filter.value.tag != null ? filter.value.tag : {}
 
             content {
               key   = tag.key
@@ -585,12 +684,18 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 
       # Max 1 block - filter - with more than one key arguments or multiple tags
       dynamic "filter" {
-        for_each = [for v in try(flatten([rule.value.filter]), []) : v if max(length(keys(v)), length(try(rule.value.filter.tags, rule.value.filter.tag, []))) > 1]
+        for_each = rule.value.filter != null && max(
+          length([for k, a in {
+            prefix = rule.value.filter.prefix
+            tags   = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
+          } : k if a != null]),
+          length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
+        ) > 1 ? [rule.value.filter] : []
 
         content {
           and {
-            prefix = try(filter.value.prefix, null)
-            tags   = try(filter.value.tags, filter.value.tag, null)
+            prefix = filter.value.prefix
+            tags   = filter.value.tags != null ? filter.value.tags : filter.value.tag
           }
         }
       }
@@ -600,6 +705,10 @@ resource "aws_s3_bucket_replication_configuration" "this" {
   # Must have bucket versioning enabled first
   depends_on = [aws_s3_bucket_versioning.this]
 }
+
+################################################################################
+# Bucket Policy
+################################################################################
 
 resource "aws_s3_bucket_policy" "this" {
   count = local.create_bucket && local.attach_policy ? 1 : 0
@@ -893,7 +1002,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/AWSLogs/${data.aws_caller_identity.current.id}/*",
+      "${aws_s3_bucket.this[0].arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
     ]
 
     condition {
@@ -904,13 +1013,13 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.id]
+      values   = [data.aws_caller_identity.current.account_id]
       variable = "aws:SourceAccount"
     }
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:${data.aws_partition.current.partition}:logs:*:${data.aws_caller_identity.current.id}:*"]
+      values   = ["arn:${data.aws_partition.current.partition}:logs:*:${data.aws_caller_identity.current.account_id}:*"]
       variable = "aws:SourceArn"
     }
   }
@@ -935,13 +1044,13 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.id]
+      values   = [data.aws_caller_identity.current.account_id]
       variable = "aws:SourceAccount"
     }
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:${data.aws_partition.current.partition}:logs:*:${data.aws_caller_identity.current.id}:*"]
+      values   = ["arn:${data.aws_partition.current.partition}:logs:*:${data.aws_caller_identity.current.account_id}:*"]
       variable = "aws:SourceArn"
     }
   }
@@ -1100,7 +1209,7 @@ data "aws_iam_policy_document" "deny_incorrect_kms_key_sse" {
     condition {
       test     = "StringNotEquals"
       variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
-      values   = [try(var.allowed_kms_key_arn, null)]
+      values   = [var.allowed_kms_key_arn]
     }
   }
 }
@@ -1161,6 +1270,10 @@ data "aws_iam_policy_document" "deny_ssec_encrypted_object_uploads" {
   }
 }
 
+################################################################################
+# Public Access Block
+################################################################################
+
 resource "aws_s3_bucket_public_access_block" "this" {
   count = local.create_bucket && var.attach_public_policy && !var.is_directory_bucket ? 1 : 0
 
@@ -1174,6 +1287,10 @@ resource "aws_s3_bucket_public_access_block" "this" {
   restrict_public_buckets = var.restrict_public_buckets
   skip_destroy            = var.skip_destroy_public_access_block
 }
+
+################################################################################
+# Ownership Controls
+################################################################################
 
 resource "aws_s3_bucket_ownership_controls" "this" {
   count = local.create_bucket && var.control_object_ownership && !var.is_directory_bucket ? 1 : 0
@@ -1194,6 +1311,10 @@ resource "aws_s3_bucket_ownership_controls" "this" {
   ]
 }
 
+################################################################################
+# Intelligent Tiering
+################################################################################
+
 resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
   for_each = { for k, v in local.intelligent_tiering : k => v if local.create_bucket && !var.is_directory_bucket }
 
@@ -1205,11 +1326,11 @@ resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
 
   # Max 1 block - filter
   dynamic "filter" {
-    for_each = length(try(flatten([each.value.filter]), [])) == 0 ? [] : [true]
+    for_each = each.value.filter != null ? [each.value.filter] : []
 
     content {
-      prefix = try(each.value.filter.prefix, null)
-      tags   = try(each.value.filter.tags, null)
+      prefix = filter.value.prefix
+      tags   = filter.value.tags
     }
   }
 
@@ -1224,8 +1345,12 @@ resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
 
 }
 
+################################################################################
+# Metric(s)
+################################################################################
+
 resource "aws_s3_bucket_metric" "this" {
-  for_each = { for k, v in local.metric_configuration : k => v if local.create_bucket }
+  for_each = { for k, v in var.metric_configuration : k => v if local.create_bucket }
 
   region = var.region
 
@@ -1233,14 +1358,19 @@ resource "aws_s3_bucket_metric" "this" {
   bucket = var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id
 
   dynamic "filter" {
-    for_each = length(try(flatten([each.value.filter]), [])) == 0 ? [] : [true]
+    for_each = each.value.filter != null ? [each.value.filter] : []
+
     content {
-      prefix       = try(each.value.filter.prefix, null)
-      tags         = var.is_directory_bucket ? null : try(each.value.filter.tags, null)
-      access_point = try(each.value.filter.access_point, null)
+      prefix       = filter.value.prefix
+      tags         = var.is_directory_bucket ? null : filter.value.tags
+      access_point = filter.value.access_point
     }
   }
 }
+
+################################################################################
+# Inventory
+################################################################################
 
 resource "aws_s3_bucket_inventory" "this" {
   for_each = { for k, v in var.inventory_configuration : k => v if local.create_bucket }
@@ -1248,33 +1378,33 @@ resource "aws_s3_bucket_inventory" "this" {
   region = var.region
 
   name                     = each.key
-  bucket                   = try(each.value.bucket, var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id)
+  bucket                   = each.value.bucket != null ? each.value.bucket : (var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id)
   included_object_versions = each.value.included_object_versions
-  enabled                  = try(each.value.enabled, true)
-  optional_fields          = try(each.value.optional_fields, null)
+  enabled                  = each.value.enabled
+  optional_fields          = each.value.optional_fields
 
   destination {
     bucket {
-      bucket_arn = try(each.value.destination.bucket_arn, aws_s3_bucket.this[0].arn)
-      format     = try(each.value.destination.format, null)
-      account_id = try(each.value.destination.account_id, null)
-      prefix     = try(each.value.destination.prefix, null)
+      bucket_arn = each.value.destination.bucket_arn != null ? each.value.destination.bucket_arn : try(aws_s3_bucket.this[0].arn, null)
+      format     = each.value.destination.format
+      account_id = each.value.destination.account_id
+      prefix     = each.value.destination.prefix
 
       dynamic "encryption" {
-        for_each = length(try(flatten([each.value.destination.encryption]), [])) == 0 ? [] : [true]
+        for_each = each.value.destination.encryption != null ? [each.value.destination.encryption] : []
 
         content {
 
           dynamic "sse_kms" {
-            for_each = each.value.destination.encryption.encryption_type == "sse_kms" ? [true] : []
+            for_each = encryption.value.encryption_type == "sse_kms" ? [true] : []
 
             content {
-              key_id = try(each.value.destination.encryption.kms_key_id, null)
+              key_id = encryption.value.kms_key_id
             }
           }
 
           dynamic "sse_s3" {
-            for_each = each.value.destination.encryption.encryption_type == "sse_s3" ? [true] : []
+            for_each = encryption.value.encryption_type == "sse_s3" ? [true] : []
 
             content {
             }
@@ -1289,10 +1419,10 @@ resource "aws_s3_bucket_inventory" "this" {
   }
 
   dynamic "filter" {
-    for_each = length(try(flatten([each.value.filter]), [])) == 0 ? [] : [true]
+    for_each = each.value.filter != null ? [each.value.filter] : []
 
     content {
-      prefix = try(each.value.filter.prefix, null)
+      prefix = filter.value.prefix
     }
   }
 }
@@ -1331,8 +1461,8 @@ data "aws_iam_policy_document" "inventory_and_analytics_destination_policy" {
     condition {
       test = "StringEquals"
       values = compact(distinct([
-        var.inventory_self_source_destination ? data.aws_caller_identity.current.id : var.inventory_source_account_id,
-        var.analytics_self_source_destination ? data.aws_caller_identity.current.id : var.analytics_source_account_id
+        var.inventory_self_source_destination ? data.aws_caller_identity.current.account_id : var.inventory_source_account_id,
+        var.analytics_self_source_destination ? data.aws_caller_identity.current.account_id : var.analytics_source_account_id
       ]))
       variable = "aws:SourceAccount"
     }
@@ -1345,6 +1475,10 @@ data "aws_iam_policy_document" "inventory_and_analytics_destination_policy" {
   }
 }
 
+################################################################################
+# Analytics
+################################################################################
+
 resource "aws_s3_bucket_analytics_configuration" "this" {
   for_each = { for k, v in var.analytics_configuration : k => v if local.create_bucket && !var.is_directory_bucket }
 
@@ -1354,35 +1488,39 @@ resource "aws_s3_bucket_analytics_configuration" "this" {
   name   = each.key
 
   dynamic "filter" {
-    for_each = length(try(flatten([each.value.filter]), [])) == 0 ? [] : [true]
+    for_each = each.value.filter != null ? [each.value.filter] : []
 
     content {
-      prefix = try(each.value.filter.prefix, null)
-      tags   = try(each.value.filter.tags, null)
+      prefix = filter.value.prefix
+      tags   = filter.value.tags
     }
   }
 
   dynamic "storage_class_analysis" {
-    for_each = length(try(flatten([each.value.storage_class_analysis]), [])) == 0 ? [] : [true]
+    for_each = each.value.storage_class_analysis != null ? [each.value.storage_class_analysis] : []
 
     content {
 
       data_export {
-        output_schema_version = try(each.value.storage_class_analysis.output_schema_version, null)
+        output_schema_version = storage_class_analysis.value.output_schema_version
 
         destination {
 
           s3_bucket_destination {
-            bucket_arn        = try(each.value.storage_class_analysis.destination_bucket_arn, aws_s3_bucket.this[0].arn)
-            bucket_account_id = try(each.value.storage_class_analysis.destination_account_id, data.aws_caller_identity.current.id)
-            format            = try(each.value.storage_class_analysis.export_format, "CSV")
-            prefix            = try(each.value.storage_class_analysis.export_prefix, null)
+            bucket_arn        = storage_class_analysis.value.destination_bucket_arn != null ? storage_class_analysis.value.destination_bucket_arn : try(aws_s3_bucket.this[0].arn, null)
+            bucket_account_id = coalesce(storage_class_analysis.value.destination_account_id, data.aws_caller_identity.current.account_id)
+            format            = coalesce(storage_class_analysis.value.export_format, "CSV")
+            prefix            = storage_class_analysis.value.export_prefix
           }
         }
       }
     }
   }
 }
+
+################################################################################
+# Metadata
+################################################################################
 
 resource "aws_s3_bucket_metadata_configuration" "this" {
   count = local.create_bucket && var.create_metadata_configuration ? 1 : 0
@@ -1397,7 +1535,7 @@ resource "aws_s3_bucket_metadata_configuration" "this" {
       dynamic "encryption_configuration" {
         for_each = var.metadata_encryption_configuration != null ? [var.metadata_encryption_configuration] : []
         content {
-          kms_key_arn   = try(encryption_configuration.value.kms_key_arn, null)
+          kms_key_arn   = encryption_configuration.value.kms_key_arn
           sse_algorithm = encryption_configuration.value.sse_algorithm
         }
       }

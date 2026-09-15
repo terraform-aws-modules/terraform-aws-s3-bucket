@@ -59,7 +59,7 @@ The following examples demonstrate some of the changes that users can elect to m
 
 ### Before 2.x Example
 
-See code in [`examples/complete-legacy`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete-legacy).
+See code in [`examples/complete-legacy`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/v5.0.0/examples/complete-legacy).
 
 ```hcl
 module "s3_bucket" {

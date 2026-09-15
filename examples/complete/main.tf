@@ -1,166 +1,62 @@
 provider "aws" {
   region = local.region
-
-  # Make it faster by skipping something
-  skip_metadata_api_check     = true
-  skip_region_validation      = true
-  skip_credentials_validation = true
 }
 
 locals {
-  bucket_name = "s3-bucket-${random_pet.this.id}"
-  region      = "eu-west-1"
+  region = "eu-west-1"
+  name   = "ex-${basename(path.cwd)}"
+
+  tags = {
+    Name       = local.name
+    Example    = local.name
+    Repository = "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
+  }
 }
 
 data "aws_caller_identity" "current" {}
 
-data "aws_canonical_user_id" "current" {}
-
-data "aws_cloudfront_log_delivery_canonical_user_id" "cloudfront" {}
-
-data "aws_region" "current" {}
-
-resource "random_pet" "this" {
-  length = 2
-}
-
-resource "aws_kms_key" "objects" {
-  description             = "KMS key is used to encrypt bucket objects"
-  deletion_window_in_days = 7
-}
-
-resource "aws_iam_role" "this" {
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
-
-data "aws_iam_policy_document" "bucket_policy" {
-  statement {
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.this.arn]
-    }
-
-    actions = [
-      "s3:ListBucket",
-    ]
-
-    resources = [
-      "arn:aws:s3:::${local.bucket_name}",
-    ]
-  }
-
-  statement {
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.this.arn]
-    }
-
-    actions = [
-      "s3:ListBucket",
-    ]
-
-    resources = [
-      "_S3_BUCKET_ARN_",
-    ]
-
-    condition {
-      test     = "StringNotEquals"
-      variable = "aws:PrincipalAccount"
-      values   = ["_AWS_ACCOUNT_ID_"]
-    }
-  }
-}
-
-module "log_bucket" {
-  source = "../../"
-
-  bucket        = "logs-${random_pet.this.id}"
-  force_destroy = true
-
-  control_object_ownership = true
-
-  attach_elb_log_delivery_policy        = true
-  attach_lb_log_delivery_policy         = true
-  attach_access_log_delivery_policy     = true
-  attach_cloudtrail_log_delivery_policy = true
-  attach_deny_insecure_transport_policy = true
-  attach_require_latest_tls_policy      = true
-  attach_waf_log_delivery_policy        = true
-
-  access_log_delivery_policy_source_accounts      = [data.aws_caller_identity.current.account_id]
-  access_log_delivery_policy_source_buckets       = ["arn:aws:s3:::${local.bucket_name}"]
-  access_log_delivery_policy_source_organizations = ["o-123456"]
-  lb_log_delivery_policy_source_organizations     = ["o-123456"]
-}
-
-module "cloudfront_log_bucket" {
-  source = "../../"
-
-  bucket                   = "cloudfront-logs-${random_pet.this.id}"
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
-
-  grant = [{
-    type       = "CanonicalUser"
-    permission = "FULL_CONTROL"
-    id         = data.aws_canonical_user_id.current.id
-    }, {
-    type       = "CanonicalUser"
-    permission = "FULL_CONTROL"
-    id         = data.aws_cloudfront_log_delivery_canonical_user_id.cloudfront.id # Ref. https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
-    }
-  ]
-
-  owner = {
-    id = data.aws_canonical_user_id.current.id
-  }
-
-  force_destroy = true
-}
+################################################################################
+# S3 Bucket
+################################################################################
 
 module "simple_bucket" {
   source = "../../"
 
-  bucket = "simple-${random_pet.this.id}"
+  bucket_prefix = "${local.name}-simple-"
 
+  # For example only
   force_destroy = true
+
+  tags = local.tags
 }
 
 module "simple_account_regional_bucket" {
   source = "../../"
 
-  bucket           = format("simple-%s-%s-an", data.aws_caller_identity.current.account_id, data.aws_region.current.region)
+  # An account-regional namespace bucket must carry the account id and region in its own
+  # name, so it cannot use bucket_prefix
+  bucket           = format("%s-simple-%s-%s-an", local.name, data.aws_caller_identity.current.account_id, local.region)
   bucket_namespace = "account-regional"
 
+  # For example only
   force_destroy = true
+
+  tags = local.tags
 }
 
 module "s3_bucket" {
   source = "../../"
 
-  bucket = local.bucket_name
+  region = local.region
 
+  bucket_prefix = "${local.name}-"
+
+  # For example only
   force_destroy       = true
   acceleration_status = "Suspended"
   request_payer       = "BucketOwner"
 
-  tags = {
-    Owner = "Anton"
-  }
+  tags = local.tags
 
   # Note: Object Lock configuration can be enabled only on new buckets
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_object_lock_configuration
@@ -174,43 +70,28 @@ module "s3_bucket" {
     }
   }
 
-  # Bucket policies
-  attach_policy                             = true
-  policy                                    = data.aws_iam_policy_document.bucket_policy.json
-  attach_deny_insecure_transport_policy     = true
-  attach_require_latest_tls_policy          = true
-  attach_deny_incorrect_encryption_headers  = true
-  attach_deny_incorrect_kms_key_sse         = true
-  allowed_kms_key_arn                       = aws_kms_key.objects.arn
-  attach_deny_unencrypted_object_uploads    = true
-  attach_deny_ssec_encrypted_object_uploads = true
+  # S3 Metadata: an inventory table of object metadata, plus a journal of changes
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/metadata-tables-overview.html
+  # Destroying this leaves the journal and inventory tables behind in the AWS managed table
+  # bucket; only the configuration is removed. They are not Terraform managed, so nothing
+  # here will clean them up, and re-creating a configuration for a bucket of the same name
+  # fails until they are deleted by hand
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/metadata-tables-delete-configuration.html
+  create_metadata_configuration                 = true
+  metadata_inventory_table_configuration_state  = "ENABLED"
+  metadata_journal_table_record_expiration      = "ENABLED"
+  metadata_journal_table_record_expiration_days = 7
+  metadata_encryption_configuration = {
+    sse_algorithm = "aws:kms"
+    kms_key_arn   = module.kms.key_arn
+  }
 
-  # S3 bucket-level Public Access Block configuration (by default now AWS has made this default as true for S3 bucket-level block public access)
-  # block_public_acls       = true
-  # block_public_policy     = true
-  # ignore_public_acls      = true
-  # restrict_public_buckets = true
-
-  # S3 Bucket Ownership Controls
-  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls
-  control_object_ownership = true
-  object_ownership         = "BucketOwnerPreferred"
-
+  # Object Ownership is left at the module default of BucketOwnerEnforced, which disables ACLs
+  # entirely. AWS recommends this for all but the few workloads that must grant access per
+  # object; see examples/acl for those.
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html
   expected_bucket_owner                  = data.aws_caller_identity.current.account_id
   transition_default_minimum_object_size = "varies_by_storage_class"
-
-  acl = "private" # "acl" conflicts with "grant" and "owner"
-
-  logging = {
-    target_bucket = module.log_bucket.s3_bucket_id
-    target_prefix = "log/"
-    target_object_key_format = {
-      partitioned_prefix = {
-        partition_date_source = "DeliveryTime" # "EventTime"
-      }
-      # simple_prefix = {}
-    }
-  }
 
   versioning = {
     status     = true
@@ -249,7 +130,7 @@ module "s3_bucket" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = aws_kms_key.objects.arn
+        kms_master_key_id = module.kms.key_arn
         sse_algorithm     = "aws:kms"
       }
       blocked_encryption_types = ["SSE-C"]
@@ -427,4 +308,38 @@ module "disabled" {
   source = "../../"
 
   create_bucket = false
+
+  tags = local.tags
+}
+
+################################################################################
+# Supporting Resources
+################################################################################
+
+module "kms" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "~> 4.0"
+
+  description             = "Key example for S3 bucket objects"
+  deletion_window_in_days = 7
+
+  # S3 Metadata builds its inventory and journal on S3 Tables, and those tables are encrypted
+  # by a service principal rather than by the caller
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/metadata-tables-permissions.html
+  key_statements = [
+    {
+      sid       = "S3MetadataTables"
+      actions   = ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey"]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["maintenance.s3tables.amazonaws.com", "metadata.s3.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+
+  tags = local.tags
 }

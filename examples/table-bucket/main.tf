@@ -1,26 +1,29 @@
 provider "aws" {
-  region = "eu-west-1"
-
-  # Make it faster by skipping something
-  skip_metadata_api_check     = true
-  skip_region_validation      = true
-  skip_credentials_validation = true
+  region = local.region
 }
 
 locals {
-  bucket_name = "s3-table-bucket-${random_pet.this.id}"
+  region      = "eu-west-1"
+  name        = "ex-${basename(path.cwd)}"
+  bucket_name = "${local.name}-s3-table-bucket"
 
   tags = {
-    bucket_name = local.bucket_name
+    Name       = local.name
+    Example    = local.name
+    Repository = "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
   }
 }
 
 data "aws_caller_identity" "this" {}
 
-data "aws_region" "this" {}
+################################################################################
+# Table Bucket
+################################################################################
 
 module "table_bucket" {
   source = "../../modules/table-bucket"
+
+  region = local.region
 
   table_bucket_name = local.bucket_name
 
@@ -135,9 +138,47 @@ module "table_bucket" {
   }
 }
 
-resource "random_pet" "this" {
-  length = 2
+# A caller supplying a complete policy document, rather than having the module build one from
+# statements. table_bucket_policy takes precedence; the source and override document lists are
+# merged into a generated policy when it does not.
+module "caller_supplied_policy" {
+  source = "../../modules/table-bucket"
+
+  region = local.region
+
+  table_bucket_name          = "${local.name}-policy"
+  create_table_bucket_policy = true
+  table_bucket_policy        = data.aws_iam_policy_document.table_bucket.json
+
+  tags = local.tags
 }
+
+module "merged_policy_documents" {
+  source = "../../modules/table-bucket"
+
+  region = local.region
+
+  table_bucket_name                      = "${local.name}-merged"
+  create_table_bucket_policy             = true
+  table_bucket_source_policy_documents   = [data.aws_iam_policy_document.table_bucket.json]
+  table_bucket_override_policy_documents = [data.aws_iam_policy_document.table_bucket_override.json]
+
+  tags = local.tags
+}
+
+################################################################################
+# Disabled
+################################################################################
+
+module "disabled" {
+  source = "../../modules/table-bucket"
+
+  create = false
+}
+
+################################################################################
+# Supporting Resources
+################################################################################
 
 resource "aws_s3tables_namespace" "namespace" {
   namespace        = "example_namespace"
@@ -146,7 +187,7 @@ resource "aws_s3tables_namespace" "namespace" {
 
 module "kms" {
   source  = "terraform-aws-modules/kms/aws"
-  version = "~> 3.0"
+  version = "~> 4.0"
 
   description             = "Key example for s3 table buckets"
   deletion_window_in_days = 7
@@ -180,10 +221,39 @@ module "kms" {
           test     = "StringLike"
           variable = "kms:EncryptionContext:aws:s3:arn"
           values = [
-            "arn:aws:s3tables:${data.aws_region.this.region}:${data.aws_caller_identity.this.account_id}:bucket/${local.bucket_name}/table/*"
+            "arn:aws:s3tables:${local.region}:${data.aws_caller_identity.this.account_id}:bucket/${local.bucket_name}/table/*"
           ]
         }
       ]
     }
   ]
+
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "table_bucket" {
+  statement {
+    sid       = "AllowAccountRead"
+    actions   = ["s3tables:GetTableData"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_caller_identity.this.account_id]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "table_bucket_override" {
+  statement {
+    sid       = "AllowAccountRead"
+    actions   = ["s3tables:GetTableData", "s3tables:GetTableMetadataLocation"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_caller_identity.this.account_id]
+    }
+  }
 }
