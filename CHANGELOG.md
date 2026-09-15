@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.16.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.4...v5.16.0) (2026-09-15)
+
+### Features
+
+* Type variable attributes against the provider schema ([#408](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/408)) ([203636f](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/203636f8ce7f6101e7b7af5e5a829e11deb78c28))
+
 ## [5.15.4](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.3...v5.15.4) (2026-08-06)
 
 ### Bug Fixes
