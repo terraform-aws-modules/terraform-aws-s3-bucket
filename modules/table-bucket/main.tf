@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "table_bucket_policy" {
       actions       = statement.value.actions
       not_actions   = statement.value.not_actions
       effect        = statement.value.effect
-      resources     = statement.value.resources != null ? statement.value.resources : (statement.value.not_resources == null ? ["${aws_s3tables_table_bucket.this[0].arn}/table/*"] : null)
+      resources     = statement.value.resources != null || statement.value.not_resources != null ? statement.value.resources : ["${aws_s3tables_table_bucket.this[0].arn}/table/*"]
       not_resources = statement.value.not_resources
 
       dynamic "principals" {

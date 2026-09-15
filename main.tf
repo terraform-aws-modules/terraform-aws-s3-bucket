@@ -9,6 +9,14 @@ data "aws_canonical_user_id" "this" {
 data "aws_caller_identity" "current" {}
 
 data "aws_partition" "current" {}
+
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+  dns_suffix = data.aws_partition.current.dns_suffix
+  partition  = data.aws_partition.current.partition
+  region     = data.aws_region.current.region
+}
+
 locals {
   create_bucket = var.create_bucket && var.putin_khuylo
 
@@ -20,7 +28,7 @@ locals {
   policy_placeholders = {
     "_S3_BUCKET_ID_"   = try(var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id, null),
     "_S3_BUCKET_ARN_"  = try(var.is_directory_bucket ? aws_s3_directory_bucket.this[0].arn : aws_s3_bucket.this[0].arn, null),
-    "_AWS_ACCOUNT_ID_" = try(data.aws_caller_identity.current.account_id, null)
+    "_AWS_ACCOUNT_ID_" = local.account_id
   }
 
   policy = local.create_bucket && local.attach_policy ? replace(
@@ -785,14 +793,14 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 
   # Policy for AWS Regions created before August 2022 (e.g. US East (N. Virginia), Asia Pacific (Singapore), Asia Pacific (Sydney), Asia Pacific (Tokyo), Europe (Ireland))
   dynamic "statement" {
-    for_each = { for k, v in local.elb_service_accounts : k => v if k == data.aws_region.current.region }
+    for_each = { for k, v in local.elb_service_accounts : k => v if k == local.region }
 
     content {
       sid = format("ELBRegion%s", title(statement.key))
 
       principals {
         type        = "AWS"
-        identifiers = [format("arn:%s:iam::%s:root", data.aws_partition.current.partition, statement.value)]
+        identifiers = [format("arn:%s:iam::%s:root", local.partition, statement.value)]
       }
 
       effect = "Allow"
@@ -1002,7 +1010,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+      "${aws_s3_bucket.this[0].arn}/AWSLogs/${local.account_id}/*",
     ]
 
     condition {
@@ -1013,13 +1021,13 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.account_id]
+      values   = [local.account_id]
       variable = "aws:SourceAccount"
     }
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:${data.aws_partition.current.partition}:logs:*:${data.aws_caller_identity.current.account_id}:*"]
+      values   = ["arn:${local.partition}:logs:*:${local.account_id}:*"]
       variable = "aws:SourceArn"
     }
   }
@@ -1044,13 +1052,13 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.account_id]
+      values   = [local.account_id]
       variable = "aws:SourceAccount"
     }
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:${data.aws_partition.current.partition}:logs:*:${data.aws_caller_identity.current.account_id}:*"]
+      values   = ["arn:${local.partition}:logs:*:${local.account_id}:*"]
       variable = "aws:SourceArn"
     }
   }
@@ -1461,8 +1469,8 @@ data "aws_iam_policy_document" "inventory_and_analytics_destination_policy" {
     condition {
       test = "StringEquals"
       values = compact(distinct([
-        var.inventory_self_source_destination ? data.aws_caller_identity.current.account_id : var.inventory_source_account_id,
-        var.analytics_self_source_destination ? data.aws_caller_identity.current.account_id : var.analytics_source_account_id
+        var.inventory_self_source_destination ? local.account_id : var.inventory_source_account_id,
+        var.analytics_self_source_destination ? local.account_id : var.analytics_source_account_id
       ]))
       variable = "aws:SourceAccount"
     }
@@ -1508,7 +1516,7 @@ resource "aws_s3_bucket_analytics_configuration" "this" {
 
           s3_bucket_destination {
             bucket_arn        = storage_class_analysis.value.destination_bucket_arn != null ? storage_class_analysis.value.destination_bucket_arn : try(aws_s3_bucket.this[0].arn, null)
-            bucket_account_id = coalesce(storage_class_analysis.value.destination_account_id, data.aws_caller_identity.current.account_id)
+            bucket_account_id = coalesce(storage_class_analysis.value.destination_account_id, local.account_id)
             format            = coalesce(storage_class_analysis.value.export_format, "CSV")
             prefix            = storage_class_analysis.value.export_prefix
           }
@@ -1601,29 +1609,36 @@ locals {
   file_system_iam_roles = { for k, v in local.file_systems : k => v if v.create_iam_role }
 }
 
+data "aws_service_principal" "elasticfilesystem" {
+  count = length(local.file_system_iam_roles) > 0 ? 1 : 0
+
+  service_name = "elasticfilesystem"
+  region       = local.region
+}
+
 data "aws_iam_policy_document" "file_system_assume_role" {
   count = length(local.file_system_iam_roles) > 0 ? 1 : 0
 
   statement {
-    sid     = "S3FilesAssumeRole"
+    sid     = "AllowS3FilesAssumeRole"
     actions = ["sts:AssumeRole"]
 
     principals {
       type        = "Service"
-      identifiers = ["elasticfilesystem.amazonaws.com"]
+      identifiers = [data.aws_service_principal.elasticfilesystem[0].name]
     }
 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
+      values   = [local.account_id]
     }
 
     # The role exists before its file system, so the trust cannot name one file system
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = ["arn:${data.aws_partition.current.partition}:s3files:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:file-system/*"]
+      values   = ["arn:${local.partition}:s3files:${local.region}:${local.account_id}:file-system/*"]
     }
   }
 }
@@ -1657,7 +1672,7 @@ data "aws_iam_policy_document" "file_system" {
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
+      values   = [local.account_id]
     }
   }
 
@@ -1675,7 +1690,7 @@ data "aws_iam_policy_document" "file_system" {
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
+      values   = [local.account_id]
     }
   }
 
@@ -1688,12 +1703,12 @@ data "aws_iam_policy_document" "file_system" {
       "kms:ReEncryptFrom",
       "kms:ReEncryptTo",
     ]
-    resources = ["arn:${data.aws_partition.current.partition}:kms:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
+    resources = ["arn:${local.partition}:kms:${local.region}:${local.account_id}:*"]
 
     condition {
       test     = "StringLike"
       variable = "kms:ViaService"
-      values   = ["s3.${data.aws_region.current.region}.amazonaws.com"]
+      values   = ["s3.${local.region}.${local.dns_suffix}"]
     }
 
     condition {
@@ -1717,12 +1732,12 @@ data "aws_iam_policy_document" "file_system" {
       "events:PutTargets",
       "events:RemoveTargets",
     ]
-    resources = ["arn:${data.aws_partition.current.partition}:events:*:*:rule/DO-NOT-DELETE-S3-Files*"]
+    resources = ["arn:${local.partition}:events:*:*:rule/DO-NOT-DELETE-S3-Files*"]
 
     condition {
       test     = "StringEquals"
       variable = "events:ManagedBy"
-      values   = ["elasticfilesystem.amazonaws.com"]
+      values   = [data.aws_service_principal.elasticfilesystem[0].name]
     }
   }
 
@@ -1734,7 +1749,7 @@ data "aws_iam_policy_document" "file_system" {
       "events:ListRules",
       "events:ListTargetsByRule",
     ]
-    resources = ["arn:${data.aws_partition.current.partition}:events:*:*:rule/*"]
+    resources = ["arn:${local.partition}:events:*:*:rule/*"]
   }
 }
 
@@ -1975,7 +1990,7 @@ data "aws_iam_policy_document" "file_system_policy" {
       actions       = statement.value.actions
       not_actions   = statement.value.not_actions
       effect        = statement.value.effect
-      resources     = statement.value.resources != null ? statement.value.resources : (statement.value.not_resources == null ? [aws_s3files_file_system.this[each.key].arn] : null)
+      resources     = statement.value.resources != null || statement.value.not_resources != null ? statement.value.resources : [aws_s3files_file_system.this[each.key].arn]
       not_resources = statement.value.not_resources
 
       dynamic "principals" {
