@@ -1775,6 +1775,16 @@ resource "aws_s3files_mount_target" "this" {
   ipv4_address    = each.value.ipv4_address
   ipv6_address    = each.value.ipv6_address
   security_groups = each.value.security_groups != null ? each.value.security_groups : (local.create_file_system_security_group ? [aws_security_group.file_system[0].id] : null)
+
+  dynamic "timeouts" {
+    for_each = each.value.timeouts != null ? [each.value.timeouts] : []
+
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      update = timeouts.value.update
+    }
+  }
 }
 
 ################################################################################
@@ -1912,6 +1922,15 @@ resource "aws_s3files_access_point" "this" {
     { Name = coalesce(each.value.name, each.value.access_point_key) },
     each.value.tags
   )
+
+  dynamic "timeouts" {
+    for_each = each.value.timeouts != null ? [each.value.timeouts] : []
+
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+    }
+  }
 }
 
 ################################################################################
@@ -1937,10 +1956,11 @@ locals {
     ]
   ])
 
-  # A policy exists whenever there is something to put in it, so principals listed on an access point are never silently ignored
+  # A policy exists whenever the caller sets statements or lists principals on an access point, so neither is silently
+  # ignored. Presence is tested rather than length, which is unknown at plan time for a list built from computed values
   file_system_policies = {
     for k, v in local.file_systems : k => v
-    if try(length(v.policy_statements), 0) > 0 || anytrue([for g in local.file_system_access_point_grants : g.file_system_key == k])
+    if v.policy_statements != null || anytrue([for ap in values(v.access_points) : ap.read_access_arns != null || ap.read_write_access_arns != null])
   }
 }
 
@@ -1955,7 +1975,7 @@ data "aws_iam_policy_document" "file_system_policy" {
       actions       = statement.value.actions
       not_actions   = statement.value.not_actions
       effect        = statement.value.effect
-      resources     = statement.value.resources != null ? statement.value.resources : [aws_s3files_file_system.this[each.key].arn]
+      resources     = statement.value.resources != null ? statement.value.resources : (statement.value.not_resources == null ? [aws_s3files_file_system.this[each.key].arn] : null)
       not_resources = statement.value.not_resources
 
       dynamic "principals" {

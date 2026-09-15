@@ -94,7 +94,7 @@ module "s3_bucket" {
 
 ### Bucket with an S3 file system
 
-S3 Files requires versioning on the bucket. The module creates an IAM role for each file system and a security group shared by the mount targets.
+S3 Files requires versioning on the bucket. The module creates an IAM role for each file system and a security group shared by the mount targets. A principal listed in an access point's `read_access_arns` or `read_write_access_arns` can mount that file system only through the access points that list it.
 
 ```hcl
 module "s3_bucket" {
