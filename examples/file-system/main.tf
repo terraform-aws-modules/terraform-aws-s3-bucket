@@ -141,12 +141,9 @@ module "s3_bucket" {
 module "disabled" {
   source = "../../"
 
-  create_bucket                     = false
-  create_file_system_security_group = false
+  create_bucket = false
 
-  file_systems = {
-    disabled = {}
-  }
+  tags = local.tags
 }
 
 ################################################################################
