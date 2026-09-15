@@ -784,7 +784,8 @@ variable "file_systems" {
     name   = optional(string) # Will fall back to map key
     tags   = optional(map(string))
 
-    # File system
+    # File system. Changing the prefix, the KMS key or the IAM role (including the created role's name or path)
+    # replaces the file system, its mount targets and its access points
     prefix                = optional(string)
     kms_key_id            = optional(string)
     accept_bucket_warning = optional(bool)
