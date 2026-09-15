@@ -47,6 +47,16 @@ module "s3_bucket" {
       prefix        = "training/"
       mount_targets = local.mount_targets
 
+      # Training jobs read the dataset but never write to it
+      policy_statements = [{
+        sid     = "ReadOnlyClients"
+        actions = ["s3files:ClientMount"]
+        principals = [{
+          type        = "AWS"
+          identifiers = [module.client_role.arn]
+        }]
+      }]
+
       synchronization_configuration = {
         # Preload files under 10 MiB and expire them after 3 days without access
         import_data_rule = [{
@@ -80,6 +90,17 @@ module "s3_bucket" {
             }
           }
           read_write_access_arns = [module.client_role.arn]
+        }
+        reports = {
+          root_directory = {
+            path = "/reports"
+            creation_permissions = {
+              owner_uid   = 1000
+              owner_gid   = 1000
+              permissions = "755"
+            }
+          }
+          read_access_arns = [module.client_role.arn]
         }
       }
 

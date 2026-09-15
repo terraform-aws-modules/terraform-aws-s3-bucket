@@ -794,7 +794,9 @@ variable "file_systems" {
     }))
 
     # IAM role
-    create_iam_role               = optional(bool, true)
+    create_iam_role = optional(bool, true)
+    # A role brought in must already carry its permissions when the file system is created. S3 Files checks
+    # them at creation, and the file system depends only on the role's ARN, not on any policy attached to it
     iam_role_arn                  = optional(string)
     iam_role_name                 = optional(string)
     iam_role_use_name_prefix      = optional(bool, true)
@@ -810,6 +812,11 @@ variable "file_systems" {
       ip_address_type = optional(string)
       ipv4_address    = optional(string)
       ipv6_address    = optional(string)
+      timeouts = optional(object({
+        create = optional(string)
+        delete = optional(string)
+        update = optional(string)
+      }))
     })), {})
 
     # Access point(s)
@@ -831,6 +838,12 @@ variable "file_systems" {
         }))
       }))
 
+      timeouts = optional(object({
+        create = optional(string)
+        delete = optional(string)
+      }))
+
+      # A principal listed here is denied every other way into this file system, including mounting without an access point
       read_access_arns       = optional(list(string))
       read_write_access_arns = optional(list(string))
     })), {})
@@ -865,6 +878,7 @@ variable "file_systems" {
         size_less_than = number
         trigger        = string
       }))
+      # Required: the API takes exactly one expiration rule with every synchronization configuration
       expiration_data_rule = object({
         days_after_last_access = number
       })
