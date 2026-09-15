@@ -773,6 +773,185 @@ variable "metadata_journal_table_record_expiration" {
   default     = null
 }
 
+################################################################################
+# File System(s)
+################################################################################
+
+variable "file_systems" {
+  description = "Map of Amazon S3 Files file system definitions to create on the bucket. Requires bucket versioning, and is not supported on a directory bucket"
+  type = map(object({
+    create = optional(bool, true)
+    name   = optional(string) # Will fall back to map key
+    tags   = optional(map(string))
+
+    # File system
+    prefix                = optional(string)
+    kms_key_id            = optional(string)
+    accept_bucket_warning = optional(bool)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+    }))
+
+    # IAM role
+    create_iam_role               = optional(bool, true)
+    iam_role_arn                  = optional(string)
+    iam_role_name                 = optional(string)
+    iam_role_use_name_prefix      = optional(bool, true)
+    iam_role_path                 = optional(string)
+    iam_role_description          = optional(string)
+    iam_role_permissions_boundary = optional(string)
+    iam_role_tags                 = optional(map(string))
+
+    # Mount target(s)
+    security_groups = optional(list(string))
+    mount_targets = optional(map(object({
+      subnet_id       = string
+      ip_address_type = optional(string)
+      ipv4_address    = optional(string)
+      ipv6_address    = optional(string)
+    })), {})
+
+    # Access point(s)
+    access_points = optional(map(object({
+      name = optional(string) # Will fall back to map key
+      tags = optional(map(string))
+
+      posix_user = optional(object({
+        gid            = number
+        uid            = number
+        secondary_gids = optional(list(number))
+      }))
+      root_directory = optional(object({
+        path = optional(string)
+        creation_permissions = optional(object({
+          owner_gid   = number
+          owner_uid   = number
+          permissions = string
+        }))
+      }))
+
+      read_access_arns       = optional(list(string))
+      read_write_access_arns = optional(list(string))
+    })), {})
+
+    # File system policy
+    policy_statements = optional(list(object({
+      sid           = optional(string)
+      actions       = optional(list(string))
+      not_actions   = optional(list(string))
+      effect        = optional(string)
+      resources     = optional(list(string))
+      not_resources = optional(list(string))
+      principals = optional(list(object({
+        type        = string
+        identifiers = list(string)
+      })))
+      not_principals = optional(list(object({
+        type        = string
+        identifiers = list(string)
+      })))
+      conditions = optional(list(object({
+        test     = string
+        values   = list(string)
+        variable = string
+      })))
+    })))
+
+    # Synchronization
+    synchronization_configuration = optional(object({
+      import_data_rule = list(object({
+        prefix         = string
+        size_less_than = number
+        trigger        = string
+      }))
+      expiration_data_rule = object({
+        days_after_last_access = number
+      })
+    }))
+  }))
+  default  = {}
+  nullable = false
+}
+
+################################################################################
+# File System Security Group
+################################################################################
+
+variable "create_file_system_security_group" {
+  description = "Determines whether to create a security group shared by the mount targets of every file system that does not set its own `security_groups`"
+  type        = bool
+  default     = true
+}
+
+variable "file_system_security_group_name" {
+  description = "Name of the file system security group. Defaults to `<bucket>-s3files`"
+  type        = string
+  default     = null
+}
+
+variable "file_system_security_group_use_name_prefix" {
+  description = "Determines whether `file_system_security_group_name` is used as a prefix"
+  type        = bool
+  default     = true
+}
+
+variable "file_system_security_group_description" {
+  description = "Description of the file system security group"
+  type        = string
+  default     = null
+}
+
+variable "file_system_security_group_vpc_id" {
+  description = "ID of the VPC where the file system security group is created. Must be the VPC of the mount target subnets"
+  type        = string
+  default     = null
+}
+
+variable "file_system_security_group_ingress_rules" {
+  description = "Map of ingress rules to add to the file system security group"
+  type = map(object({
+    name = optional(string)
+
+    cidr_ipv4                    = optional(string)
+    cidr_ipv6                    = optional(string)
+    description                  = optional(string)
+    from_port                    = optional(number, 2049)
+    ip_protocol                  = optional(string, "tcp")
+    prefix_list_id               = optional(string)
+    referenced_security_group_id = optional(string)
+    tags                         = optional(map(string))
+    to_port                      = optional(number, 2049)
+  }))
+  default  = {}
+  nullable = false
+}
+
+variable "file_system_security_group_egress_rules" {
+  description = "Map of egress rules to add to the file system security group"
+  type = map(object({
+    name = optional(string)
+
+    cidr_ipv4                    = optional(string)
+    cidr_ipv6                    = optional(string)
+    description                  = optional(string)
+    from_port                    = optional(number)
+    ip_protocol                  = string
+    prefix_list_id               = optional(string)
+    referenced_security_group_id = optional(string)
+    tags                         = optional(map(string))
+    to_port                      = optional(number)
+  }))
+  default  = {}
+  nullable = false
+}
+
+variable "file_system_security_group_tags" {
+  description = "A map of additional tags to add to the file system security group"
+  type        = map(string)
+  default     = null
+}
+
 variable "putin_khuylo" {
   description = "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!"
   type        = bool
