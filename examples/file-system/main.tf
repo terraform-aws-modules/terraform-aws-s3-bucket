@@ -9,6 +9,9 @@ locals {
   vpc_cidr = "10.0.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
+  # One mount target per Availability Zone, keyed by the zone name so the keys are known at plan time
+  mount_targets = { for az, subnet_id in zipmap(local.azs, module.vpc.private_subnets) : az => { subnet_id = subnet_id } }
+
   tags = {
     Name       = local.name
     Example    = local.name
@@ -36,13 +39,13 @@ module "s3_bucket" {
   force_destroy = true
 
   versioning = {
-    status = true
+    enabled = true
   }
 
   file_systems = {
     training = {
       prefix        = "training/"
-      mount_targets = { for az, subnet_id in zipmap(local.azs, module.vpc.private_subnets) : az => { subnet_id = subnet_id } }
+      mount_targets = local.mount_targets
 
       synchronization_configuration = {
         # Preload files under 10 MiB and expire them after 3 days without access
@@ -59,7 +62,7 @@ module "s3_bucket" {
 
     agents = {
       prefix          = "agents/"
-      mount_targets   = { for az, subnet_id in zipmap(local.azs, module.vpc.private_subnets) : az => { subnet_id = subnet_id } }
+      mount_targets   = local.mount_targets
       security_groups = [module.agents_security_group.id]
 
       access_points = {
@@ -94,11 +97,17 @@ module "s3_bucket" {
     }
   }
 
-  file_system_security_group_vpc_id = module.vpc.vpc_id
+  file_system_security_group_name            = "${local.name}-mount-targets"
+  file_system_security_group_use_name_prefix = false
+  file_system_security_group_description     = "S3 Files mount targets"
+  file_system_security_group_vpc_id          = module.vpc.vpc_id
   file_system_security_group_ingress_rules = {
     clients = {
       referenced_security_group_id = module.client_security_group.id
     }
+  }
+  file_system_security_group_tags = {
+    Purpose = "s3-files"
   }
 
   tags = local.tags
@@ -111,7 +120,8 @@ module "s3_bucket" {
 module "disabled" {
   source = "../../"
 
-  create_bucket = false
+  create_bucket                     = false
+  create_file_system_security_group = false
 
   file_systems = {
     disabled = {}

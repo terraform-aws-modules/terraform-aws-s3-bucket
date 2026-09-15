@@ -828,7 +828,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
   }
 }
 
-# ALB/NLB
+# Network Load Balancer access logs
 data "aws_iam_policy_document" "lb_log_delivery" {
   count = local.create_bucket && var.attach_lb_log_delivery_policy && !var.is_directory_bucket ? 1 : 0
 
