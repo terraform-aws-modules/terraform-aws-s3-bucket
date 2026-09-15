@@ -54,7 +54,7 @@ No inputs.
 | Name | Description |
 | ---- | ----------- |
 | <a name="output_file_system_access_points"></a> [file\_system\_access\_points](#output\_file\_system\_access\_points) | Map of file system access points created and their attributes |
-| <a name="output_file_system_iam_roles"></a> [file\_system\_iam\_roles](#output\_file\_system\_iam\_roles) | Map of IAM roles created for the file systems and their attributes |
+| <a name="output_file_system_iam_roles"></a> [file\_system\_iam\_roles](#output\_file\_system\_iam\_roles) | Map of IAM roles created for the file systems, with their ARN, name and unique ID |
 | <a name="output_file_system_mount_targets"></a> [file\_system\_mount\_targets](#output\_file\_system\_mount\_targets) | Map of file system mount targets created and their attributes |
 | <a name="output_file_system_security_group_arn"></a> [file\_system\_security\_group\_arn](#output\_file\_system\_security\_group\_arn) | ARN of the file system security group |
 | <a name="output_file_system_security_group_id"></a> [file\_system\_security\_group\_id](#output\_file\_system\_security\_group\_id) | ID of the file system security group |

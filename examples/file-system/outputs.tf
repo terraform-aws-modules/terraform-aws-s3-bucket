@@ -14,7 +14,7 @@ output "file_system_access_points" {
 }
 
 output "file_system_iam_roles" {
-  description = "Map of IAM roles created for the file systems and their attributes"
+  description = "Map of IAM roles created for the file systems, with their ARN, name and unique ID"
   value       = module.s3_bucket.file_system_iam_roles
 }
 
