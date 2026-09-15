@@ -114,8 +114,12 @@ output "file_systems" {
 }
 
 output "file_system_iam_roles" {
-  description = "Map of file system IAM roles created and their attributes"
-  value       = aws_iam_role.file_system
+  description = "Map of file system IAM roles created, with their ARN, name and unique ID"
+  value = { for k, v in aws_iam_role.file_system : k => {
+    arn       = v.arn
+    name      = v.name
+    unique_id = v.unique_id
+  } }
 }
 
 output "file_system_mount_targets" {

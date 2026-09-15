@@ -376,7 +376,7 @@ No modules.
 | ---- | ----------- |
 | <a name="output_aws_s3_bucket_versioning_status"></a> [aws\_s3\_bucket\_versioning\_status](#output\_aws\_s3\_bucket\_versioning\_status) | The versioning status of the bucket. Will be 'Enabled', 'Suspended', or 'Disabled' |
 | <a name="output_file_system_access_points"></a> [file\_system\_access\_points](#output\_file\_system\_access\_points) | Map of file system access points created and their attributes, keyed `<file system>/<access point>` |
-| <a name="output_file_system_iam_roles"></a> [file\_system\_iam\_roles](#output\_file\_system\_iam\_roles) | Map of file system IAM roles created and their attributes |
+| <a name="output_file_system_iam_roles"></a> [file\_system\_iam\_roles](#output\_file\_system\_iam\_roles) | Map of file system IAM roles created, with their ARN, name and unique ID |
 | <a name="output_file_system_mount_targets"></a> [file\_system\_mount\_targets](#output\_file\_system\_mount\_targets) | Map of file system mount targets created and their attributes, keyed `<file system>/<mount target>` |
 | <a name="output_file_system_security_group_arn"></a> [file\_system\_security\_group\_arn](#output\_file\_system\_security\_group\_arn) | ARN of the security group shared by the file system mount targets |
 | <a name="output_file_system_security_group_id"></a> [file\_system\_security\_group\_id](#output\_file\_system\_security\_group\_id) | ID of the security group shared by the file system mount targets |
