@@ -14,15 +14,19 @@ These features of S3 bucket configurations are supported:
 - server-side encryption
 - object locking
 - Cross-Region Replication (CRR)
-- ELB log delivery bucket policy
-- ALB/NLB log delivery bucket policy
-- WAF log delivery bucket policy
+- ELB, ALB/NLB and WAF log delivery bucket policies
+- file system access to bucket data with Amazon S3 Files
 - Account-level Public Access Block
-- S3 Directory Bucket
-- S3 Table Bucket
-- S3 Vectors
+
+Besides general purpose buckets, this repository manages these S3 bucket types:
+
+- [S3 Directory Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/directory-bucket), created by the root module when `is_directory_bucket = true`
+- [S3 Table Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/table-bucket), through the `table-bucket` sub-module
+- [S3 Vectors](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/vectors), through the `vectors` sub-module
 
 ## Usage
+
+See the [`examples`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples) directory for working examples to reference.
 
 ### Private bucket with versioning enabled
 
@@ -42,58 +46,22 @@ module "s3_bucket" {
 }
 ```
 
-### Bucket with ELB access log delivery policy attached
+### Bucket with log delivery policies attached
+
+Each `attach_*_log_delivery_policy` flag adds the statements one service needs to write its logs to the bucket, and the module merges every enabled flag into a single bucket policy.
 
 ```hcl
 module "s3_bucket_for_logs" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "my-s3-bucket-for-logs"
-  acl    = "log-delivery-write"
+  bucket = "aws-waf-logs-my-s3-bucket-for-logs"
 
-  # Allow deletion of non-empty bucket
-  force_destroy = true
-
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
-
+  # Application and Classic Load Balancer access logs
   attach_elb_log_delivery_policy = true
-}
-```
-
-### Bucket with ALB/NLB access log delivery policy attached
-
-```hcl
-module "s3_bucket_for_logs" {
-  source = "terraform-aws-modules/s3-bucket/aws"
-
-  bucket = "my-s3-bucket-for-logs"
-
-  # Allow deletion of non-empty bucket
-  force_destroy = true
-
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
-
-  attach_lb_log_delivery_policy = true # Required for ALB/NLB logs
-}
-```
-
-### Bucket with WAF log delivery policy attached
-
-```hcl
-module "s3_bucket_for_waf_logs" {
-  source = "terraform-aws-modules/s3-bucket/aws"
-
-  bucket = "my-s3-bucket-for-waf-logs"
-
-  # Allow deletion of non-empty bucket
-  force_destroy = true
-
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
-
-  attach_waf_log_delivery_policy = true  # Required for WAF logs
+  # Network Load Balancer access logs
+  attach_lb_log_delivery_policy = true
+  # AWS WAF logs, which require a bucket name that starts with `aws-waf-logs-`
+  attach_waf_log_delivery_policy = true
 }
 ```
 
@@ -124,6 +92,40 @@ module "s3_bucket" {
 }
 ```
 
+### Bucket with an S3 file system
+
+S3 Files requires versioning on the bucket, and the module creates the IAM role and a security group shared by the mount targets.
+
+```hcl
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket = "my-s3-bucket"
+
+  versioning = {
+    enabled = true
+  }
+
+  file_system_security_group_vpc_id = "vpc-1234556abcdef"
+  file_system_security_group_ingress_rules = {
+    clients = {
+      referenced_security_group_id = "sg-1234556abcdef"
+    }
+  }
+
+  file_systems = {
+    datasets = {
+      prefix = "datasets/"
+
+      mount_targets = {
+        eu-west-1a = { subnet_id = "subnet-abcde012" }
+        eu-west-1b = { subnet_id = "subnet-bcde012a" }
+      }
+    }
+  }
+}
+```
+
 ## Conditional creation
 
 Sometimes you need to have a way to create S3 resources conditionally but Terraform does not allow to use `count` inside `module` block, so the solution is to specify argument `create_bucket`.
@@ -140,9 +142,7 @@ module "s3_bucket" {
 
 ## Module wrappers
 
-Users of this Terraform module can create multiple similar resources by using [`for_each` meta-argument within `module` block](https://www.terraform.io/language/meta-arguments/for_each) which became available in Terraform 0.13.
-
-Users of Terragrunt can achieve similar results by using modules provided in the [wrappers](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/wrappers) directory, if they prefer to reduce amount of configuration files.
+Users of Terragrunt can create multiple similar resources from one configuration with the modules in the [wrappers](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/wrappers) directory.
 
 <!-- BEGIN_KNOWN_LIMITATIONS -->
 
@@ -204,6 +204,7 @@ Disclosure: written by this module's maintainer, who also builds
 - [S3 Inventory and Analytics](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/inventory-and-analytics) - S3 bucket Inventory and Analytics configurations.
 - [S3 ACLs](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/acl) - S3 bucket ACLs, for the buckets that still require them.
 - [S3 Bucket Policies](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/bucket-policies) - Attach the bundled log delivery and transport policies.
+- [S3 file system](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/file-system) - Amazon S3 Files file systems scoped to bucket prefixes, with mount targets and access points.
 - [S3 Account-level Public Access Block](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/account-public-access) - Manage S3 account-level Public Access Block.
 - [S3 Directory Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/directory-bucket) - S3 Directory Bucket configuration.
 - [S3 Table Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/table-bucket) - S3 Table Bucket configuration.
