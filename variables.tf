@@ -806,7 +806,7 @@ variable "file_systems" {
     iam_role_permissions_boundary = optional(string)
     iam_role_tags                 = optional(map(string))
 
-    # Mount target(s)
+    # Mount target(s). Key them by a value known at plan time, such as the Availability Zone
     security_groups = optional(list(string))
     mount_targets = optional(map(object({
       subnet_id       = string
@@ -850,6 +850,8 @@ variable "file_systems" {
     })), {})
 
     # File system policy
+    source_policy_documents   = optional(list(string), [])
+    override_policy_documents = optional(list(string), [])
     policy_statements = optional(list(object({
       sid           = optional(string)
       actions       = optional(list(string))
