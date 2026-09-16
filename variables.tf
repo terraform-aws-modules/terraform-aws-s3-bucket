@@ -807,7 +807,39 @@ variable "file_systems" {
     iam_role_tags                 = optional(map(string))
 
     # Mount target(s). Key them by a value known at plan time, such as the Availability Zone
-    security_groups = optional(list(string))
+    # Setting security_groups replaces the group this module would otherwise create for the file system
+    security_groups                = optional(list(string))
+    create_security_group          = optional(bool)
+    security_group_name            = optional(string)
+    security_group_use_name_prefix = optional(bool)
+    security_group_description     = optional(string)
+    security_group_ingress_rules = optional(map(object({
+      name = optional(string)
+
+      cidr_ipv4                    = optional(string)
+      cidr_ipv6                    = optional(string)
+      description                  = optional(string)
+      from_port                    = optional(number, 2049)
+      ip_protocol                  = optional(string, "tcp")
+      prefix_list_id               = optional(string)
+      referenced_security_group_id = optional(string)
+      tags                         = optional(map(string))
+      to_port                      = optional(number, 2049)
+    })))
+    security_group_egress_rules = optional(map(object({
+      name = optional(string)
+
+      cidr_ipv4                    = optional(string)
+      cidr_ipv6                    = optional(string)
+      description                  = optional(string)
+      from_port                    = optional(number)
+      ip_protocol                  = string
+      prefix_list_id               = optional(string)
+      referenced_security_group_id = optional(string)
+      tags                         = optional(map(string))
+      to_port                      = optional(number)
+    })))
+    security_group_tags = optional(map(string))
     mount_targets = optional(map(object({
       subnet_id       = string
       ip_address_type = optional(string)
@@ -896,37 +928,19 @@ variable "file_systems" {
 ################################################################################
 
 variable "create_file_system_security_group" {
-  description = "Whether to create a security group shared by the mount targets of every file system that does not set its own `security_groups`"
+  description = "Whether each file system creates a security group for its mount targets. A file system that sets its own `security_groups` never creates one"
   type        = bool
   default     = true
-}
-
-variable "file_system_security_group_name" {
-  description = "Name of the file system security group. Defaults to `<bucket>-s3files`"
-  type        = string
-  default     = null
-}
-
-variable "file_system_security_group_use_name_prefix" {
-  description = "Whether `file_system_security_group_name` is used as a prefix"
-  type        = bool
-  default     = true
-}
-
-variable "file_system_security_group_description" {
-  description = "Description of the file system security group"
-  type        = string
-  default     = null
 }
 
 variable "file_system_security_group_vpc_id" {
-  description = "ID of the VPC where the file system security group is created. Must be the VPC of the mount target subnets"
+  description = "ID of the VPC where the file system security groups are created. Must be the VPC of the mount target subnets"
   type        = string
   default     = null
 }
 
 variable "file_system_security_group_ingress_rules" {
-  description = "Map of ingress rules to add to the file system security group"
+  description = "Map of ingress rules added to every file system security group this module creates. A file system can replace them with its own `security_group_ingress_rules`"
   type = map(object({
     name = optional(string)
 
@@ -945,7 +959,7 @@ variable "file_system_security_group_ingress_rules" {
 }
 
 variable "file_system_security_group_egress_rules" {
-  description = "Map of egress rules to add to the file system security group"
+  description = "Map of egress rules added to every file system security group this module creates. A file system can replace them with its own `security_group_egress_rules`"
   type = map(object({
     name = optional(string)
 
@@ -964,7 +978,7 @@ variable "file_system_security_group_egress_rules" {
 }
 
 variable "file_system_security_group_tags" {
-  description = "A map of additional tags to add to the file system security group"
+  description = "A map of additional tags added to every file system security group this module creates"
   type        = map(string)
   default     = null
 }

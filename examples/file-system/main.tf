@@ -50,6 +50,10 @@ module "s3_bucket" {
       prefix        = "training/"
       mount_targets = local.mount_targets
 
+      security_group_name            = "${local.name}-training"
+      security_group_use_name_prefix = false
+      security_group_description     = "Mount targets of the training S3 file system"
+
       # A hand-written document, merged into the policy the module generates
       source_policy_documents = [data.aws_iam_policy_document.no_root_access.json]
 
@@ -125,10 +129,8 @@ module "s3_bucket" {
     }
   }
 
-  file_system_security_group_name            = "${local.name}-mount-targets"
-  file_system_security_group_use_name_prefix = false
-  file_system_security_group_description     = "S3 Files mount targets"
-  file_system_security_group_vpc_id          = module.vpc.vpc_id
+  # Defaults for the security group each file system creates for its own mount targets
+  file_system_security_group_vpc_id = module.vpc.vpc_id
   file_system_security_group_ingress_rules = {
     clients = {
       referenced_security_group_id = module.client_security_group.id
@@ -145,13 +147,14 @@ module "s3_bucket" {
 # File System On A Bucket This Module Does Not Manage
 ################################################################################
 
-module "file_system" {
+module "s3_file_system" {
   source = "../../modules/file-system"
 
   name       = "${local.name}-external"
   bucket_arn = aws_s3_bucket.external.arn
-  # Passing the versioning resource's own status orders the file system after versioning on create,
-  # and before it on destroy
+  # Pass the versioning resource's own status, not a literal "Enabled". The reference is what makes the
+  # file system wait for versioning on create, and be deleted before versioning is suspended on destroy.
+  # Callers of the root module's file_systems input get this wiring for free
   bucket_versioning_status = aws_s3_bucket_versioning.external.versioning_configuration[0].status
 
   prefix        = "external/"
