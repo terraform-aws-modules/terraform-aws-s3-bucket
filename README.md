@@ -24,6 +24,15 @@ Besides general purpose buckets, this repository manages these S3 bucket types:
 - [S3 Table Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/table-bucket), through the `table-bucket` sub-module
 - [S3 Vectors](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/vectors), through the `vectors` sub-module
 
+See the respective sub-module `README.md` for details on how to use:
+
+- [`account-public-access`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/account-public-access) - the account-level Public Access Block, which applies to every bucket in the account
+- [`file-system`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/file-system) - an Amazon S3 Files file system on a bucket this module does not manage
+- [`notification`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/notification) - bucket notifications to Lambda, SQS, SNS and EventBridge
+- [`object`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/object) - objects placed in a bucket
+- [`table-bucket`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/table-bucket) - table buckets and the Iceberg tables in them
+- [`vectors`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/vectors) - vector buckets and vector indexes
+
 ## Usage
 
 See the [`examples`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples) directory for working examples to reference.
@@ -127,6 +136,14 @@ module "s3_bucket" {
   }
 }
 ```
+
+## Notes
+
+- A bucket carrying an S3 file system needs versioning enabled and either SSE-S3 or SSE-KMS encryption. S3 Files is not available on a directory bucket, and the module says so rather than ignoring `file_systems`.
+- Changing a file system's `prefix`, its KMS key, or its IAM role replaces the file system, along with its mount targets and access points. An access point cannot be edited either, so any change to one replaces it and gives it a new ARN.
+- Removing a `synchronization_configuration` leaves the file system expiring data after 365 days, not the 30 days AWS applies to a file system that never had one.
+- A principal named in an access point's `read_access_arns` or `read_write_access_arns` reaches that file system only through the access points that name it. The module writes the allow and deny pair AWS recommends, and a read-only principal is also denied writes through its own access point.
+- Key `mount_targets` by something known at plan time, such as the Availability Zone. Terraform cannot create resources whose map keys come from values that only exist after an apply.
 
 ## Conditional creation
 
