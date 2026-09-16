@@ -2,6 +2,7 @@ variable "create" {
   description = "Whether to create the file system and its associated resources"
   type        = bool
   default     = true
+  nullable    = false
 }
 
 variable "region" {
@@ -73,6 +74,7 @@ variable "create_iam_role" {
   description = "Whether to create an IAM role for the file system"
   type        = bool
   default     = true
+  nullable    = false
 }
 
 # A role brought in must already carry its permissions when the file system is created. S3 Files checks
@@ -93,6 +95,7 @@ variable "iam_role_use_name_prefix" {
   description = "Whether to use the IAM role name as a prefix"
   type        = bool
   default     = true
+  nullable    = false
 }
 
 variable "iam_role_path" {
@@ -103,6 +106,40 @@ variable "iam_role_path" {
 
 variable "iam_role_description" {
   description = "Description of the IAM role created"
+  type        = string
+  default     = null
+}
+
+variable "iam_role_source_assume_policy_documents" {
+  description = "List of IAM policy documents that are merged together into the role's trust policy. Statements must have unique `sid`s"
+  type        = list(string)
+  default     = []
+  nullable    = false
+}
+
+variable "iam_role_override_assume_policy_documents" {
+  description = "List of IAM policy documents that are merged together into the role's trust policy. In merging, statements with non-blank `sid`s will override statements with the same `sid`"
+  type        = list(string)
+  default     = []
+  nullable    = false
+}
+
+variable "iam_role_source_policy_documents" {
+  description = "List of IAM policy documents that are merged together into the role's permissions policy. Statements must have unique `sid`s"
+  type        = list(string)
+  default     = []
+  nullable    = false
+}
+
+variable "iam_role_override_policy_documents" {
+  description = "List of IAM policy documents that are merged together into the role's permissions policy. In merging, statements with non-blank `sid`s will override statements with the same `sid`"
+  type        = list(string)
+  default     = []
+  nullable    = false
+}
+
+variable "iam_role_policy_name" {
+  description = "Name of the role's inline permissions policy. Falls back to the role's own name"
   type        = string
   default     = null
 }
@@ -130,7 +167,7 @@ variable "mount_targets" {
     ip_address_type = optional(string)
     ipv4_address    = optional(string)
     ipv6_address    = optional(string)
-    security_groups = optional(list(string))
+    security_groups = optional(list(string), [])
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -142,9 +179,10 @@ variable "mount_targets" {
 }
 
 variable "security_groups" {
-  description = "Security groups for the mount targets. Replaces the security group this module would otherwise create"
+  description = "Security groups added to every mount target, alongside the group this module creates"
   type        = list(string)
-  default     = null
+  default     = []
+  nullable    = false
 }
 
 ################################################################################
@@ -155,6 +193,7 @@ variable "create_security_group" {
   description = "Whether to create a security group for the mount targets"
   type        = bool
   default     = true
+  nullable    = false
 }
 
 variable "security_group_name" {
@@ -167,6 +206,7 @@ variable "security_group_use_name_prefix" {
   description = "Whether to use the security group name as a prefix"
   type        = bool
   default     = true
+  nullable    = false
 }
 
 variable "security_group_description" {

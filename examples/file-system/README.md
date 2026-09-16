@@ -36,6 +36,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="module_client_role"></a> [client\_role](#module\_client\_role) | terraform-aws-modules/iam/aws//modules/iam-role | ~> 6.0 |
 | <a name="module_client_security_group"></a> [client\_security\_group](#module\_client\_security\_group) | terraform-aws-modules/security-group/aws | ~> 6.0 |
 | <a name="module_disabled"></a> [disabled](#module\_disabled) | ../../ | n/a |
+| <a name="module_external_bucket"></a> [external\_bucket](#module\_external\_bucket) | ../../ | n/a |
 | <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
 | <a name="module_s3_file_system"></a> [s3\_file\_system](#module\_s3\_file\_system) | ../../modules/file-system | n/a |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 6.0 |
@@ -44,8 +45,6 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Type |
 | ---- | ---- |
-| [aws_s3_bucket.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
-| [aws_s3_bucket_versioning.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_iam_policy_document.no_root_access](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 

@@ -798,17 +798,22 @@ variable "file_systems" {
     create_iam_role = optional(bool, true)
     # A role brought in must already carry its permissions when the file system is created. S3 Files checks
     # them at creation, and the file system depends only on the role's ARN, not on any policy attached to it
-    iam_role_arn                  = optional(string)
-    iam_role_name                 = optional(string)
-    iam_role_use_name_prefix      = optional(bool, true)
-    iam_role_path                 = optional(string)
-    iam_role_description          = optional(string)
-    iam_role_permissions_boundary = optional(string)
-    iam_role_tags                 = optional(map(string))
+    iam_role_arn                              = optional(string)
+    iam_role_name                             = optional(string)
+    iam_role_use_name_prefix                  = optional(bool, true)
+    iam_role_path                             = optional(string)
+    iam_role_description                      = optional(string)
+    iam_role_permissions_boundary             = optional(string)
+    iam_role_policy_name                      = optional(string)
+    iam_role_source_assume_policy_documents   = optional(list(string), [])
+    iam_role_override_assume_policy_documents = optional(list(string), [])
+    iam_role_source_policy_documents          = optional(list(string), [])
+    iam_role_override_policy_documents        = optional(list(string), [])
+    iam_role_tags                             = optional(map(string))
 
     # Mount target(s). Key them by a value known at plan time, such as the Availability Zone
-    # Setting security_groups replaces the group this module would otherwise create for the file system
-    security_groups                = optional(list(string))
+    # security_groups are added to every mount target, alongside the group this module creates
+    security_groups                = optional(list(string), [])
     create_security_group          = optional(bool)
     security_group_name            = optional(string)
     security_group_use_name_prefix = optional(bool)
