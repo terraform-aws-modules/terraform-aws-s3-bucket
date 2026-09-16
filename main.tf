@@ -1628,6 +1628,7 @@ module "s3_file_system" {
   security_group_tags            = each.value.security_group_tags != null ? each.value.security_group_tags : var.file_system_security_group_tags
 
   access_points             = each.value.access_points
+  create_policy             = each.value.create_policy
   source_policy_documents   = each.value.source_policy_documents
   override_policy_documents = each.value.override_policy_documents
   policy_statements         = each.value.policy_statements

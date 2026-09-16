@@ -887,6 +887,7 @@ variable "file_systems" {
     })), {})
 
     # File system policy
+    create_policy             = optional(bool, false)
     source_policy_documents   = optional(list(string), [])
     override_policy_documents = optional(list(string), [])
     policy_statements = optional(list(object({

@@ -29,11 +29,12 @@ data "aws_iam_policy_document" "table_bucket_policy" {
     for_each = var.table_bucket_policy_statements
 
     content {
-      sid           = statement.value.sid
-      actions       = statement.value.actions
-      not_actions   = statement.value.not_actions
-      effect        = statement.value.effect
-      resources     = statement.value.resources != null || statement.value.not_resources != null ? statement.value.resources : ["${aws_s3tables_table_bucket.this[0].arn}/table/*"]
+      sid         = statement.value.sid
+      actions     = statement.value.actions
+      not_actions = statement.value.not_actions
+      effect      = statement.value.effect
+      # Default to the tables in this bucket, unless the caller scoped the statement with not_resources
+      resources     = statement.value.not_resources == null ? coalesce(statement.value.resources, ["${aws_s3tables_table_bucket.this[0].arn}/table/*"]) : statement.value.resources
       not_resources = statement.value.not_resources
 
       dynamic "principals" {

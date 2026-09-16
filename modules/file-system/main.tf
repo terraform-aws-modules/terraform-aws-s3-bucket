@@ -66,6 +66,12 @@ resource "aws_s3files_file_system" "this" {
       condition     = var.create_iam_role || var.iam_role_arn != null
       error_message = "Set iam_role_arn when create_iam_role is false. The file system cannot be created without a role."
     }
+
+    # Those grants are written into the file system policy, so without one they do nothing at all
+    precondition {
+      condition     = var.create_policy || !local.has_access_point_grants
+      error_message = "Set create_policy when an access point names read_access_arns or read_write_access_arns."
+    }
   }
 
   depends_on = [
@@ -451,14 +457,10 @@ locals {
     ]
   ])
 
-  # A policy exists whenever the caller sets statements or lists principals on an access point, so neither is silently
-  # ignored. Presence is tested rather than length, which is unknown at plan time for a list built from computed values
-  create_policy = var.create && (
-    var.policy_statements != null ||
-    length(var.source_policy_documents) > 0 ||
-    length(var.override_policy_documents) > 0 ||
-    anytrue([for ap in values(var.access_points) : ap.read_access_arns != null || ap.read_write_access_arns != null])
-  )
+  create_policy = var.create && var.create_policy
+
+  # Presence is tested rather than length, which is unknown at plan time for a list built from computed values
+  has_access_point_grants = anytrue([for ap in values(var.access_points) : ap.read_access_arns != null || ap.read_write_access_arns != null])
 }
 
 data "aws_iam_policy_document" "policy" {
@@ -471,11 +473,12 @@ data "aws_iam_policy_document" "policy" {
     for_each = var.policy_statements != null ? var.policy_statements : []
 
     content {
-      sid           = statement.value.sid
-      actions       = statement.value.actions
-      not_actions   = statement.value.not_actions
-      effect        = statement.value.effect
-      resources     = statement.value.resources != null || statement.value.not_resources != null ? statement.value.resources : [aws_s3files_file_system.this[0].arn]
+      sid         = statement.value.sid
+      actions     = statement.value.actions
+      not_actions = statement.value.not_actions
+      effect      = statement.value.effect
+      # Default to this file system, unless the caller scoped the statement with not_resources
+      resources     = statement.value.not_resources == null ? coalesce(statement.value.resources, [aws_s3files_file_system.this[0].arn]) : statement.value.resources
       not_resources = statement.value.not_resources
 
       dynamic "principals" {
@@ -526,38 +529,6 @@ data "aws_iam_policy_document" "policy" {
         test     = "StringEquals"
         variable = "s3files:AccessPointArn"
         values   = [aws_s3files_access_point.this[statement.value.access_point].arn]
-      }
-    }
-  }
-
-  # Deny writes to a principal granted read access, through the access point that grants it. The allow
-  # above grants only ClientMount, and an allow elsewhere would otherwise still let it write
-  dynamic "statement" {
-    for_each = {
-      for pair in flatten([
-        for ap_key, ap in var.access_points : [
-          for principal in(ap.read_access_arns != null ? ap.read_access_arns : []) : {
-            principal    = principal
-            access_point = ap_key
-          }
-        ]
-      ]) : pair.principal => pair.access_point...
-    }
-
-    content {
-      effect    = "Deny"
-      actions   = ["s3files:ClientWrite", "s3files:ClientRootAccess"]
-      resources = [aws_s3files_file_system.this[0].arn]
-
-      principals {
-        type        = "AWS"
-        identifiers = [statement.key]
-      }
-
-      condition {
-        test     = "StringEquals"
-        variable = "s3files:AccessPointArn"
-        values   = [for ap in distinct(statement.value) : aws_s3files_access_point.this[ap].arn]
       }
     }
   }

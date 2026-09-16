@@ -9,6 +9,7 @@ module "wrapper" {
   bucket_versioning_status                  = try(each.value.bucket_versioning_status, var.defaults.bucket_versioning_status)
   create                                    = try(each.value.create, var.defaults.create, true)
   create_iam_role                           = try(each.value.create_iam_role, var.defaults.create_iam_role, true)
+  create_policy                             = try(each.value.create_policy, var.defaults.create_policy, false)
   create_security_group                     = try(each.value.create_security_group, var.defaults.create_security_group, true)
   iam_role_arn                              = try(each.value.iam_role_arn, var.defaults.iam_role_arn, null)
   iam_role_description                      = try(each.value.iam_role_description, var.defaults.iam_role_description, null)
