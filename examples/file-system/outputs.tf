@@ -18,14 +18,14 @@ output "file_system_iam_roles" {
   value       = module.s3_bucket.file_system_iam_roles
 }
 
-output "file_system_security_group_arn" {
-  description = "ARN of the file system security group"
-  value       = module.s3_bucket.file_system_security_group_arn
+output "file_system_security_group_arns" {
+  description = "Map of the security group created for each file system, by ARN"
+  value       = module.s3_bucket.file_system_security_group_arns
 }
 
-output "file_system_security_group_id" {
-  description = "ID of the file system security group"
-  value       = module.s3_bucket.file_system_security_group_id
+output "file_system_security_group_ids" {
+  description = "Map of the security group created for each file system, by ID"
+  value       = module.s3_bucket.file_system_security_group_ids
 }
 
 ################################################################################
@@ -34,15 +34,15 @@ output "file_system_security_group_id" {
 
 output "external_file_system_arn" {
   description = "ARN of the file system created on the bucket this module does not manage"
-  value       = module.file_system.arn
+  value       = module.s3_file_system.arn
 }
 
 output "external_file_system_id" {
   description = "ID of the file system created on the bucket this module does not manage"
-  value       = module.file_system.id
+  value       = module.s3_file_system.id
 }
 
 output "external_file_system_security_group_id" {
   description = "ID of the security group created for that file system's mount targets"
-  value       = module.file_system.security_group_id
+  value       = module.s3_file_system.security_group_id
 }

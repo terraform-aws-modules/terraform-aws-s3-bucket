@@ -1,4 +1,6 @@
 data "aws_region" "current" {
+  count = local.create_bucket ? 1 : 0
+
   region = var.region
 }
 
@@ -6,14 +8,18 @@ data "aws_canonical_user_id" "this" {
   count = local.create_bucket && local.create_bucket_acl && try(var.owner["id"], null) == null ? 1 : 0
 }
 
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+  count = local.create_bucket ? 1 : 0
+}
 
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+  count = local.create_bucket ? 1 : 0
+}
 
 locals {
-  account_id = data.aws_caller_identity.current.account_id
-  partition  = data.aws_partition.current.partition
-  region     = data.aws_region.current.region
+  account_id = try(data.aws_caller_identity.current[0].account_id, "")
+  partition  = try(data.aws_partition.current[0].partition, "")
+  region     = try(data.aws_region.current[0].region, "")
 }
 
 locals {
@@ -1574,7 +1580,7 @@ locals {
   file_systems = { for k, v in var.file_systems : k => v if local.create_bucket && !var.is_directory_bucket }
 }
 
-module "file_system" {
+module "s3_file_system" {
   source = "./modules/file-system"
 
   for_each = local.file_systems
@@ -1602,10 +1608,19 @@ module "file_system" {
   iam_role_permissions_boundary = each.value.iam_role_permissions_boundary
   iam_role_tags                 = each.value.iam_role_tags
 
-  # Mount targets use the group shared by every file system on the bucket unless this one brings its own
-  mount_targets         = each.value.mount_targets
-  create_security_group = false
-  security_groups       = each.value.security_groups != null ? each.value.security_groups : (local.create_file_system_security_group ? [aws_security_group.file_system[0].id] : null)
+  mount_targets   = each.value.mount_targets
+  security_groups = each.value.security_groups
+
+  # Each file system gets its own group, so a rule can be withdrawn from one without touching the rest.
+  # The root settings are the defaults, and a file system can replace any of them
+  create_security_group          = each.value.create_security_group != null ? each.value.create_security_group : var.create_file_system_security_group
+  security_group_name            = each.value.security_group_name
+  security_group_use_name_prefix = each.value.security_group_use_name_prefix
+  security_group_description     = each.value.security_group_description
+  security_group_vpc_id          = var.file_system_security_group_vpc_id
+  security_group_ingress_rules   = each.value.security_group_ingress_rules != null ? each.value.security_group_ingress_rules : var.file_system_security_group_ingress_rules
+  security_group_egress_rules    = each.value.security_group_egress_rules != null ? each.value.security_group_egress_rules : var.file_system_security_group_egress_rules
+  security_group_tags            = each.value.security_group_tags != null ? each.value.security_group_tags : var.file_system_security_group_tags
 
   access_points             = each.value.access_points
   source_policy_documents   = each.value.source_policy_documents
@@ -1615,92 +1630,4 @@ module "file_system" {
   synchronization_configuration = each.value.synchronization_configuration
 
   tags = merge(var.tags, each.value.tags)
-}
-
-################################################################################
-# File System Security Group
-################################################################################
-
-locals {
-  # Only created when at least one file system relies on this group rather than on groups of its own.
-  # Neither the mount targets nor the VPC take part: mount targets can be keyed, and a VPC given, by
-  # values known only after apply, either of which would make this count unknown at plan time
-  create_file_system_security_group = var.create_file_system_security_group && anytrue([
-    for k, v in local.file_systems : v.create && v.security_groups == null
-  ])
-
-  file_system_security_group_name = var.file_system_security_group_name != null ? var.file_system_security_group_name : "${try(aws_s3_bucket.this[0].id, "")}-s3files"
-}
-
-resource "aws_security_group" "file_system" {
-  count = local.create_file_system_security_group ? 1 : 0
-
-  region = var.region
-
-  name        = var.file_system_security_group_use_name_prefix ? null : local.file_system_security_group_name
-  name_prefix = var.file_system_security_group_use_name_prefix ? "${local.file_system_security_group_name}-" : null
-  description = var.file_system_security_group_description
-
-  revoke_rules_on_delete = true
-  vpc_id                 = var.file_system_security_group_vpc_id
-
-  tags = merge(
-    var.tags,
-    { Name = local.file_system_security_group_name },
-    var.file_system_security_group_tags
-  )
-
-  lifecycle {
-    create_before_destroy = true
-
-    # Without a VPC the group would be created in the account's default VPC, where no mount target can use it
-    precondition {
-      condition     = var.file_system_security_group_vpc_id != null
-      error_message = "Set file_system_security_group_vpc_id, give each file system its own security_groups, or set create_file_system_security_group to false."
-    }
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "file_system" {
-  for_each = { for k, v in var.file_system_security_group_ingress_rules : k => v if local.create_file_system_security_group }
-
-  region = var.region
-
-  cidr_ipv4                    = each.value.cidr_ipv4
-  cidr_ipv6                    = each.value.cidr_ipv6
-  description                  = each.value.description
-  from_port                    = each.value.from_port
-  ip_protocol                  = each.value.ip_protocol
-  prefix_list_id               = each.value.prefix_list_id
-  referenced_security_group_id = each.value.referenced_security_group_id == "self" ? aws_security_group.file_system[0].id : each.value.referenced_security_group_id
-  security_group_id            = aws_security_group.file_system[0].id
-  to_port                      = each.value.to_port
-
-  tags = merge(
-    var.tags,
-    { Name = coalesce(each.value.name, "${local.file_system_security_group_name}-${each.key}") },
-    each.value.tags
-  )
-}
-
-resource "aws_vpc_security_group_egress_rule" "file_system" {
-  for_each = { for k, v in var.file_system_security_group_egress_rules : k => v if local.create_file_system_security_group }
-
-  region = var.region
-
-  cidr_ipv4                    = each.value.cidr_ipv4
-  cidr_ipv6                    = each.value.cidr_ipv6
-  description                  = each.value.description
-  from_port                    = each.value.from_port
-  ip_protocol                  = each.value.ip_protocol
-  prefix_list_id               = each.value.prefix_list_id
-  referenced_security_group_id = each.value.referenced_security_group_id == "self" ? aws_security_group.file_system[0].id : each.value.referenced_security_group_id
-  security_group_id            = aws_security_group.file_system[0].id
-  to_port                      = each.value.to_port
-
-  tags = merge(
-    var.tags,
-    { Name = coalesce(each.value.name, "${local.file_system_security_group_name}-${each.key}") },
-    each.value.tags
-  )
 }
