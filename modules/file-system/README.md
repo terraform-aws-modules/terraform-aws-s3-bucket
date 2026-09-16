@@ -85,6 +85,7 @@ No modules.
 | <a name="input_bucket_versioning_status"></a> [bucket\_versioning\_status](#input\_bucket\_versioning\_status) | Versioning status of the bucket. Pass the versioning resource's own attribute, which makes the file system wait for versioning on create and be deleted before it is suspended on destroy | `string` | n/a | yes |
 | <a name="input_create"></a> [create](#input\_create) | Whether to create the file system and its associated resources | `bool` | `true` | no |
 | <a name="input_create_iam_role"></a> [create\_iam\_role](#input\_create\_iam\_role) | Whether to create an IAM role for the file system | `bool` | `true` | no |
+| <a name="input_create_policy"></a> [create\_policy](#input\_create\_policy) | Whether to create a file system policy. Required for the access point `read_access_arns` and `read_write_access_arns` grants to take effect | `bool` | `false` | no |
 | <a name="input_create_security_group"></a> [create\_security\_group](#input\_create\_security\_group) | Whether to create a security group for the mount targets | `bool` | `true` | no |
 | <a name="input_iam_role_arn"></a> [iam\_role\_arn](#input\_iam\_role\_arn) | ARN of an existing IAM role for the file system to assume. Used when `create_iam_role` is `false` | `string` | `null` | no |
 | <a name="input_iam_role_description"></a> [iam\_role\_description](#input\_iam\_role\_description) | Description of the IAM role created | `string` | `null` | no |

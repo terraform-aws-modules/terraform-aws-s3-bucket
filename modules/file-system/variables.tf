@@ -318,6 +318,13 @@ variable "override_policy_documents" {
   default     = []
 }
 
+variable "create_policy" {
+  description = "Whether to create a file system policy. Required for the access point `read_access_arns` and `read_write_access_arns` grants to take effect"
+  type        = bool
+  default     = false
+  nullable    = false
+}
+
 variable "policy_statements" {
   description = "List of IAM policy [statements](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#statement) to add to the file system policy"
   type = list(object({
