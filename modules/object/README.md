@@ -1,6 +1,27 @@
 # S3 bucket object
 
-Creates S3 bucket objects with different configurations.
+Puts an object in a bucket, from a local file, inline content, or base64 content, with the storage
+class, encryption, tags and object lock settings the object needs.
+
+## Usage
+
+```hcl
+module "object" {
+  source = "terraform-aws-modules/s3-bucket/aws//modules/object"
+
+  bucket = "my-s3-bucket"
+  key    = "config/settings.json"
+
+  file_source = "settings.json"
+  # Triggers an update when the file content changes, without relying on etag, which is not a
+  # content hash for multipart or SSE-KMS objects
+  source_hash = filemd5("settings.json")
+
+  tags = {
+    Environment = "dev"
+  }
+}
+```
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

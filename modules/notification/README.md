@@ -1,6 +1,40 @@
 # S3 bucket notification
 
-Creates S3 bucket notification resource with all supported types of deliveries: AWS Lambda, SQS Queue, SNS Topic.
+Sends bucket events to AWS Lambda functions, SQS queues, SNS topics and EventBridge, and grants each
+destination the permission to receive them.
+
+> [!NOTE]
+> A bucket has one notification configuration, so all of its notifications belong to a single call of
+> this module. AWS also rejects two rules whose prefixes and suffixes overlap for the same event type.
+
+## Usage
+
+```hcl
+module "notifications" {
+  source = "terraform-aws-modules/s3-bucket/aws//modules/notification"
+
+  bucket = "my-s3-bucket"
+
+  eventbridge = true
+
+  lambda_notifications = {
+    thumbnails = {
+      function_arn  = "arn:aws:lambda:eu-west-1:123456789012:function:thumbnails"
+      function_name = "thumbnails"
+      events        = ["s3:ObjectCreated:Put"]
+      filter_prefix = "images/"
+      filter_suffix = ".jpg"
+    }
+  }
+
+  sqs_notifications = {
+    ingest = {
+      queue_arn = "arn:aws:sqs:eu-west-1:123456789012:ingest"
+      events    = ["s3:ObjectCreated:*"]
+    }
+  }
+}
+```
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

@@ -1,10 +1,26 @@
 # S3 account-level Public Access Block
 
-Manages S3 account-level Public Access Block configuration.
+Manages the S3 account-level Public Access Block, which applies to every bucket in the account and
+takes precedence over the settings on an individual bucket.
 
-## Note
+> [!IMPORTANT]
+> An account has one Public Access Block configuration. Managing it from more than one Terraform
+> configuration means each apply overwrites the other.
 
-Each AWS account may only have one S3 Public Access Block configuration.
+## Usage
+
+```hcl
+module "account_public_access" {
+  source = "terraform-aws-modules/s3-bucket/aws//modules/account-public-access"
+
+  account_id = "123456789012"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+```
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

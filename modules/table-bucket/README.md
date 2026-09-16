@@ -1,6 +1,53 @@
 # S3 Table Bucket
 
-Creates S3 Table Bucket and Tables with various configurations.
+Creates an [S3 Table Bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables.html)
+and the Apache Iceberg tables in it, with their encryption, maintenance configuration and policies.
+
+## Usage
+
+```hcl
+module "table_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws//modules/table-bucket"
+
+  table_bucket_name = "my-table-bucket"
+
+  encryption_configuration = {
+    sse_algorithm = "AES256"
+  }
+
+  maintenance_configuration = {
+    iceberg_unreferenced_file_removal = {
+      status = "enabled"
+
+      settings = {
+        non_current_days  = 7
+        unreferenced_days = 3
+      }
+    }
+  }
+
+  tables = {
+    orders = {
+      format    = "ICEBERG"
+      namespace = "sales"
+
+      maintenance_configuration = {
+        iceberg_compaction = {
+          status = "enabled"
+
+          settings = {
+            target_file_size_mb = 64
+          }
+        }
+      }
+    }
+  }
+
+  tags = {
+    Environment = "dev"
+  }
+}
+```
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

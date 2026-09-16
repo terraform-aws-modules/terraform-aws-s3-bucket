@@ -10,7 +10,7 @@ Amazon S3 Vectors is a vector embedding storage service built into Amazon S3 tha
 
 ```hcl
 module "vector_bucket" {
-  source = "../../modules/vectors"
+  source = "terraform-aws-modules/s3-bucket/aws//modules/vectors"
 
   vector_bucket_name = "my-vector-bucket"
 
@@ -29,7 +29,7 @@ module "vector_bucket" {
 
 ```hcl
 module "vector_bucket" {
-  source = "../../modules/vectors"
+  source = "terraform-aws-modules/s3-bucket/aws//modules/vectors"
 
   vector_bucket_name = "my-vector-bucket"
 
@@ -57,7 +57,7 @@ module "vector_bucket" {
 
 ```hcl
 module "vector_bucket" {
-  source = "../../modules/vectors"
+  source = "terraform-aws-modules/s3-bucket/aws//modules/vectors"
 
   vector_bucket_name = "my-vector-bucket"
 
