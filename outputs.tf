@@ -110,21 +110,21 @@ output "s3_bucket_policy" {
 
 output "file_systems" {
   description = "Map of file systems created and their attributes"
-  value       = aws_s3files_file_system.this
+  value       = { for k, v in module.file_system : k => v.file_system }
 }
 
 output "file_system_iam_roles" {
   description = "Map of file system IAM roles created, with their ARN, name and unique ID"
-  value = { for k, v in aws_iam_role.file_system : k => {
-    arn       = v.arn
-    name      = v.name
-    unique_id = v.unique_id
+  value = { for k, v in module.file_system : k => {
+    arn       = v.iam_role_arn
+    name      = v.iam_role_name
+    unique_id = v.iam_role_unique_id
   } }
 }
 
 output "file_system_mount_targets" {
-  description = "Map of file system mount targets created and their attributes, keyed `<file system>/<mount target>`"
-  value       = aws_s3files_mount_target.this
+  description = "Map of file system mount targets created and their attributes, keyed by file system and then by mount target"
+  value       = { for k, v in module.file_system : k => v.mount_targets }
 }
 
 output "file_system_security_group_arn" {
@@ -138,6 +138,6 @@ output "file_system_security_group_id" {
 }
 
 output "file_system_access_points" {
-  description = "Map of file system access points created and their attributes, keyed `<file system>/<access point>`"
-  value       = aws_s3files_access_point.this
+  description = "Map of file system access points created and their attributes, keyed by file system and then by access point"
+  value       = { for k, v in module.file_system : k => v.access_points }
 }
