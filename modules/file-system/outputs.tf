@@ -2,9 +2,24 @@
 # File System
 ################################################################################
 
-output "file_system" {
-  description = "The file system created and its attributes"
-  value       = try(aws_s3files_file_system.this[0], null)
+output "arn" {
+  description = "ARN of the file system"
+  value       = try(aws_s3files_file_system.this[0].arn, null)
+}
+
+output "id" {
+  description = "ID of the file system"
+  value       = try(aws_s3files_file_system.this[0].id, null)
+}
+
+output "name" {
+  description = "Name of the file system"
+  value       = try(aws_s3files_file_system.this[0].name, null)
+}
+
+output "status" {
+  description = "Status of the file system"
+  value       = try(aws_s3files_file_system.this[0].status, null)
 }
 
 ################################################################################
@@ -12,8 +27,8 @@ output "file_system" {
 ################################################################################
 
 output "iam_role_arn" {
-  description = "ARN of the IAM role created"
-  value       = try(aws_iam_role.this[0].arn, null)
+  description = "ARN of the IAM role the file system assumes, whether created here or supplied by the caller"
+  value       = try(aws_iam_role.this[0].arn, var.iam_role_arn)
 }
 
 output "iam_role_name" {

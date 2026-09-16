@@ -110,7 +110,7 @@ output "s3_bucket_policy" {
 
 output "file_systems" {
   description = "Map of file systems created and their attributes"
-  value       = { for k, v in module.file_system : k => v.file_system }
+  value       = module.file_system
 }
 
 output "file_system_iam_roles" {
@@ -126,6 +126,10 @@ output "file_system_mount_targets" {
   description = "Map of file system mount targets created and their attributes, keyed by file system and then by mount target"
   value       = { for k, v in module.file_system : k => v.mount_targets }
 }
+
+################################################################################
+# File System Security Group
+################################################################################
 
 output "file_system_security_group_arn" {
   description = "ARN of the security group shared by the file system mount targets"

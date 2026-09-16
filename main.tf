@@ -98,6 +98,14 @@ resource "aws_s3_directory_bucket" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    # Saying so beats dropping the entries silently, which is what filtering them out would do
+    precondition {
+      condition     = length(var.file_systems) == 0
+      error_message = "S3 Files is not supported on a directory bucket, so file_systems must be empty when is_directory_bucket is true."
+    }
+  }
 }
 
 ################################################################################
@@ -1614,10 +1622,10 @@ module "file_system" {
 ################################################################################
 
 locals {
-  # Only created when a VPC is given and at least one file system relies on this group rather than on
-  # groups of its own. Whether a file system has mount targets is deliberately not part of this: mount
-  # targets can be keyed by a value only known after apply, which would make this count unknown at plan
-  create_file_system_security_group = var.create_file_system_security_group && var.file_system_security_group_vpc_id != null && anytrue([
+  # Only created when at least one file system relies on this group rather than on groups of its own.
+  # Neither the mount targets nor the VPC take part: mount targets can be keyed, and a VPC given, by
+  # values known only after apply, either of which would make this count unknown at plan time
+  create_file_system_security_group = var.create_file_system_security_group && anytrue([
     for k, v in local.file_systems : v.create && v.security_groups == null
   ])
 
@@ -1644,6 +1652,12 @@ resource "aws_security_group" "file_system" {
 
   lifecycle {
     create_before_destroy = true
+
+    # Without a VPC the group would be created in the account's default VPC, where no mount target can use it
+    precondition {
+      condition     = var.file_system_security_group_vpc_id != null
+      error_message = "Set file_system_security_group_vpc_id, give each file system its own security_groups, or set create_file_system_security_group to false."
+    }
   }
 }
 

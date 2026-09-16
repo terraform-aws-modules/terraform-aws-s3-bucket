@@ -896,7 +896,7 @@ variable "file_systems" {
 ################################################################################
 
 variable "create_file_system_security_group" {
-  description = "Determines whether to create a security group shared by the mount targets of every file system that does not set its own `security_groups`"
+  description = "Whether to create a security group shared by the mount targets of every file system that does not set its own `security_groups`"
   type        = bool
   default     = true
 }
@@ -908,7 +908,7 @@ variable "file_system_security_group_name" {
 }
 
 variable "file_system_security_group_use_name_prefix" {
-  description = "Determines whether `file_system_security_group_name` is used as a prefix"
+  description = "Whether `file_system_security_group_name` is used as a prefix"
   type        = bool
   default     = true
 }

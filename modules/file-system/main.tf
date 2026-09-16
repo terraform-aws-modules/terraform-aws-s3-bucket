@@ -63,6 +63,11 @@ resource "aws_s3files_file_system" "this" {
       condition     = can(regex("^arn:[^:]*:s3:::", var.bucket_arn))
       error_message = "S3 Files supports general purpose buckets only, so bucket_arn must look like arn:aws:s3:::my-bucket."
     }
+
+    precondition {
+      condition     = var.create_iam_role || var.iam_role_arn != null
+      error_message = "Set iam_role_arn when create_iam_role is false. The file system cannot be created without a role."
+    }
   }
 
   depends_on = [
@@ -238,6 +243,12 @@ resource "aws_iam_role_policy" "this" {
 # Mount Target(s)
 ################################################################################
 
+locals {
+  # What a mount target uses when it names no groups of its own. Null leaves the mount target on the
+  # VPC's default security group, which is what AWS does when none are given
+  mount_target_security_groups = var.security_groups != null ? var.security_groups : (local.create_security_group ? [aws_security_group.this[0].id] : null)
+}
+
 resource "aws_s3files_mount_target" "this" {
   for_each = { for k, v in var.mount_targets : k => v if local.create }
 
@@ -248,7 +259,7 @@ resource "aws_s3files_mount_target" "this" {
   ip_address_type = each.value.ip_address_type
   ipv4_address    = each.value.ipv4_address
   ipv6_address    = each.value.ipv6_address
-  security_groups = var.security_groups != null ? var.security_groups : (local.create_security_group ? [aws_security_group.this[0].id] : null)
+  security_groups = each.value.security_groups != null ? each.value.security_groups : local.mount_target_security_groups
 
   dynamic "timeouts" {
     for_each = each.value.timeouts != null ? [each.value.timeouts] : []
@@ -267,10 +278,10 @@ resource "aws_s3files_mount_target" "this" {
 
 locals {
   # Only created when the mount targets rely on it rather than on groups the caller supplies
-  # Whether there are mount targets is deliberately not part of this: they can be keyed by a value only
-  # known after apply, which would make this count unknown at plan time. A VPC is required instead, so a
-  # file system without one never puts a group in the default VPC
-  create_security_group = local.create && var.create_security_group && var.security_groups == null && var.security_group_vpc_id != null
+  # Neither the mount targets nor the VPC take part in this: mount targets can be keyed, and a VPC given,
+  # by values known only after apply, either of which would make this count unknown at plan time. The
+  # precondition below is what keeps a group out of the default VPC
+  create_security_group = local.create && var.create_security_group && var.security_groups == null
 
   # Without a name to build on, the provider generates one
   security_group_name = var.security_group_name != null ? var.security_group_name : (var.name != null ? "${var.name}-s3files" : null)
@@ -296,6 +307,12 @@ resource "aws_security_group" "this" {
 
   lifecycle {
     create_before_destroy = true
+
+    # Without a VPC the group would be created in the account's default VPC, where no mount target can use it
+    precondition {
+      condition     = var.security_group_vpc_id != null
+      error_message = "Set security_group_vpc_id, supply security_groups, or set create_security_group to false."
+    }
   }
 }
 
@@ -499,6 +516,38 @@ data "aws_iam_policy_document" "policy" {
     }
   }
 
+  # Deny writes to a principal granted read access, through the access point that grants it. The allow
+  # above grants only ClientMount, and an allow elsewhere would otherwise still let it write
+  dynamic "statement" {
+    for_each = {
+      for pair in flatten([
+        for ap_key, ap in var.access_points : [
+          for principal in(ap.read_access_arns != null ? ap.read_access_arns : []) : {
+            principal    = principal
+            access_point = ap_key
+          }
+        ]
+      ]) : pair.principal => pair.access_point...
+    }
+
+    content {
+      effect    = "Deny"
+      actions   = ["s3files:ClientWrite", "s3files:ClientRootAccess"]
+      resources = [aws_s3files_file_system.this[0].arn]
+
+      principals {
+        type        = "AWS"
+        identifiers = [statement.key]
+      }
+
+      condition {
+        test     = "StringEquals"
+        variable = "s3files:AccessPointArn"
+        values   = [for ap in distinct(statement.value) : aws_s3files_access_point.this[ap].arn]
+      }
+    }
+  }
+
   # Deny each listed principal through every other access point. An allow alone does not restrict,
   # because allows are additive across identity and resource policies
   dynamic "statement" {
@@ -536,6 +585,15 @@ resource "aws_s3files_file_system_policy" "this" {
 
   file_system_id = aws_s3files_file_system.this[0].id
   policy         = data.aws_iam_policy_document.policy[0].json
+
+  lifecycle {
+    # An empty list of statements renders a document AWS rejects, and the message it returns says
+    # nothing about which input produced it
+    precondition {
+      condition     = length(data.aws_iam_policy_document.policy[0].statement) > 0
+      error_message = "The file system policy has no statements. Give policy_statements at least one entry, or leave it unset."
+    }
+  }
 }
 
 ################################################################################
