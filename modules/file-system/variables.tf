@@ -130,6 +130,7 @@ variable "mount_targets" {
     ip_address_type = optional(string)
     ipv4_address    = optional(string)
     ipv6_address    = optional(string)
+    security_groups = optional(list(string))
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)

@@ -57,7 +57,8 @@ No inputs.
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_external_file_system"></a> [external\_file\_system](#output\_external\_file\_system) | The file system created on the bucket this module does not manage |
+| <a name="output_external_file_system_arn"></a> [external\_file\_system\_arn](#output\_external\_file\_system\_arn) | ARN of the file system created on the bucket this module does not manage |
+| <a name="output_external_file_system_id"></a> [external\_file\_system\_id](#output\_external\_file\_system\_id) | ID of the file system created on the bucket this module does not manage |
 | <a name="output_external_file_system_security_group_id"></a> [external\_file\_system\_security\_group\_id](#output\_external\_file\_system\_security\_group\_id) | ID of the security group created for that file system's mount targets |
 | <a name="output_file_system_access_points"></a> [file\_system\_access\_points](#output\_file\_system\_access\_points) | Map of file system access points created and their attributes |
 | <a name="output_file_system_iam_roles"></a> [file\_system\_iam\_roles](#output\_file\_system\_iam\_roles) | Map of IAM roles created for the file systems, with their ARN, name and unique ID |

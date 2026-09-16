@@ -32,9 +32,14 @@ output "file_system_security_group_id" {
 # File System On A Bucket This Module Does Not Manage
 ################################################################################
 
-output "external_file_system" {
-  description = "The file system created on the bucket this module does not manage"
-  value       = module.file_system.file_system
+output "external_file_system_arn" {
+  description = "ARN of the file system created on the bucket this module does not manage"
+  value       = module.file_system.arn
+}
+
+output "external_file_system_id" {
+  description = "ID of the file system created on the bucket this module does not manage"
+  value       = module.file_system.id
 }
 
 output "external_file_system_security_group_id" {
