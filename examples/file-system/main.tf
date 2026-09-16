@@ -135,6 +135,35 @@ module "s3_bucket" {
 }
 
 ################################################################################
+# File System On A Bucket This Module Does Not Manage
+################################################################################
+
+module "file_system" {
+  source = "../../modules/file-system"
+
+  name       = "${local.name}-external"
+  bucket_arn = aws_s3_bucket.external.arn
+  # Passing the versioning resource's own status orders the file system after versioning on create,
+  # and before it on destroy
+  bucket_versioning_status = aws_s3_bucket_versioning.external.versioning_configuration[0].status
+
+  prefix        = "external/"
+  mount_targets = local.mount_targets
+
+  security_group_name            = "${local.name}-external"
+  security_group_use_name_prefix = false
+  security_group_description     = "S3 Files mount targets for a bucket managed outside this module"
+  security_group_vpc_id          = module.vpc.vpc_id
+  security_group_ingress_rules = {
+    clients = {
+      referenced_security_group_id = module.client_security_group.id
+    }
+  }
+
+  tags = local.tags
+}
+
+################################################################################
 # Disabled
 ################################################################################
 
@@ -218,4 +247,22 @@ module "client_role" {
   }
 
   tags = local.tags
+}
+
+# Stands in for a bucket managed outside this module, for example by another team or another state
+resource "aws_s3_bucket" "external" {
+  bucket_prefix = "${local.name}-external-"
+
+  # For example only
+  force_destroy = true
+
+  tags = local.tags
+}
+
+resource "aws_s3_bucket_versioning" "external" {
+  bucket = aws_s3_bucket.external.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
 }

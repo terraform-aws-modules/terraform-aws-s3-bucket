@@ -27,3 +27,17 @@ output "file_system_security_group_id" {
   description = "ID of the file system security group"
   value       = module.s3_bucket.file_system_security_group_id
 }
+
+################################################################################
+# File System On A Bucket This Module Does Not Manage
+################################################################################
+
+output "external_file_system" {
+  description = "The file system created on the bucket this module does not manage"
+  value       = module.file_system.file_system
+}
+
+output "external_file_system_security_group_id" {
+  description = "ID of the security group created for that file system's mount targets"
+  value       = module.file_system.security_group_id
+}

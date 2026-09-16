@@ -36,6 +36,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="module_client_role"></a> [client\_role](#module\_client\_role) | terraform-aws-modules/iam/aws//modules/iam-role | ~> 6.0 |
 | <a name="module_client_security_group"></a> [client\_security\_group](#module\_client\_security\_group) | terraform-aws-modules/security-group/aws | ~> 6.0 |
 | <a name="module_disabled"></a> [disabled](#module\_disabled) | ../../ | n/a |
+| <a name="module_file_system"></a> [file\_system](#module\_file\_system) | ../../modules/file-system | n/a |
 | <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 6.0 |
 
@@ -43,6 +44,8 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Type |
 | ---- | ---- |
+| [aws_s3_bucket.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
+| [aws_s3_bucket_versioning.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 
 ## Inputs
@@ -53,6 +56,8 @@ No inputs.
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_external_file_system"></a> [external\_file\_system](#output\_external\_file\_system) | The file system created on the bucket this module does not manage |
+| <a name="output_external_file_system_security_group_id"></a> [external\_file\_system\_security\_group\_id](#output\_external\_file\_system\_security\_group\_id) | ID of the security group created for that file system's mount targets |
 | <a name="output_file_system_access_points"></a> [file\_system\_access\_points](#output\_file\_system\_access\_points) | Map of file system access points created and their attributes |
 | <a name="output_file_system_iam_roles"></a> [file\_system\_iam\_roles](#output\_file\_system\_iam\_roles) | Map of IAM roles created for the file systems, with their ARN, name and unique ID |
 | <a name="output_file_system_mount_targets"></a> [file\_system\_mount\_targets](#output\_file\_system\_mount\_targets) | Map of file system mount targets created and their attributes |

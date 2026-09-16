@@ -96,6 +96,8 @@ module "s3_bucket" {
 
 S3 Files requires versioning on the bucket. The module creates an IAM role for each file system and a security group shared by the mount targets. A principal listed in an access point's `read_access_arns` or `read_write_access_arns` can mount that file system only through the access points that list it.
 
+To put a file system on a bucket this module does not manage, call [`modules/file-system`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/file-system) directly.
+
 ```hcl
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
@@ -226,14 +228,14 @@ Disclosure: written by this module's maintainer, who also builds
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+| ---- | ------ | ------- |
+| <a name="module_file_system"></a> [file\_system](#module\_file\_system) | ./modules/file-system | n/a |
 
 ## Resources
 
 | Name | Type |
 | ---- | ---- |
-| [aws_iam_role.file_system](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy.file_system](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_s3_bucket.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket_accelerate_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_accelerate_configuration) | resource |
 | [aws_s3_bucket_acl.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
@@ -255,11 +257,6 @@ No modules.
 | [aws_s3_bucket_versioning.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 | [aws_s3_bucket_website_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_website_configuration) | resource |
 | [aws_s3_directory_bucket.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_directory_bucket) | resource |
-| [aws_s3files_access_point.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_access_point) | resource |
-| [aws_s3files_file_system.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_file_system) | resource |
-| [aws_s3files_file_system_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_file_system_policy) | resource |
-| [aws_s3files_mount_target.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_mount_target) | resource |
-| [aws_s3files_synchronization_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_synchronization_configuration) | resource |
 | [aws_security_group.file_system](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_vpc_security_group_egress_rule.file_system](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
 | [aws_vpc_security_group_ingress_rule.file_system](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
@@ -274,16 +271,12 @@ No modules.
 | [aws_iam_policy_document.deny_ssec_encrypted_object_uploads](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.deny_unencrypted_object_uploads](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.elb_log_delivery](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.file_system](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.file_system_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.file_system_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.inventory_and_analytics_destination_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.lb_log_delivery](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.require_latest_tls](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.waf_log_delivery](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
-| [aws_service_principal.elasticfilesystem](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/service_principal) | data source |
 
 ## Inputs
 
@@ -376,9 +369,9 @@ No modules.
 | Name | Description |
 | ---- | ----------- |
 | <a name="output_aws_s3_bucket_versioning_status"></a> [aws\_s3\_bucket\_versioning\_status](#output\_aws\_s3\_bucket\_versioning\_status) | The versioning status of the bucket. Will be 'Enabled', 'Suspended', or 'Disabled' |
-| <a name="output_file_system_access_points"></a> [file\_system\_access\_points](#output\_file\_system\_access\_points) | Map of file system access points created and their attributes, keyed `<file system>/<access point>` |
+| <a name="output_file_system_access_points"></a> [file\_system\_access\_points](#output\_file\_system\_access\_points) | Map of file system access points created and their attributes, keyed by file system and then by access point |
 | <a name="output_file_system_iam_roles"></a> [file\_system\_iam\_roles](#output\_file\_system\_iam\_roles) | Map of file system IAM roles created, with their ARN, name and unique ID |
-| <a name="output_file_system_mount_targets"></a> [file\_system\_mount\_targets](#output\_file\_system\_mount\_targets) | Map of file system mount targets created and their attributes, keyed `<file system>/<mount target>` |
+| <a name="output_file_system_mount_targets"></a> [file\_system\_mount\_targets](#output\_file\_system\_mount\_targets) | Map of file system mount targets created and their attributes, keyed by file system and then by mount target |
 | <a name="output_file_system_security_group_arn"></a> [file\_system\_security\_group\_arn](#output\_file\_system\_security\_group\_arn) | ARN of the security group shared by the file system mount targets |
 | <a name="output_file_system_security_group_id"></a> [file\_system\_security\_group\_id](#output\_file\_system\_security\_group\_id) | ID of the security group shared by the file system mount targets |
 | <a name="output_file_systems"></a> [file\_systems](#output\_file\_systems) | Map of file systems created and their attributes |
