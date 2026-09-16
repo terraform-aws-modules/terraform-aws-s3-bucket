@@ -96,7 +96,7 @@ module "s3_bucket" {
 
 S3 Files requires versioning on the bucket. The module creates an IAM role for each file system and a security group shared by the mount targets. A principal listed in an access point's `read_access_arns` or `read_write_access_arns` can mount that file system only through the access points that list it.
 
-To put a file system on a bucket this module does not manage, call [`modules/file-system`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/file-system) directly.
+To put a file system on a bucket this module does not manage, call [`modules/file-system`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/file-system) directly. Its README covers the one thing that module asks of callers, which is to pass the bucket's versioning status as a reference to the versioning resource rather than as a literal.
 
 ```hcl
 module "s3_bucket" {

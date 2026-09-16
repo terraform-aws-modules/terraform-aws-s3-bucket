@@ -2,7 +2,15 @@
 
 Creates an Amazon S3 Files file system on a general purpose bucket, with its IAM role, mount targets, access points, file system policy and synchronization configuration.
 
-The bucket must have versioning enabled. Pass the versioning resource's own status rather than a literal, so the file system is created after versioning and deleted before it is suspended:
+The bucket must have versioning enabled.
+
+> [!IMPORTANT]
+> Pass the versioning resource's own status to `bucket_versioning_status`, as in
+> `aws_s3_bucket_versioning.this.versioning_configuration[0].status`. That reference is what makes the
+> file system wait for versioning on create, and be deleted before versioning is suspended on destroy.
+> A literal `"Enabled"` passes the check and leaves no such ordering, so a destroy can fail with
+> `BucketHasS3FileSystemAttached`. This applies only when calling this module directly. The root
+> module's `file_systems` input passes the reference for you.
 
 ```hcl
 module "file_system" {
