@@ -57,6 +57,12 @@ resource "aws_s3files_file_system" "this" {
       condition     = var.bucket_versioning_status == "Enabled"
       error_message = "S3 Files requires versioning to be enabled on the bucket."
     }
+
+    # A directory bucket ARN names the s3express service, and S3 Files does not support one
+    precondition {
+      condition     = can(regex("^arn:[^:]*:s3:::", var.bucket_arn))
+      error_message = "S3 Files supports general purpose buckets only, so bucket_arn must look like arn:aws:s3:::my-bucket."
+    }
   }
 
   depends_on = [
@@ -261,7 +267,10 @@ resource "aws_s3files_mount_target" "this" {
 
 locals {
   # Only created when the mount targets rely on it rather than on groups the caller supplies
-  create_security_group = local.create && var.create_security_group && var.security_groups == null && length(var.mount_targets) > 0
+  # Whether there are mount targets is deliberately not part of this: they can be keyed by a value only
+  # known after apply, which would make this count unknown at plan time. A VPC is required instead, so a
+  # file system without one never puts a group in the default VPC
+  create_security_group = local.create && var.create_security_group && var.security_groups == null && var.security_group_vpc_id != null
 
   # Without a name to build on, the provider generates one
   security_group_name = var.security_group_name != null ? var.security_group_name : (var.name != null ? "${var.name}-s3files" : null)
@@ -404,9 +413,9 @@ locals {
   access_point_grants = flatten([
     for ap_key, ap in var.access_points : [
       for level, principals in { read = ap.read_access_arns, read_write = ap.read_write_access_arns } : {
-        access_point = ap_key
-        actions      = local.access_point_actions[level]
-        principals   = principals
+        access_point                  = ap_key
+        actions                       = local.access_point_actions[level]
+        principals                    = principals
       } if try(length(principals), 0) > 0
     ]
   ])
@@ -415,12 +424,17 @@ locals {
   # ignored. Presence is tested rather than length, which is unknown at plan time for a list built from computed values
   create_policy = local.create && (
     var.policy_statements != null ||
+    length(var.source_policy_documents) > 0 ||
+    length(var.override_policy_documents) > 0 ||
     anytrue([for ap in values(var.access_points) : ap.read_access_arns != null || ap.read_write_access_arns != null])
   )
 }
 
 data "aws_iam_policy_document" "policy" {
   count = local.create_policy ? 1 : 0
+
+  source_policy_documents   = var.source_policy_documents
+  override_policy_documents = var.override_policy_documents
 
   dynamic "statement" {
     for_each = var.policy_statements != null ? var.policy_statements : []

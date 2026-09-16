@@ -10,7 +10,10 @@ locals {
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   # One mount target per Availability Zone, keyed by the zone name so the keys are known at plan time
-  mount_targets = { for az, subnet_id in zipmap(local.azs, module.vpc.private_subnets) : az => { subnet_id = subnet_id } }
+  mount_targets = { for az, subnet_id in zipmap(local.azs, module.vpc.private_subnets) : az => {
+    subnet_id       = subnet_id
+    ip_address_type = "IPV4_ONLY"
+  } }
 
   tags = {
     Name       = local.name
@@ -47,6 +50,9 @@ module "s3_bucket" {
       prefix        = "training/"
       mount_targets = local.mount_targets
 
+      # A hand-written document, merged into the policy the module generates
+      source_policy_documents = [data.aws_iam_policy_document.no_root_access.json]
+
       # Training jobs read the dataset but never write to it
       policy_statements = [{
         sid     = "ReadOnlyClients"
@@ -78,8 +84,9 @@ module "s3_bucket" {
       access_points = {
         app = {
           posix_user = {
-            uid = 1000
-            gid = 1000
+            uid            = 1000
+            gid            = 1000
+            secondary_gids = [1001]
           }
           root_directory = {
             path = "/app"
@@ -264,5 +271,20 @@ resource "aws_s3_bucket_versioning" "external" {
 
   versioning_configuration {
     status = "Enabled"
+  }
+}
+
+# Nobody mounts the training file system as root, whatever else the policy allows
+data "aws_iam_policy_document" "no_root_access" {
+  statement {
+    sid       = "DenyRootAccess"
+    effect    = "Deny"
+    actions   = ["s3files:ClientRootAccess"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
   }
 }

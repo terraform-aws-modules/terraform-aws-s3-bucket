@@ -1599,8 +1599,11 @@ module "file_system" {
   create_security_group = false
   security_groups       = each.value.security_groups != null ? each.value.security_groups : (local.create_file_system_security_group ? [aws_security_group.file_system[0].id] : null)
 
-  access_points                 = each.value.access_points
-  policy_statements             = each.value.policy_statements
+  access_points             = each.value.access_points
+  source_policy_documents   = each.value.source_policy_documents
+  override_policy_documents = each.value.override_policy_documents
+  policy_statements         = each.value.policy_statements
+
   synchronization_configuration = each.value.synchronization_configuration
 
   tags = merge(var.tags, each.value.tags)
@@ -1611,9 +1614,11 @@ module "file_system" {
 ################################################################################
 
 locals {
-  # Only created when at least one file system relies on it rather than on groups of its own
-  create_file_system_security_group = var.create_file_system_security_group && anytrue([
-    for k, v in local.file_systems : v.create && v.security_groups == null && length(v.mount_targets) > 0
+  # Only created when a VPC is given and at least one file system relies on this group rather than on
+  # groups of its own. Whether a file system has mount targets is deliberately not part of this: mount
+  # targets can be keyed by a value only known after apply, which would make this count unknown at plan
+  create_file_system_security_group = var.create_file_system_security_group && var.file_system_security_group_vpc_id != null && anytrue([
+    for k, v in local.file_systems : v.create && v.security_groups == null
   ])
 
   file_system_security_group_name = var.file_system_security_group_name != null ? var.file_system_security_group_name : "${try(aws_s3_bucket.this[0].id, "")}-s3files"

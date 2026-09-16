@@ -124,7 +124,7 @@ variable "iam_role_tags" {
 ################################################################################
 
 variable "mount_targets" {
-  description = "Map of mount targets to create for the file system. One per Availability Zone at most"
+  description = "Map of mount targets to create for the file system, keyed by a value known at plan time such as the Availability Zone. One per Availability Zone at most"
   type = map(object({
     subnet_id       = string
     ip_address_type = optional(string)
@@ -264,6 +264,18 @@ variable "access_points" {
 ################################################################################
 # File System Policy
 ################################################################################
+
+variable "source_policy_documents" {
+  description = "List of IAM policy documents that are merged together into the file system policy. Statements must have unique `sid`s"
+  type        = list(string)
+  default     = []
+}
+
+variable "override_policy_documents" {
+  description = "List of IAM policy documents that are merged together into the file system policy. In merging, statements with non-blank `sid`s will override statements with the same `sid`"
+  type        = list(string)
+  default     = []
+}
 
 variable "policy_statements" {
   description = "List of IAM policy [statements](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#statement) to add to the file system policy"
