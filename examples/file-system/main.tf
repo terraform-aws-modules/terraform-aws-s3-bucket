@@ -81,9 +81,12 @@ module "s3_bucket" {
     }
 
     agents = {
-      prefix          = "agents/"
-      mount_targets   = local.mount_targets
-      security_groups = [module.agents_security_group.id]
+      prefix        = "agents/"
+      mount_targets = local.mount_targets
+
+      # This file system uses a group of its own rather than one this module creates
+      create_security_group = false
+      security_groups       = [module.agents_security_group.id]
 
       access_points = {
         app = {
@@ -151,11 +154,11 @@ module "s3_file_system" {
   source = "../../modules/file-system"
 
   name       = "${local.name}-external"
-  bucket_arn = aws_s3_bucket.external.arn
+  bucket_arn = module.external_bucket.s3_bucket_arn
   # Pass the versioning resource's own status, not a literal "Enabled". The reference is what makes the
   # file system wait for versioning on create, and be deleted before versioning is suspended on destroy.
   # Callers of the root module's file_systems input get this wiring for free
-  bucket_versioning_status = aws_s3_bucket_versioning.external.versioning_configuration[0].status
+  bucket_versioning_status = module.external_bucket.aws_s3_bucket_versioning_status
 
   prefix        = "external/"
   mount_targets = local.mount_targets
@@ -259,22 +262,20 @@ module "client_role" {
   tags = local.tags
 }
 
-# Stands in for a bucket managed outside this module, for example by another team or another state
-resource "aws_s3_bucket" "external" {
+# Stands in for a bucket managed elsewhere, for example by another team or in another state
+module "external_bucket" {
+  source = "../../"
+
   bucket_prefix = "${local.name}-external-"
 
   # For example only
   force_destroy = true
 
-  tags = local.tags
-}
-
-resource "aws_s3_bucket_versioning" "external" {
-  bucket = aws_s3_bucket.external.id
-
-  versioning_configuration {
-    status = "Enabled"
+  versioning = {
+    enabled = true
   }
+
+  tags = local.tags
 }
 
 # Nobody mounts the training file system as root, whatever else the policy allows

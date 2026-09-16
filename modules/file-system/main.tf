@@ -1,20 +1,18 @@
 data "aws_caller_identity" "current" {
-  count = local.create ? 1 : 0
+  count = var.create ? 1 : 0
 }
 
 data "aws_partition" "current" {
-  count = local.create ? 1 : 0
+  count = var.create ? 1 : 0
 }
 
 data "aws_region" "current" {
-  count = local.create ? 1 : 0
+  count = var.create ? 1 : 0
 
   region = var.region
 }
 
 locals {
-  create = var.create
-
   account_id = try(data.aws_caller_identity.current[0].account_id, "")
   dns_suffix = try(data.aws_partition.current[0].dns_suffix, "")
   partition  = try(data.aws_partition.current[0].partition, "")
@@ -26,7 +24,7 @@ locals {
 ################################################################################
 
 resource "aws_s3files_file_system" "this" {
-  count = local.create ? 1 : 0
+  count = var.create ? 1 : 0
 
   region = var.region
 
@@ -81,10 +79,11 @@ resource "aws_s3files_file_system" "this" {
 ################################################################################
 
 locals {
-  create_iam_role = local.create && var.create_iam_role
+  create_iam_role = var.create && var.create_iam_role
 
   # Without a name to build on, the provider generates one
-  iam_role_name = var.iam_role_name != null ? var.iam_role_name : (var.name != null ? "${var.name}-s3files" : null)
+  iam_role_name        = var.iam_role_name != null ? var.iam_role_name : (var.name != null ? "${var.name}-s3files" : null)
+  iam_role_policy_name = var.iam_role_policy_name != null ? var.iam_role_policy_name : local.iam_role_name
 }
 
 data "aws_service_principal" "elasticfilesystem" {
@@ -96,6 +95,9 @@ data "aws_service_principal" "elasticfilesystem" {
 
 data "aws_iam_policy_document" "assume_role" {
   count = local.create_iam_role ? 1 : 0
+
+  source_policy_documents   = var.iam_role_source_assume_policy_documents
+  override_policy_documents = var.iam_role_override_assume_policy_documents
 
   statement {
     sid     = "AllowS3FilesAssumeRole"
@@ -138,6 +140,9 @@ resource "aws_iam_role" "this" {
 
 data "aws_iam_policy_document" "this" {
   count = local.create_iam_role ? 1 : 0
+
+  source_policy_documents   = var.iam_role_source_policy_documents
+  override_policy_documents = var.iam_role_override_policy_documents
 
   statement {
     sid = "S3BucketPermissions"
@@ -234,9 +239,10 @@ data "aws_iam_policy_document" "this" {
 resource "aws_iam_role_policy" "this" {
   count = local.create_iam_role ? 1 : 0
 
-  name   = "S3Files"
-  role   = aws_iam_role.this[0].id
-  policy = data.aws_iam_policy_document.this[0].json
+  name        = var.iam_role_use_name_prefix ? null : local.iam_role_policy_name
+  name_prefix = var.iam_role_use_name_prefix && local.iam_role_policy_name != null ? "${local.iam_role_policy_name}-" : null
+  role        = aws_iam_role.this[0].id
+  policy      = data.aws_iam_policy_document.this[0].json
 }
 
 ################################################################################
@@ -244,13 +250,13 @@ resource "aws_iam_role_policy" "this" {
 ################################################################################
 
 locals {
-  # What a mount target uses when it names no groups of its own. Null leaves the mount target on the
-  # VPC's default security group, which is what AWS does when none are given
-  mount_target_security_groups = var.security_groups != null ? var.security_groups : (local.create_security_group ? [aws_security_group.this[0].id] : null)
+  # The group this module creates, when it creates one, plus whatever the caller names for every mount
+  # target or for one of them
+  mount_target_security_groups = { for k, v in var.mount_targets : k => concat(aws_security_group.this[*].id, var.security_groups, v.security_groups) }
 }
 
 resource "aws_s3files_mount_target" "this" {
-  for_each = { for k, v in var.mount_targets : k => v if local.create }
+  for_each = { for k, v in var.mount_targets : k => v if var.create }
 
   region = var.region
 
@@ -259,7 +265,7 @@ resource "aws_s3files_mount_target" "this" {
   ip_address_type = each.value.ip_address_type
   ipv4_address    = each.value.ipv4_address
   ipv6_address    = each.value.ipv6_address
-  security_groups = each.value.security_groups != null ? each.value.security_groups : local.mount_target_security_groups
+  security_groups = local.mount_target_security_groups[each.key]
 
   dynamic "timeouts" {
     for_each = each.value.timeouts != null ? [each.value.timeouts] : []
@@ -270,6 +276,15 @@ resource "aws_s3files_mount_target" "this" {
       update = timeouts.value.update
     }
   }
+
+  lifecycle {
+    # Left with none, AWS would put the mount target on the VPC's default security group, which is a
+    # posture nobody asked for
+    precondition {
+      condition     = length(local.mount_target_security_groups[each.key]) > 0
+      error_message = "A mount target needs at least one security group. Leave create_security_group on, or name one in security_groups."
+    }
+  }
 }
 
 ################################################################################
@@ -278,10 +293,9 @@ resource "aws_s3files_mount_target" "this" {
 
 locals {
   # Only created when the mount targets rely on it rather than on groups the caller supplies
-  # Neither the mount targets nor the VPC take part in this: mount targets can be keyed, and a VPC given,
-  # by values known only after apply, either of which would make this count unknown at plan time. The
-  # precondition below is what keeps a group out of the default VPC
-  create_security_group = local.create && var.create_security_group && var.security_groups == null
+  # Mount targets take no part in this: they can be keyed by values known only after apply, which would
+  # make this count unknown at plan time. The precondition below is what keeps a group out of the default VPC
+  create_security_group = var.create && var.create_security_group
 
   # Without a name to build on, the provider generates one
   security_group_name = var.security_group_name != null ? var.security_group_name : (var.name != null ? "${var.name}-s3files" : null)
@@ -365,7 +379,7 @@ resource "aws_vpc_security_group_egress_rule" "this" {
 ################################################################################
 
 resource "aws_s3files_access_point" "this" {
-  for_each = { for k, v in var.access_points : k => v if local.create }
+  for_each = { for k, v in var.access_points : k => v if var.create }
 
   region = var.region
 
@@ -439,7 +453,7 @@ locals {
 
   # A policy exists whenever the caller sets statements or lists principals on an access point, so neither is silently
   # ignored. Presence is tested rather than length, which is unknown at plan time for a list built from computed values
-  create_policy = local.create && (
+  create_policy = var.create && (
     var.policy_statements != null ||
     length(var.source_policy_documents) > 0 ||
     length(var.override_policy_documents) > 0 ||
@@ -601,7 +615,7 @@ resource "aws_s3files_file_system_policy" "this" {
 ################################################################################
 
 resource "aws_s3files_synchronization_configuration" "this" {
-  count = local.create && var.synchronization_configuration != null ? 1 : 0
+  count = var.create && var.synchronization_configuration != null ? 1 : 0
 
   region = var.region
 

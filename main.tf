@@ -1599,14 +1599,19 @@ module "s3_file_system" {
   accept_bucket_warning = each.value.accept_bucket_warning
   timeouts              = each.value.timeouts
 
-  create_iam_role               = each.value.create_iam_role
-  iam_role_arn                  = each.value.iam_role_arn
-  iam_role_name                 = each.value.iam_role_name
-  iam_role_use_name_prefix      = each.value.iam_role_use_name_prefix
-  iam_role_path                 = each.value.iam_role_path
-  iam_role_description          = each.value.iam_role_description
-  iam_role_permissions_boundary = each.value.iam_role_permissions_boundary
-  iam_role_tags                 = each.value.iam_role_tags
+  create_iam_role                           = each.value.create_iam_role
+  iam_role_arn                              = each.value.iam_role_arn
+  iam_role_name                             = each.value.iam_role_name
+  iam_role_use_name_prefix                  = each.value.iam_role_use_name_prefix
+  iam_role_path                             = each.value.iam_role_path
+  iam_role_description                      = each.value.iam_role_description
+  iam_role_permissions_boundary             = each.value.iam_role_permissions_boundary
+  iam_role_policy_name                      = each.value.iam_role_policy_name
+  iam_role_source_assume_policy_documents   = each.value.iam_role_source_assume_policy_documents
+  iam_role_override_assume_policy_documents = each.value.iam_role_override_assume_policy_documents
+  iam_role_source_policy_documents          = each.value.iam_role_source_policy_documents
+  iam_role_override_policy_documents        = each.value.iam_role_override_policy_documents
+  iam_role_tags                             = each.value.iam_role_tags
 
   mount_targets   = each.value.mount_targets
   security_groups = each.value.security_groups
