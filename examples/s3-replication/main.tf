@@ -1,42 +1,30 @@
 provider "aws" {
   region = local.origin_region
-
-  # Make it faster by skipping something
-  skip_metadata_api_check     = true
-  skip_region_validation      = true
-  skip_credentials_validation = true
 }
 
 provider "aws" {
   region = local.replica_region
 
   alias = "replica"
-
-  # Make it faster by skipping something
-  skip_metadata_api_check     = true
-  skip_region_validation      = true
-  skip_credentials_validation = true
 }
 
 locals {
-  bucket_name             = "origin-s3-bucket-${random_pet.this.id}"
-  destination_bucket_name = "replica-s3-bucket-${random_pet.this.id}"
-  origin_region           = "eu-west-1"
-  replica_region          = "eu-central-1"
+  name           = "ex-${basename(path.cwd)}"
+  origin_region  = "eu-west-1"
+  replica_region = "eu-central-1"
+
+  tags = {
+    Name       = local.name
+    Example    = local.name
+    Repository = "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
+  }
 }
 
 data "aws_caller_identity" "current" {}
 
-resource "random_pet" "this" {
-  length = 2
-}
-
-resource "aws_kms_key" "replica" {
-  provider = aws.replica
-
-  description             = "S3 bucket replication KMS key"
-  deletion_window_in_days = 7
-}
+################################################################################
+# Cross-Region Replication
+################################################################################
 
 module "replica_bucket" {
   source = "../../"
@@ -45,17 +33,19 @@ module "replica_bucket" {
     aws = aws.replica
   }
 
-  bucket = local.destination_bucket_name
+  bucket_prefix = "${local.name}-replica-"
 
   versioning = {
     enabled = true
   }
+
+  tags = local.tags
 }
 
 module "s3_bucket" {
   source = "../../"
 
-  bucket = local.bucket_name
+  bucket_prefix = "${local.name}-origin-"
 
   versioning = {
     enabled = true
@@ -89,10 +79,10 @@ module "s3_bucket" {
         }
 
         destination = {
-          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          bucket        = module.replica_bucket.s3_bucket_arn
           storage_class = "STANDARD"
 
-          replica_kms_key_id = aws_kms_key.replica.arn
+          replica_kms_key_id = module.kms_replica.key_arn
           account_id         = data.aws_caller_identity.current.account_id
 
           access_control_translation = {
@@ -124,7 +114,7 @@ module "s3_bucket" {
         }
 
         destination = {
-          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          bucket        = module.replica_bucket.s3_bucket_arn
           storage_class = "STANDARD"
         }
       },
@@ -140,7 +130,7 @@ module "s3_bucket" {
         }
 
         destination = {
-          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          bucket        = module.replica_bucket.s3_bucket_arn
           storage_class = "STANDARD"
         }
       },
@@ -151,11 +141,30 @@ module "s3_bucket" {
         delete_marker_replication = true
 
         destination = {
-          bucket        = "arn:aws:s3:::${local.destination_bucket_name}"
+          bucket        = module.replica_bucket.s3_bucket_arn
           storage_class = "STANDARD"
         }
       },
     ]
   }
 
+  tags = local.tags
+}
+
+################################################################################
+# Supporting Resources
+################################################################################
+
+module "kms_replica" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "~> 4.0"
+
+  providers = {
+    aws = aws.replica
+  }
+
+  description             = "S3 bucket replication KMS key"
+  deletion_window_in_days = 7
+
+  tags = local.tags
 }

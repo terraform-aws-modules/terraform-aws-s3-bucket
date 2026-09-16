@@ -1,6 +1,9 @@
-# S3 directory bucket
+# S3 bucket policies
 
-Configuration in this directory creates S3 directory bucket and related resources.
+Configuration in this directory demonstrates every bucket policy the module can attach.
+Each `attach_*` toggle appends a statement to a single merged policy, so they compose
+rather than conflict. The log delivery policies sit on a separate bucket, since they are
+attached to the bucket that receives logs rather than the one that produces them.
 
 ## Usage
 
@@ -32,19 +35,17 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
-| <a name="module_complete"></a> [complete](#module\_complete) | ../../ | n/a |
-| <a name="module_inventory_destination_bucket"></a> [inventory\_destination\_bucket](#module\_inventory\_destination\_bucket) | ../../ | n/a |
 | <a name="module_kms"></a> [kms](#module\_kms) | terraform-aws-modules/kms/aws | ~> 4.0 |
-| <a name="module_simple"></a> [simple](#module\_simple) | ../../ | n/a |
+| <a name="module_log_bucket"></a> [log\_bucket](#module\_log\_bucket) | ../../ | n/a |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../../ | n/a |
 
 ## Resources
 
 | Name | Type |
 | ---- | ---- |
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+| [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.destination_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 
@@ -52,8 +53,5 @@ No inputs.
 
 ## Outputs
 
-| Name | Description |
-| ---- | ----------- |
-| <a name="output_directory_bucket_arn"></a> [directory\_bucket\_arn](#output\_directory\_bucket\_arn) | ARN of the directory bucket |
-| <a name="output_directory_bucket_name"></a> [directory\_bucket\_name](#output\_directory\_bucket\_name) | Name of the directory bucket |
+No outputs.
 <!-- END_TF_DOCS -->

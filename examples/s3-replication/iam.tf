@@ -1,5 +1,5 @@
 resource "aws_iam_role" "replication" {
-  name = "s3-bucket-replication-${random_pet.this.id}"
+  name = "${local.name}-replication"
 
   assume_role_policy = <<POLICY
 {
@@ -19,7 +19,7 @@ POLICY
 }
 
 resource "aws_iam_policy" "replication" {
-  name = "s3-bucket-replication-${random_pet.this.id}"
+  name = "${local.name}-replication"
 
   policy = <<POLICY
 {
@@ -32,7 +32,7 @@ resource "aws_iam_policy" "replication" {
       ],
       "Effect": "Allow",
       "Resource": [
-        "arn:aws:s3:::${local.bucket_name}"
+        "${module.s3_bucket.s3_bucket_arn}"
       ]
     },
     {
@@ -42,7 +42,7 @@ resource "aws_iam_policy" "replication" {
       ],
       "Effect": "Allow",
       "Resource": [
-        "arn:aws:s3:::${local.bucket_name}/*"
+        "${module.s3_bucket.s3_bucket_arn}/*"
       ]
     },
     {
@@ -51,7 +51,7 @@ resource "aws_iam_policy" "replication" {
         "s3:ReplicateDelete"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${local.destination_bucket_name}/*"
+      "Resource": "${module.replica_bucket.s3_bucket_arn}/*"
     }
   ]
 }
@@ -59,7 +59,7 @@ POLICY
 }
 
 resource "aws_iam_policy_attachment" "replication" {
-  name       = "s3-bucket-replication-${random_pet.this.id}"
+  name       = "${local.name}-replication"
   roles      = [aws_iam_role.replication.name]
   policy_arn = aws_iam_policy.replication.arn
 }

@@ -21,7 +21,7 @@ variable "force_destroy" {
 }
 
 variable "region" {
-  description = "Region where the vector bucket will be managed. Defaults to the region set in the provider configuration"
+  description = "Region where the vector bucket will be managed. Defaults to the Region set in the provider configuration"
   type        = string
   default     = null
 }
@@ -62,7 +62,7 @@ variable "policy" {
 ################################################################################
 
 variable "indexes" {
-  description = "A map of vector indexes to create in the vector bucket. Each key is an arbitrary index name used for resource naming."
+  description = "A map of vector indexes to create in the vector bucket. Each key is an arbitrary index name used for resource naming"
   type = map(object({
     index_name      = string
     dimension       = number

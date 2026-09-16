@@ -52,7 +52,7 @@ module "wrapper" {
   lb_log_delivery_policy_source_organizations     = try(each.value.lb_log_delivery_policy_source_organizations, var.defaults.lb_log_delivery_policy_source_organizations, [])
   lifecycle_rule                                  = try(each.value.lifecycle_rule, var.defaults.lifecycle_rule, [])
   location_type                                   = try(each.value.location_type, var.defaults.location_type, null)
-  logging                                         = try(each.value.logging, var.defaults.logging, {})
+  logging                                         = try(each.value.logging, var.defaults.logging, null)
   metadata_encryption_configuration               = try(each.value.metadata_encryption_configuration, var.defaults.metadata_encryption_configuration, null)
   metadata_inventory_table_configuration_state    = try(each.value.metadata_inventory_table_configuration_state, var.defaults.metadata_inventory_table_configuration_state, null)
   metadata_journal_table_record_expiration        = try(each.value.metadata_journal_table_record_expiration, var.defaults.metadata_journal_table_record_expiration, null)

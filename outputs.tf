@@ -1,78 +1,105 @@
+################################################################################
+# TODO: drop the `s3_bucket_` prefix from every output in this file. This module has a
+# single subject, and house style is bare names (`arn`, `id`, `region`). Breaking: renaming an
+# output forces every caller to change. See terraform-aws-security-group/outputs.tf.
+################################################################################
+
+################################################################################
+# Bucket
+################################################################################
+
 output "s3_bucket_id" {
-  description = "The name of the bucket."
-  value       = try(aws_s3_bucket.this[0].id, aws_s3_directory_bucket.this[0].bucket, "")
+  description = "The name of the bucket"
+  value       = try(aws_s3_bucket.this[0].id, aws_s3_directory_bucket.this[0].bucket, null)
 }
 
 output "s3_bucket_arn" {
-  description = "The ARN of the bucket. Will be of format arn:aws:s3:::bucketname."
-  value       = try(aws_s3_bucket.this[0].arn, "")
+  description = "The ARN of the bucket. Will be of format arn:aws:s3:::bucketname"
+  value       = try(aws_s3_bucket.this[0].arn, null)
 }
 
 output "s3_bucket_bucket_domain_name" {
-  description = "The bucket domain name. Will be of format bucketname.s3.amazonaws.com."
-  value       = try(aws_s3_bucket.this[0].bucket_domain_name, "")
+  description = "The bucket domain name. Will be of format bucketname.s3.amazonaws.com"
+  value       = try(aws_s3_bucket.this[0].bucket_domain_name, null)
 }
 
 output "s3_bucket_bucket_regional_domain_name" {
-  description = "The bucket region-specific domain name. The bucket domain name including the region name, please refer here for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoint when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL."
-  value       = try(aws_s3_bucket.this[0].bucket_regional_domain_name, "")
+  description = "The bucket region-specific domain name. The bucket domain name including the region name, please refer here for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoint when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL"
+  value       = try(aws_s3_bucket.this[0].bucket_regional_domain_name, null)
 }
 
 output "s3_bucket_bucket_namespace" {
-  description = "The namespace of the bucket."
+  description = "The namespace of the bucket"
   value       = try(aws_s3_bucket.this[0].bucket_namespace, null)
 }
 
 output "s3_bucket_hosted_zone_id" {
-  description = "The Route 53 Hosted Zone ID for this bucket's region."
-  value       = try(aws_s3_bucket.this[0].hosted_zone_id, "")
-}
-
-output "s3_bucket_lifecycle_configuration_rules" {
-  description = "The lifecycle rules of the bucket, if the bucket is configured with lifecycle rules. If not, this will be an empty string."
-  value = try([
-    for r in aws_s3_bucket_lifecycle_configuration.this[0].rule : {
-      for k, v in r : k => v if k != "prefix"
-    }
-  ], "")
-}
-
-output "s3_bucket_policy" {
-  description = "The policy of the bucket, if the bucket is configured with a policy. If not, this will be an empty string."
-  value       = try(aws_s3_bucket_policy.this[0].policy, "")
+  description = "The Route 53 Hosted Zone ID for this bucket's region"
+  value       = try(aws_s3_bucket.this[0].hosted_zone_id, null)
 }
 
 output "s3_bucket_region" {
-  description = "The AWS region this bucket resides in."
-  value       = try(aws_s3_bucket.this[0].bucket_region, "")
+  description = "The AWS region this bucket resides in"
+  value       = try(aws_s3_bucket.this[0].bucket_region, null)
 }
 
-output "s3_bucket_website_endpoint" {
-  description = "The website endpoint, if the bucket is configured with a website. If not, this will be an empty string."
-  value       = try(aws_s3_bucket_website_configuration.this[0].website_endpoint, "")
-}
-
-output "s3_bucket_website_domain" {
-  description = "The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records."
-  value       = try(aws_s3_bucket_website_configuration.this[0].website_domain, "")
+output "s3_bucket_tags" {
+  description = "Tags of the bucket"
+  value       = try(aws_s3_bucket.this[0].tags, {})
 }
 
 output "s3_directory_bucket_name" {
-  description = "Name of the directory bucket."
+  description = "Name of the directory bucket"
   value       = try(aws_s3_directory_bucket.this[0].bucket, null)
 }
 
 output "s3_directory_bucket_arn" {
-  description = "ARN of the directory bucket."
+  description = "ARN of the directory bucket"
   value       = try(aws_s3_directory_bucket.this[0].arn, null)
 }
 
+################################################################################
+# Website
+################################################################################
+
+output "s3_bucket_website_endpoint" {
+  description = "The website endpoint, if the bucket is configured with a website"
+  value       = try(aws_s3_bucket_website_configuration.this[0].website_endpoint, null)
+}
+
+output "s3_bucket_website_domain" {
+  description = "The domain of the website endpoint, if the bucket is configured with a website. This is used to create Route 53 alias records"
+  value       = try(aws_s3_bucket_website_configuration.this[0].website_domain, null)
+}
+
+################################################################################
+# Versioning
+################################################################################
+
+# TODO: rename to `versioning_status`. Breaking: an output rename forces callers to change.
 output "aws_s3_bucket_versioning_status" {
-  description = "The versioning status of the bucket. Will be 'Enabled', 'Suspended', or 'Disabled'."
+  description = "The versioning status of the bucket. Will be 'Enabled', 'Suspended', or 'Disabled'"
   value       = try(aws_s3_bucket_versioning.this[0].versioning_configuration[0].status, null)
 }
 
-output "s3_bucket_tags" {
-  description = "Tags of the bucket."
-  value       = try(aws_s3_bucket.this[0].tags, {})
+################################################################################
+# Lifecycle Rule(s)
+################################################################################
+
+output "s3_bucket_lifecycle_configuration_rules" {
+  description = "The lifecycle rules of the bucket, if the bucket is configured with lifecycle rules"
+  value = try([
+    for r in aws_s3_bucket_lifecycle_configuration.this[0].rule : {
+      for k, v in r : k => v if k != "prefix"
+    }
+  ], null)
+}
+
+################################################################################
+# Bucket Policy
+################################################################################
+
+output "s3_bucket_policy" {
+  description = "The policy of the bucket, if the bucket is configured with a policy"
+  value       = try(aws_s3_bucket_policy.this[0].policy, null)
 }

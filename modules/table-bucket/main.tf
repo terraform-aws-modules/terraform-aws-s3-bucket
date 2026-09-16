@@ -29,15 +29,15 @@ data "aws_iam_policy_document" "table_bucket_policy" {
     for_each = var.table_bucket_policy_statements
 
     content {
-      sid           = try(statement.value.sid, null)
-      actions       = try(statement.value.actions, null)
-      not_actions   = try(statement.value.not_actions, null)
-      effect        = try(statement.value.effect, null)
-      resources     = try(statement.value.resources, ["${aws_s3tables_table_bucket.this[0].arn}/table/*"])
-      not_resources = try(statement.value.not_resources, null)
+      sid           = statement.value.sid
+      actions       = statement.value.actions
+      not_actions   = statement.value.not_actions
+      effect        = statement.value.effect
+      resources     = statement.value.resources != null ? statement.value.resources : ["${aws_s3tables_table_bucket.this[0].arn}/table/*"]
+      not_resources = statement.value.not_resources
 
       dynamic "principals" {
-        for_each = try(statement.value.principals, [])
+        for_each = coalesce(statement.value.principals, [])
 
         content {
           type        = principals.value.type
@@ -46,7 +46,7 @@ data "aws_iam_policy_document" "table_bucket_policy" {
       }
 
       dynamic "not_principals" {
-        for_each = try(statement.value.not_principals, [])
+        for_each = coalesce(statement.value.not_principals, [])
 
         content {
           type        = not_principals.value.type
@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "table_bucket_policy" {
       }
 
       dynamic "condition" {
-        for_each = try(statement.value.conditions, [])
+        for_each = coalesce(statement.value.conditions, [])
 
         content {
           test     = condition.value.test
@@ -73,32 +73,32 @@ resource "aws_s3tables_table" "this" {
   region = var.region
 
   format                    = each.value.format
-  name                      = try(each.value.table_name, each.key)
+  name                      = coalesce(each.value.table_name, each.key)
   namespace                 = each.value.namespace
   table_bucket_arn          = aws_s3tables_table_bucket.this[0].arn
-  encryption_configuration  = try(each.value.encryption_configuration, null)
-  maintenance_configuration = try(each.value.maintenance_configuration, null)
-  tags                      = merge(var.tags, try(each.value.tags, {}))
+  encryption_configuration  = each.value.encryption_configuration
+  maintenance_configuration = each.value.maintenance_configuration
+  tags                      = merge(var.tags, each.value.tags)
 
   dynamic "metadata" {
-    for_each = try([each.value.metadata], [])
+    for_each = each.value.metadata != null ? [each.value.metadata] : []
     content {
 
       dynamic "iceberg" {
-        for_each = try([metadata.value.iceberg], [])
+        for_each = metadata.value.iceberg != null ? [metadata.value.iceberg] : []
         content {
 
           dynamic "schema" {
-            for_each = try([iceberg.value.schema], [])
+            for_each = iceberg.value.schema != null ? [iceberg.value.schema] : []
             content {
 
               dynamic "field" {
-                for_each = try(schema.value.field, [])
+                for_each = schema.value.field
                 content {
 
-                  name     = try(field.value.name, field.key)
+                  name     = coalesce(field.value.name, field.key)
                   type     = field.value.type
-                  required = try(field.value.required, null)
+                  required = field.value.required
                 }
               }
             }
@@ -110,7 +110,7 @@ resource "aws_s3tables_table" "this" {
 }
 
 resource "aws_s3tables_table_policy" "this" {
-  for_each = { for k, v in var.tables : k => v if var.create && try(v.create_table_policy, false) }
+  for_each = { for k, v in var.tables : k => v if var.create && v.create_table_policy }
 
   region = var.region
 
@@ -121,20 +121,20 @@ resource "aws_s3tables_table_policy" "this" {
 }
 
 data "aws_iam_policy_document" "table_policy" {
-  for_each = { for k, v in var.tables : k => v.policy_statements if var.create && try(v.create_table_policy, false) }
+  for_each = { for k, v in var.tables : k => v.policy_statements if var.create && v.create_table_policy }
 
   dynamic "statement" {
     for_each = each.value
 
     content {
-      sid         = try(statement.value.sid, null)
-      actions     = try(statement.value.actions, null)
-      not_actions = try(statement.value.not_actions, null)
-      effect      = try(statement.value.effect, null)
+      sid         = statement.value.sid
+      actions     = statement.value.actions
+      not_actions = statement.value.not_actions
+      effect      = statement.value.effect
       resources   = [aws_s3tables_table.this[each.key].arn]
 
       dynamic "principals" {
-        for_each = try(statement.value.principals, [])
+        for_each = coalesce(statement.value.principals, [])
 
         content {
           type        = principals.value.type
@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "table_policy" {
       }
 
       dynamic "not_principals" {
-        for_each = try(statement.value.not_principals, [])
+        for_each = coalesce(statement.value.not_principals, [])
 
         content {
           type        = not_principals.value.type
@@ -152,7 +152,7 @@ data "aws_iam_policy_document" "table_policy" {
       }
 
       dynamic "condition" {
-        for_each = try(statement.value.conditions, [])
+        for_each = coalesce(statement.value.conditions, [])
 
         content {
           test     = condition.value.test

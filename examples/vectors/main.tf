@@ -1,5 +1,12 @@
 locals {
+  name   = "ex-${basename(path.cwd)}"
   region = "eu-west-1"
+
+  tags = {
+    Name       = local.name
+    Example    = local.name
+    Repository = "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
+  }
 }
 
 provider "aws" {
@@ -8,66 +15,20 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-resource "random_pet" "this" {
-  length = 2
-}
-
 # https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-data-encryption.html
-module "kms" {
-  source  = "terraform-aws-modules/kms/aws"
-  version = "~> 3.0"
-
-  description             = "KMS key for S3 Vectors encryption"
-  deletion_window_in_days = 7
-
-  key_statements = [
-    {
-      sid = "AllowS3VectorsServicePrincipal"
-      actions = [
-        "kms:Decrypt",
-        "kms:GenerateDataKey",
-      ]
-      resources = ["*"]
-
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["indexing.s3vectors.amazonaws.com"]
-        },
-      ]
-
-      conditions = [
-        {
-          test     = "ArnLike"
-          variable = "aws:SourceArn"
-          values = [
-            "arn:aws:s3vectors:${local.region}:${data.aws_caller_identity.current.account_id}:bucket/*",
-          ]
-        },
-        {
-          test     = "StringEquals"
-          variable = "aws:SourceAccount"
-          values = [
-            data.aws_caller_identity.current.account_id,
-          ]
-        },
-        {
-          test     = "ForAnyValue:StringEquals"
-          variable = "kms:EncryptionContextKeys"
-          values = [
-            "aws:s3vectors:arn",
-            "aws:s3vectors:resource-id",
-          ]
-        },
-      ]
-    },
-  ]
-}
+################################################################################
+# Vector Buckets
+################################################################################
 
 module "vector_bucket" {
   source = "../../modules/vectors"
 
-  vector_bucket_name = random_pet.this.id
+  region = local.region
+
+  vector_bucket_name = local.name
+
+  # For example only
+  force_destroy = true
 
   encryption_configuration = {
     sse_type    = "aws:kms"
@@ -85,7 +46,7 @@ module "vector_bucket" {
 module "vector_bucket_with_index" {
   source = "../../modules/vectors"
 
-  vector_bucket_name = "${random_pet.this.id}-with-index"
+  vector_bucket_name = "${local.name}-with-index"
 
   encryption_configuration = {
     sse_type    = "aws:kms"
@@ -128,6 +89,20 @@ module "vector_bucket_with_index" {
     Example = "vectors-with-index"
   }
 }
+
+################################################################################
+# Disabled
+################################################################################
+
+module "disabled" {
+  source = "../../modules/vectors"
+
+  create = false
+}
+
+################################################################################
+# Supporting Resources
+################################################################################
 
 data "aws_iam_policy_document" "vector_bucket_policy" {
   statement {
@@ -174,4 +149,57 @@ data "aws_iam_policy_document" "vector_bucket_policy" {
       type        = "AWS"
     }
   }
+}
+
+module "kms" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "~> 4.0"
+
+  description             = "KMS key for S3 Vectors encryption"
+  deletion_window_in_days = 7
+
+  key_statements = [
+    {
+      sid = "AllowS3VectorsServicePrincipal"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["indexing.s3vectors.amazonaws.com"]
+        },
+      ]
+
+      conditions = [
+        {
+          test     = "ArnLike"
+          variable = "aws:SourceArn"
+          values = [
+            "arn:aws:s3vectors:${local.region}:${data.aws_caller_identity.current.account_id}:bucket/*",
+          ]
+        },
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values = [
+            data.aws_caller_identity.current.account_id,
+          ]
+        },
+        {
+          test     = "ForAnyValue:StringEquals"
+          variable = "kms:EncryptionContextKeys"
+          values = [
+            "aws:s3vectors:arn",
+            "aws:s3vectors:resource-id",
+          ]
+        },
+      ]
+    },
+  ]
+
+  tags = local.tags
 }
