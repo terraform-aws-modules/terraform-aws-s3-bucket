@@ -138,6 +138,19 @@ variable "iam_role_override_policy_documents" {
   nullable    = false
 }
 
+variable "iam_role_policies" {
+  description = "Policies to attach to the IAM role, keyed by a name of your choosing, valued by the policy ARN"
+  type        = map(string)
+  default     = {}
+  nullable    = false
+}
+
+variable "iam_role_kms_key_arns" {
+  description = "KMS key ARNs the role may use with S3 Files. Defaults to every key in this account and Region, which is the scope AWS's own policy template uses"
+  type        = list(string)
+  default     = null
+}
+
 variable "iam_role_policy_name" {
   description = "Name of the role's inline permissions policy. Falls back to the role's own name"
   type        = string

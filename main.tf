@@ -1606,6 +1606,8 @@ module "s3_file_system" {
   iam_role_path                             = each.value.iam_role_path
   iam_role_description                      = each.value.iam_role_description
   iam_role_permissions_boundary             = each.value.iam_role_permissions_boundary
+  iam_role_kms_key_arns                     = each.value.iam_role_kms_key_arns
+  iam_role_policies                         = each.value.iam_role_policies
   iam_role_policy_name                      = each.value.iam_role_policy_name
   iam_role_source_assume_policy_documents   = each.value.iam_role_source_assume_policy_documents
   iam_role_override_assume_policy_documents = each.value.iam_role_override_assume_policy_documents

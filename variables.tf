@@ -804,6 +804,8 @@ variable "file_systems" {
     iam_role_path                             = optional(string)
     iam_role_description                      = optional(string)
     iam_role_permissions_boundary             = optional(string)
+    iam_role_kms_key_arns                     = optional(list(string))
+    iam_role_policies                         = optional(map(string), {})
     iam_role_policy_name                      = optional(string)
     iam_role_source_assume_policy_documents   = optional(list(string), [])
     iam_role_override_assume_policy_documents = optional(list(string), [])

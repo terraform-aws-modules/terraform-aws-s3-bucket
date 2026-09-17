@@ -49,6 +49,7 @@ module "s3_bucket" {
     training = {
       prefix        = "training/"
       mount_targets = local.mount_targets
+      create_policy = true
 
       security_group_name            = "${local.name}-training"
       security_group_use_name_prefix = false
@@ -87,6 +88,8 @@ module "s3_bucket" {
       # This file system uses a group of its own rather than one this module creates
       create_security_group = false
       security_groups       = [module.agents_security_group.id]
+
+      create_policy = true
 
       access_points = {
         app = {

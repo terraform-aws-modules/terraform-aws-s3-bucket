@@ -59,6 +59,7 @@ No modules.
 | ---- | ---- |
 | [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_s3files_access_point.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_access_point) | resource |
 | [aws_s3files_file_system.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_file_system) | resource |
 | [aws_s3files_file_system_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3files_file_system_policy) | resource |
@@ -89,11 +90,13 @@ No modules.
 | <a name="input_create_security_group"></a> [create\_security\_group](#input\_create\_security\_group) | Whether to create a security group for the mount targets | `bool` | `true` | no |
 | <a name="input_iam_role_arn"></a> [iam\_role\_arn](#input\_iam\_role\_arn) | ARN of an existing IAM role for the file system to assume. Used when `create_iam_role` is `false` | `string` | `null` | no |
 | <a name="input_iam_role_description"></a> [iam\_role\_description](#input\_iam\_role\_description) | Description of the IAM role created | `string` | `null` | no |
+| <a name="input_iam_role_kms_key_arns"></a> [iam\_role\_kms\_key\_arns](#input\_iam\_role\_kms\_key\_arns) | KMS key ARNs the role may use with S3 Files. Defaults to every key in this account and Region, which is the scope AWS's own policy template uses | `list(string)` | `null` | no |
 | <a name="input_iam_role_name"></a> [iam\_role\_name](#input\_iam\_role\_name) | Name of the IAM role created. Falls back to the file system name suffixed with `-s3files` | `string` | `null` | no |
 | <a name="input_iam_role_override_assume_policy_documents"></a> [iam\_role\_override\_assume\_policy\_documents](#input\_iam\_role\_override\_assume\_policy\_documents) | List of IAM policy documents that are merged together into the role's trust policy. In merging, statements with non-blank `sid`s will override statements with the same `sid` | `list(string)` | `[]` | no |
 | <a name="input_iam_role_override_policy_documents"></a> [iam\_role\_override\_policy\_documents](#input\_iam\_role\_override\_policy\_documents) | List of IAM policy documents that are merged together into the role's permissions policy. In merging, statements with non-blank `sid`s will override statements with the same `sid` | `list(string)` | `[]` | no |
 | <a name="input_iam_role_path"></a> [iam\_role\_path](#input\_iam\_role\_path) | Path of the IAM role created | `string` | `null` | no |
 | <a name="input_iam_role_permissions_boundary"></a> [iam\_role\_permissions\_boundary](#input\_iam\_role\_permissions\_boundary) | ARN of the policy that is used to set the permissions boundary for the IAM role created | `string` | `null` | no |
+| <a name="input_iam_role_policies"></a> [iam\_role\_policies](#input\_iam\_role\_policies) | Policies to attach to the IAM role, keyed by a name of your choosing, valued by the policy ARN | `map(string)` | `{}` | no |
 | <a name="input_iam_role_policy_name"></a> [iam\_role\_policy\_name](#input\_iam\_role\_policy\_name) | Name of the role's inline permissions policy. Falls back to the role's own name | `string` | `null` | no |
 | <a name="input_iam_role_source_assume_policy_documents"></a> [iam\_role\_source\_assume\_policy\_documents](#input\_iam\_role\_source\_assume\_policy\_documents) | List of IAM policy documents that are merged together into the role's trust policy. Statements must have unique `sid`s | `list(string)` | `[]` | no |
 | <a name="input_iam_role_source_policy_documents"></a> [iam\_role\_source\_policy\_documents](#input\_iam\_role\_source\_policy\_documents) | List of IAM policy documents that are merged together into the role's permissions policy. Statements must have unique `sid`s | `list(string)` | `[]` | no |
