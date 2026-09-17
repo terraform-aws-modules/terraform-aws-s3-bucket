@@ -77,6 +77,7 @@ resource "aws_s3files_file_system" "this" {
   depends_on = [
     # The role has to be able to reach the bucket for as long as the file system exists
     aws_iam_role_policy.this,
+    aws_iam_role_policy_attachment.this,
   ]
 }
 
@@ -86,6 +87,11 @@ resource "aws_s3files_file_system" "this" {
 
 locals {
   create_iam_role = var.create && var.create_iam_role
+
+  # Every key in this account and Region, which is what AWS's own policy template uses. Narrowing it to
+  # the file system's key would assume no object in the bucket was encrypted with a different one, and
+  # the kms:ViaService and encryption context conditions on the statement are what bound its use
+  iam_role_kms_key_arns = var.iam_role_kms_key_arns != null ? var.iam_role_kms_key_arns : ["arn:${local.partition}:kms:${local.region}:${local.account_id}:*"]
 
   # Without a name to build on, the provider generates one
   iam_role_name        = var.iam_role_name != null ? var.iam_role_name : (var.name != null ? "${var.name}-s3files" : null)
@@ -192,7 +198,7 @@ data "aws_iam_policy_document" "this" {
       "kms:ReEncryptFrom",
       "kms:ReEncryptTo",
     ]
-    resources = ["arn:${local.partition}:kms:${local.region}:${local.account_id}:*"]
+    resources = local.iam_role_kms_key_arns
 
     condition {
       test     = "StringLike"
@@ -242,6 +248,15 @@ data "aws_iam_policy_document" "this" {
   }
 }
 
+resource "aws_iam_role_policy_attachment" "this" {
+  for_each = { for k, v in var.iam_role_policies : k => v if local.create_iam_role }
+
+  role       = aws_iam_role.this[0].name
+  policy_arn = each.value
+}
+
+# AWS asks for the permissions inline on this role: "This IAM role requires the following: an inline
+# policy as follows". https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-files-prereq-policies.html
 resource "aws_iam_role_policy" "this" {
   count = local.create_iam_role ? 1 : 0
 
