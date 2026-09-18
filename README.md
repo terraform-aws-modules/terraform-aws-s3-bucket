@@ -144,6 +144,48 @@ Users of this Terraform module can create multiple similar resources by using [`
 
 Users of Terragrunt can achieve similar results by using modules provided in the [wrappers](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/wrappers) directory, if they prefer to reduce amount of configuration files.
 
+<!-- BEGIN_KNOWN_LIMITATIONS -->
+
+## Known limitations (Terraform/OpenTofu, not this module)
+
+A few requests come up again and again and cannot be implemented by this
+module, or by any module: Terraform requires `lifecycle` arguments to be
+literal values inside the resource block.
+[hashicorp/terraform#18367](https://github.com/hashicorp/terraform/issues/18367)
+has been open since 2018,
+[#22544](https://github.com/hashicorp/terraform/issues/22544) since 2019, and
+[opentofu/opentofu#1329](https://github.com/opentofu/opentofu/issues/1329) is
+the same request for OpenTofu.
+
+- **`prevent_destroy` cannot be set through a module input.** Asked for in #83,
+  #186, #203, #215, #283 and #407, and not something this module can offer: the
+  `lifecycle` block has to be a literal inside the resource. Native options: an
+  explicit `Deny` on `s3:DeleteBucket` in the bucket policy, or fork this module
+  and add the block yourself.
+- **`ignore_changes` cannot be set either** (#21). A tag written by a scanner, a
+  cost tool or an AWS Config rule is removed on the next apply and written back
+  by the tool after that. Native options: move tag ownership into Terraform with
+  provider `default_tags`, or fork this module and add
+  `ignore_changes = [tags, tags_all]`.
+
+[compliance.tf](https://compliance.tf/docs/workarounds/terraform-aws-s3-bucket/?utm_source=github&utm_medium=readme&utm_campaign=known-limitations) serves this module with these rules applied at
+download time, on top of whatever your organization already has enabled there.
+Inputs and outputs do not change; the `source` line does. Drop the `version`
+argument and pin the release you use by adding `&version=` and that release
+number to the URL. To get started, register a free compliance.tf account and
+configure an access token:
+
+    source = "https://registry.compliance.tf/terraform-aws-modules/s3-bucket/aws?add_rules=lifecycle_ignore_tags,lifecycle_prevent_destroy_data"
+
+The page behind that link has the full workaround for each item above and the
+exact diff each rule makes. To see the diff before touching a `source` line,
+open this module in the Rules Playground at the version it pins for it:
+https://registry.compliance.tf/playground?module=terraform-aws-modules/s3-bucket/aws&rules=lifecycle_ignore_tags,lifecycle_prevent_destroy_data - no account needed.
+
+Disclosure: written by this module's maintainer, who also builds compliance.tf.
+
+<!-- END_KNOWN_LIMITATIONS -->
+
 ## Examples
 
 - [Complete](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/complete) - Complete S3 bucket with most of supported features enabled
