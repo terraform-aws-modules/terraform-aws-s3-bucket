@@ -176,12 +176,12 @@ the same request for OpenTofu.
   tag ownership into Terraform with provider `default_tags`, or fork this module
   and add `ignore_changes = [tags, tags_all]`.
 
-Compliance.tf serves this module with these rules applied at download time, on
-top of whatever your organization already has enabled there. Inputs and outputs
-do not change; the `source` line does. Drop the `version` argument and pin the
-release you use by adding `&version=` and that release number to the URL. To
-get started, register a free compliance.tf account and configure an access
-token:
+[Compliance.tf](https://compliance.tf/?utm_source=github&utm_medium=readme&utm_campaign=known-limitations) serves this module with
+these rules applied at download time, on top of whatever your organization
+already has enabled there. Inputs and outputs do not change; the `source` line
+does. Drop the `version` argument and pin the release you use by adding
+`&version=` and that release number to the URL. To get started, register a free
+compliance.tf account and configure an access token:
 
     source = "https://registry.compliance.tf/terraform-aws-modules/s3-bucket/aws?add_rules=lifecycle_ignore_tags,lifecycle_prevent_destroy_data"
 
