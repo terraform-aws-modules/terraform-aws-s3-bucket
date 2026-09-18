@@ -21,6 +21,7 @@ These features of S3 bucket configurations are supported:
 - S3 Directory Bucket
 - S3 Table Bucket
 - S3 Vectors
+- Amazon S3 Files support via an isolated submodule
 
 ## Usage
 
@@ -123,6 +124,10 @@ module "s3_bucket" {
   })
 }
 ```
+
+### S3 Files
+
+Amazon S3 Files can be provisioned using the `modules/s3-files` submodule. Please refer to [the submodule's README](modules/s3-files/README.md) for usage examples and detailed configuration.
 
 ## Conditional creation
 
