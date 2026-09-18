@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.16.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.16.0...v5.16.1) (2026-09-18)
+
+### Bug Fixes
+
+* Document known Terraform/OpenTofu limitations in README ([#411](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/411)) ([2c8cce7](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/2c8cce73ef1f0932cac501af4e2ce51ecb076342))
+
 ## [5.16.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.15.4...v5.16.0) (2026-09-15)
 
 ### Features
