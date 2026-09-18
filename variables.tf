@@ -457,13 +457,13 @@ variable "attach_public_policy" {
 }
 
 variable "attach_elb_log_delivery_policy" {
-  description = "Controls if S3 bucket should have ELB log delivery policy attached"
+  description = "Controls if S3 bucket should have the log delivery policy for Application and Classic Load Balancer access logs attached"
   type        = bool
   default     = false
 }
 
 variable "attach_lb_log_delivery_policy" {
-  description = "Controls if S3 bucket should have ALB/NLB log delivery policy attached"
+  description = "Controls if S3 bucket should have the log delivery policy for Network Load Balancer access logs attached"
   type        = bool
   default     = false
 }
@@ -770,6 +770,224 @@ variable "metadata_journal_table_record_expiration_days" {
 variable "metadata_journal_table_record_expiration" {
   description = "Whether journal table record expiration is enabled or disabled. Valid values: `ENABLED`, `DISABLED`"
   type        = string
+  default     = null
+}
+
+################################################################################
+# File System(s)
+################################################################################
+
+variable "file_systems" {
+  description = "Map of Amazon S3 Files file system definitions to create on the bucket. Requires bucket versioning, and is not supported on a directory bucket"
+  type = map(object({
+    create = optional(bool, true)
+    name   = optional(string) # Will fall back to map key
+    tags   = optional(map(string))
+
+    # File system. Changing the prefix, the KMS key or the IAM role (including the created role's name or path)
+    # replaces the file system, its mount targets and its access points
+    prefix                = optional(string)
+    kms_key_id            = optional(string)
+    accept_bucket_warning = optional(bool)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+    }))
+
+    # IAM role
+    create_iam_role = optional(bool, true)
+    # A role brought in must already carry its permissions when the file system is created. S3 Files checks
+    # them at creation, and the file system depends only on the role's ARN, not on any policy attached to it
+    iam_role_arn                              = optional(string)
+    iam_role_name                             = optional(string)
+    iam_role_use_name_prefix                  = optional(bool, true)
+    iam_role_path                             = optional(string)
+    iam_role_description                      = optional(string)
+    iam_role_permissions_boundary             = optional(string)
+    iam_role_kms_key_arns                     = optional(list(string))
+    iam_role_policies                         = optional(map(string), {})
+    iam_role_policy_name                      = optional(string)
+    iam_role_source_assume_policy_documents   = optional(list(string), [])
+    iam_role_override_assume_policy_documents = optional(list(string), [])
+    iam_role_source_policy_documents          = optional(list(string), [])
+    iam_role_override_policy_documents        = optional(list(string), [])
+    iam_role_tags                             = optional(map(string))
+
+    # Mount target(s). Key them by a value known at plan time, such as the Availability Zone
+    # security_groups are added to every mount target, alongside the group this module creates
+    security_groups                = optional(list(string), [])
+    create_security_group          = optional(bool)
+    security_group_name            = optional(string)
+    security_group_use_name_prefix = optional(bool)
+    security_group_description     = optional(string)
+    security_group_ingress_rules = optional(map(object({
+      name = optional(string)
+
+      cidr_ipv4                    = optional(string)
+      cidr_ipv6                    = optional(string)
+      description                  = optional(string)
+      from_port                    = optional(number, 2049)
+      ip_protocol                  = optional(string, "tcp")
+      prefix_list_id               = optional(string)
+      referenced_security_group_id = optional(string)
+      tags                         = optional(map(string))
+      to_port                      = optional(number, 2049)
+    })))
+    security_group_egress_rules = optional(map(object({
+      name = optional(string)
+
+      cidr_ipv4                    = optional(string)
+      cidr_ipv6                    = optional(string)
+      description                  = optional(string)
+      from_port                    = optional(number)
+      ip_protocol                  = string
+      prefix_list_id               = optional(string)
+      referenced_security_group_id = optional(string)
+      tags                         = optional(map(string))
+      to_port                      = optional(number)
+    })))
+    security_group_tags = optional(map(string))
+    mount_targets = optional(map(object({
+      subnet_id       = string
+      ip_address_type = optional(string)
+      ipv4_address    = optional(string)
+      ipv6_address    = optional(string)
+      timeouts = optional(object({
+        create = optional(string)
+        delete = optional(string)
+        update = optional(string)
+      }))
+    })), {})
+
+    # Access point(s)
+    access_points = optional(map(object({
+      name = optional(string) # Will fall back to map key
+      tags = optional(map(string))
+
+      posix_user = optional(object({
+        gid            = number
+        uid            = number
+        secondary_gids = optional(list(number))
+      }))
+      root_directory = optional(object({
+        path = optional(string)
+        creation_permissions = optional(object({
+          owner_gid   = number
+          owner_uid   = number
+          permissions = string
+        }))
+      }))
+
+      timeouts = optional(object({
+        create = optional(string)
+        delete = optional(string)
+      }))
+
+      # A principal listed here is denied every other way into this file system, including mounting without an access point
+      read_access_arns       = optional(list(string))
+      read_write_access_arns = optional(list(string))
+    })), {})
+
+    # File system policy
+    create_policy             = optional(bool, false)
+    source_policy_documents   = optional(list(string), [])
+    override_policy_documents = optional(list(string), [])
+    policy_statements = optional(list(object({
+      sid           = optional(string)
+      actions       = optional(list(string))
+      not_actions   = optional(list(string))
+      effect        = optional(string)
+      resources     = optional(list(string))
+      not_resources = optional(list(string))
+      principals = optional(list(object({
+        type        = string
+        identifiers = list(string)
+      })))
+      not_principals = optional(list(object({
+        type        = string
+        identifiers = list(string)
+      })))
+      conditions = optional(list(object({
+        test     = string
+        values   = list(string)
+        variable = string
+      })))
+    })))
+
+    # Synchronization
+    synchronization_configuration = optional(object({
+      import_data_rule = list(object({
+        prefix         = string
+        size_less_than = number
+        trigger        = string
+      }))
+      # Required: the API takes exactly one expiration rule with every synchronization configuration
+      expiration_data_rule = object({
+        days_after_last_access = number
+      })
+    }))
+  }))
+  default  = {}
+  nullable = false
+}
+
+################################################################################
+# File System Security Group
+################################################################################
+
+variable "create_file_system_security_group" {
+  description = "Whether each file system creates a security group for its mount targets. A file system that sets its own `security_groups` never creates one"
+  type        = bool
+  default     = true
+}
+
+variable "file_system_security_group_vpc_id" {
+  description = "ID of the VPC where the file system security groups are created. Must be the VPC of the mount target subnets"
+  type        = string
+  default     = null
+}
+
+variable "file_system_security_group_ingress_rules" {
+  description = "Map of ingress rules added to every file system security group this module creates. A file system can replace them with its own `security_group_ingress_rules`"
+  type = map(object({
+    name = optional(string)
+
+    cidr_ipv4                    = optional(string)
+    cidr_ipv6                    = optional(string)
+    description                  = optional(string)
+    from_port                    = optional(number, 2049)
+    ip_protocol                  = optional(string, "tcp")
+    prefix_list_id               = optional(string)
+    referenced_security_group_id = optional(string)
+    tags                         = optional(map(string))
+    to_port                      = optional(number, 2049)
+  }))
+  default  = {}
+  nullable = false
+}
+
+variable "file_system_security_group_egress_rules" {
+  description = "Map of egress rules added to every file system security group this module creates. A file system can replace them with its own `security_group_egress_rules`"
+  type = map(object({
+    name = optional(string)
+
+    cidr_ipv4                    = optional(string)
+    cidr_ipv6                    = optional(string)
+    description                  = optional(string)
+    from_port                    = optional(number)
+    ip_protocol                  = string
+    prefix_list_id               = optional(string)
+    referenced_security_group_id = optional(string)
+    tags                         = optional(map(string))
+    to_port                      = optional(number)
+  }))
+  default  = {}
+  nullable = false
+}
+
+variable "file_system_security_group_tags" {
+  description = "A map of additional tags added to every file system security group this module creates"
+  type        = map(string)
   default     = null
 }
 

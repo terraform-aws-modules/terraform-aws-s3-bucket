@@ -14,15 +14,28 @@ These features of S3 bucket configurations are supported:
 - server-side encryption
 - object locking
 - Cross-Region Replication (CRR)
-- ELB log delivery bucket policy
-- ALB/NLB log delivery bucket policy
-- WAF log delivery bucket policy
+- Elastic Load Balancing and AWS WAF log delivery bucket policies
+- file system access to bucket data with Amazon S3 Files
 - Account-level Public Access Block
-- S3 Directory Bucket
-- S3 Table Bucket
-- S3 Vectors
+
+Besides general purpose buckets, this repository manages these S3 bucket types:
+
+- [S3 Directory Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/directory-bucket), created by the root module when `is_directory_bucket = true`
+- [S3 Table Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/table-bucket), through the `table-bucket` sub-module
+- [S3 Vectors](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/vectors), through the `vectors` sub-module
+
+See the respective sub-module `README.md` for details on how to use:
+
+- [`account-public-access`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/account-public-access) - the account-level Public Access Block, which applies to every bucket in the account
+- [`file-system`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/file-system) - an Amazon S3 Files file system on a bucket this module does not manage
+- [`notification`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/notification) - bucket notifications to Lambda, SQS, SNS and EventBridge
+- [`object`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/object) - objects placed in a bucket
+- [`table-bucket`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/table-bucket) - table buckets and the Iceberg tables in them
+- [`vectors`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/vectors) - vector buckets and vector indexes
 
 ## Usage
+
+See the [`examples`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples) directory for working examples to reference.
 
 ### Private bucket with versioning enabled
 
@@ -42,58 +55,22 @@ module "s3_bucket" {
 }
 ```
 
-### Bucket with ELB access log delivery policy attached
+### Bucket with log delivery policies attached
+
+Each `attach_*_log_delivery_policy` flag adds the statements one service needs to write its logs to the bucket, and the module merges every enabled flag into a single bucket policy.
 
 ```hcl
 module "s3_bucket_for_logs" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "my-s3-bucket-for-logs"
-  acl    = "log-delivery-write"
+  bucket = "aws-waf-logs-my-s3-bucket-for-logs"
 
-  # Allow deletion of non-empty bucket
-  force_destroy = true
-
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
-
+  # Application and Classic Load Balancer access logs
   attach_elb_log_delivery_policy = true
-}
-```
-
-### Bucket with ALB/NLB access log delivery policy attached
-
-```hcl
-module "s3_bucket_for_logs" {
-  source = "terraform-aws-modules/s3-bucket/aws"
-
-  bucket = "my-s3-bucket-for-logs"
-
-  # Allow deletion of non-empty bucket
-  force_destroy = true
-
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
-
-  attach_lb_log_delivery_policy = true # Required for ALB/NLB logs
-}
-```
-
-### Bucket with WAF log delivery policy attached
-
-```hcl
-module "s3_bucket_for_waf_logs" {
-  source = "terraform-aws-modules/s3-bucket/aws"
-
-  bucket = "my-s3-bucket-for-waf-logs"
-
-  # Allow deletion of non-empty bucket
-  force_destroy = true
-
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
-
-  attach_waf_log_delivery_policy = true  # Required for WAF logs
+  # Network Load Balancer access logs
+  attach_lb_log_delivery_policy = true
+  # AWS WAF logs, which require a bucket name that starts with `aws-waf-logs-`
+  attach_waf_log_delivery_policy = true
 }
 ```
 
@@ -124,6 +101,50 @@ module "s3_bucket" {
 }
 ```
 
+### Bucket with an S3 file system
+
+S3 Files requires versioning on the bucket. The module creates an IAM role for each file system and a security group shared by the mount targets. A principal listed in an access point's `read_access_arns` or `read_write_access_arns` can mount that file system only through the access points that list it.
+
+To put a file system on a bucket this module does not manage, call [`modules/file-system`](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/file-system) directly. Its README covers the one thing that module asks of callers, which is to pass the bucket's versioning status as a reference to the versioning resource rather than as a literal.
+
+```hcl
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket = "my-s3-bucket"
+
+  versioning = {
+    enabled = true
+  }
+
+  file_system_security_group_vpc_id = "vpc-1234556abcdef"
+  file_system_security_group_ingress_rules = {
+    clients = {
+      referenced_security_group_id = "sg-1234556abcdef"
+    }
+  }
+
+  file_systems = {
+    datasets = {
+      prefix = "datasets/"
+
+      mount_targets = {
+        eu-west-1a = { subnet_id = "subnet-abcde012" }
+        eu-west-1b = { subnet_id = "subnet-bcde012a" }
+      }
+    }
+  }
+}
+```
+
+## Notes
+
+- A bucket carrying an S3 file system needs versioning enabled and either SSE-S3 or SSE-KMS encryption. S3 Files is not available on a directory bucket, and the module says so rather than ignoring `file_systems`.
+- Changing a file system's `prefix`, its KMS key, or its IAM role replaces the file system, along with its mount targets and access points. An access point cannot be edited either, so any change to one replaces it and gives it a new ARN.
+- Removing a `synchronization_configuration` leaves the file system expiring data after 365 days, not the 30 days AWS applies to a file system that never had one.
+- A principal named in an access point's `read_access_arns` or `read_write_access_arns` reaches that file system only through the access points that name it. The module writes the allow and deny pair AWS recommends, and a read-only principal is also denied writes through its own access point.
+- Key `mount_targets` by something known at plan time, such as the Availability Zone. Terraform cannot create resources whose map keys come from values that only exist after an apply.
+
 ## Conditional creation
 
 Sometimes you need to have a way to create S3 resources conditionally but Terraform does not allow to use `count` inside `module` block, so the solution is to specify argument `create_bucket`.
@@ -140,9 +161,7 @@ module "s3_bucket" {
 
 ## Module wrappers
 
-Users of this Terraform module can create multiple similar resources by using [`for_each` meta-argument within `module` block](https://www.terraform.io/language/meta-arguments/for_each) which became available in Terraform 0.13.
-
-Users of Terragrunt can achieve similar results by using modules provided in the [wrappers](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/wrappers) directory, if they prefer to reduce amount of configuration files.
+Users of Terragrunt can create multiple similar resources from one configuration with the modules in the [wrappers](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/wrappers) directory.
 
 <!-- BEGIN_KNOWN_LIMITATIONS -->
 
@@ -204,6 +223,7 @@ Disclosure: written by this module's maintainer, who also builds
 - [S3 Inventory and Analytics](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/inventory-and-analytics) - S3 bucket Inventory and Analytics configurations.
 - [S3 ACLs](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/acl) - S3 bucket ACLs, for the buckets that still require them.
 - [S3 Bucket Policies](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/bucket-policies) - Attach the bundled log delivery and transport policies.
+- [S3 file system](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/file-system) - Amazon S3 Files file systems scoped to bucket prefixes, with mount targets and access points.
 - [S3 Account-level Public Access Block](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/account-public-access) - Manage S3 account-level Public Access Block.
 - [S3 Directory Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/directory-bucket) - S3 Directory Bucket configuration.
 - [S3 Table Bucket](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/table-bucket) - S3 Table Bucket configuration.
@@ -215,17 +235,19 @@ Disclosure: written by this module's maintainer, who also builds
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.44 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.42 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.44 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+| ---- | ------ | ------- |
+| <a name="module_s3_file_system"></a> [s3\_file\_system](#module\_s3\_file\_system) | ./modules/file-system | n/a |
 
 ## Resources
 
@@ -292,9 +314,9 @@ No modules.
 | <a name="input_attach_deny_insecure_transport_policy"></a> [attach\_deny\_insecure\_transport\_policy](#input\_attach\_deny\_insecure\_transport\_policy) | Controls if S3 bucket should have deny non-SSL transport policy attached | `bool` | `false` | no |
 | <a name="input_attach_deny_ssec_encrypted_object_uploads"></a> [attach\_deny\_ssec\_encrypted\_object\_uploads](#input\_attach\_deny\_ssec\_encrypted\_object\_uploads) | Controls if S3 bucket should deny SSEC encrypted object uploads | `bool` | `false` | no |
 | <a name="input_attach_deny_unencrypted_object_uploads"></a> [attach\_deny\_unencrypted\_object\_uploads](#input\_attach\_deny\_unencrypted\_object\_uploads) | Controls if S3 bucket should deny unencrypted object uploads policy attached | `bool` | `false` | no |
-| <a name="input_attach_elb_log_delivery_policy"></a> [attach\_elb\_log\_delivery\_policy](#input\_attach\_elb\_log\_delivery\_policy) | Controls if S3 bucket should have ELB log delivery policy attached | `bool` | `false` | no |
+| <a name="input_attach_elb_log_delivery_policy"></a> [attach\_elb\_log\_delivery\_policy](#input\_attach\_elb\_log\_delivery\_policy) | Controls if S3 bucket should have the log delivery policy for Application and Classic Load Balancer access logs attached | `bool` | `false` | no |
 | <a name="input_attach_inventory_destination_policy"></a> [attach\_inventory\_destination\_policy](#input\_attach\_inventory\_destination\_policy) | Controls if S3 bucket should have bucket inventory destination policy attached | `bool` | `false` | no |
-| <a name="input_attach_lb_log_delivery_policy"></a> [attach\_lb\_log\_delivery\_policy](#input\_attach\_lb\_log\_delivery\_policy) | Controls if S3 bucket should have ALB/NLB log delivery policy attached | `bool` | `false` | no |
+| <a name="input_attach_lb_log_delivery_policy"></a> [attach\_lb\_log\_delivery\_policy](#input\_attach\_lb\_log\_delivery\_policy) | Controls if S3 bucket should have the log delivery policy for Network Load Balancer access logs attached | `bool` | `false` | no |
 | <a name="input_attach_policy"></a> [attach\_policy](#input\_attach\_policy) | Controls if S3 bucket should have bucket policy attached (set to `true` to use value of `policy` as bucket policy) | `bool` | `false` | no |
 | <a name="input_attach_public_policy"></a> [attach\_public\_policy](#input\_attach\_public\_policy) | Controls if the S3 Bucket Public Access Block is created (set to `false` to allow upstream to apply defaults to the bucket) | `bool` | `true` | no |
 | <a name="input_attach_require_latest_tls_policy"></a> [attach\_require\_latest\_tls\_policy](#input\_attach\_require\_latest\_tls\_policy) | Controls if S3 bucket should require the latest version of TLS | `bool` | `false` | no |
@@ -308,9 +330,15 @@ No modules.
 | <a name="input_control_object_ownership"></a> [control\_object\_ownership](#input\_control\_object\_ownership) | Whether to manage S3 Bucket Ownership Controls on this bucket | `bool` | `false` | no |
 | <a name="input_cors_rule"></a> [cors\_rule](#input\_cors\_rule) | Rules for Cross-Origin Resource Sharing on the bucket | <pre>list(object({<br/>    id              = optional(string)<br/>    allowed_methods = list(string)<br/>    allowed_origins = list(string)<br/>    allowed_headers = optional(list(string))<br/>    expose_headers  = optional(list(string))<br/>    max_age_seconds = optional(number)<br/>  }))</pre> | `[]` | no |
 | <a name="input_create_bucket"></a> [create\_bucket](#input\_create\_bucket) | Controls if S3 bucket should be created | `bool` | `true` | no |
+| <a name="input_create_file_system_security_group"></a> [create\_file\_system\_security\_group](#input\_create\_file\_system\_security\_group) | Whether each file system creates a security group for its mount targets. A file system that sets its own `security_groups` never creates one | `bool` | `true` | no |
 | <a name="input_create_metadata_configuration"></a> [create\_metadata\_configuration](#input\_create\_metadata\_configuration) | Whether to create metadata configuration resource | `bool` | `false` | no |
 | <a name="input_data_redundancy"></a> [data\_redundancy](#input\_data\_redundancy) | Data redundancy. Valid values: `SingleAvailabilityZone` | `string` | `null` | no |
 | <a name="input_expected_bucket_owner"></a> [expected\_bucket\_owner](#input\_expected\_bucket\_owner) | The account ID of the expected bucket owner | `string` | `null` | no |
+| <a name="input_file_system_security_group_egress_rules"></a> [file\_system\_security\_group\_egress\_rules](#input\_file\_system\_security\_group\_egress\_rules) | Map of egress rules added to every file system security group this module creates. A file system can replace them with its own `security_group_egress_rules` | <pre>map(object({<br/>    name = optional(string)<br/><br/>    cidr_ipv4                    = optional(string)<br/>    cidr_ipv6                    = optional(string)<br/>    description                  = optional(string)<br/>    from_port                    = optional(number)<br/>    ip_protocol                  = string<br/>    prefix_list_id               = optional(string)<br/>    referenced_security_group_id = optional(string)<br/>    tags                         = optional(map(string))<br/>    to_port                      = optional(number)<br/>  }))</pre> | `{}` | no |
+| <a name="input_file_system_security_group_ingress_rules"></a> [file\_system\_security\_group\_ingress\_rules](#input\_file\_system\_security\_group\_ingress\_rules) | Map of ingress rules added to every file system security group this module creates. A file system can replace them with its own `security_group_ingress_rules` | <pre>map(object({<br/>    name = optional(string)<br/><br/>    cidr_ipv4                    = optional(string)<br/>    cidr_ipv6                    = optional(string)<br/>    description                  = optional(string)<br/>    from_port                    = optional(number, 2049)<br/>    ip_protocol                  = optional(string, "tcp")<br/>    prefix_list_id               = optional(string)<br/>    referenced_security_group_id = optional(string)<br/>    tags                         = optional(map(string))<br/>    to_port                      = optional(number, 2049)<br/>  }))</pre> | `{}` | no |
+| <a name="input_file_system_security_group_tags"></a> [file\_system\_security\_group\_tags](#input\_file\_system\_security\_group\_tags) | A map of additional tags added to every file system security group this module creates | `map(string)` | `null` | no |
+| <a name="input_file_system_security_group_vpc_id"></a> [file\_system\_security\_group\_vpc\_id](#input\_file\_system\_security\_group\_vpc\_id) | ID of the VPC where the file system security groups are created. Must be the VPC of the mount target subnets | `string` | `null` | no |
+| <a name="input_file_systems"></a> [file\_systems](#input\_file\_systems) | Map of Amazon S3 Files file system definitions to create on the bucket. Requires bucket versioning, and is not supported on a directory bucket | <pre>map(object({<br/>    create = optional(bool, true)<br/>    name   = optional(string) # Will fall back to map key<br/>    tags   = optional(map(string))<br/><br/>    # File system. Changing the prefix, the KMS key or the IAM role (including the created role's name or path)<br/>    # replaces the file system, its mount targets and its access points<br/>    prefix                = optional(string)<br/>    kms_key_id            = optional(string)<br/>    accept_bucket_warning = optional(bool)<br/>    timeouts = optional(object({<br/>      create = optional(string)<br/>      delete = optional(string)<br/>    }))<br/><br/>    # IAM role<br/>    create_iam_role = optional(bool, true)<br/>    # A role brought in must already carry its permissions when the file system is created. S3 Files checks<br/>    # them at creation, and the file system depends only on the role's ARN, not on any policy attached to it<br/>    iam_role_arn                              = optional(string)<br/>    iam_role_name                             = optional(string)<br/>    iam_role_use_name_prefix                  = optional(bool, true)<br/>    iam_role_path                             = optional(string)<br/>    iam_role_description                      = optional(string)<br/>    iam_role_permissions_boundary             = optional(string)<br/>    iam_role_kms_key_arns                     = optional(list(string))<br/>    iam_role_policies                         = optional(map(string), {})<br/>    iam_role_policy_name                      = optional(string)<br/>    iam_role_source_assume_policy_documents   = optional(list(string), [])<br/>    iam_role_override_assume_policy_documents = optional(list(string), [])<br/>    iam_role_source_policy_documents          = optional(list(string), [])<br/>    iam_role_override_policy_documents        = optional(list(string), [])<br/>    iam_role_tags                             = optional(map(string))<br/><br/>    # Mount target(s). Key them by a value known at plan time, such as the Availability Zone<br/>    # security_groups are added to every mount target, alongside the group this module creates<br/>    security_groups                = optional(list(string), [])<br/>    create_security_group          = optional(bool)<br/>    security_group_name            = optional(string)<br/>    security_group_use_name_prefix = optional(bool)<br/>    security_group_description     = optional(string)<br/>    security_group_ingress_rules = optional(map(object({<br/>      name = optional(string)<br/><br/>      cidr_ipv4                    = optional(string)<br/>      cidr_ipv6                    = optional(string)<br/>      description                  = optional(string)<br/>      from_port                    = optional(number, 2049)<br/>      ip_protocol                  = optional(string, "tcp")<br/>      prefix_list_id               = optional(string)<br/>      referenced_security_group_id = optional(string)<br/>      tags                         = optional(map(string))<br/>      to_port                      = optional(number, 2049)<br/>    })))<br/>    security_group_egress_rules = optional(map(object({<br/>      name = optional(string)<br/><br/>      cidr_ipv4                    = optional(string)<br/>      cidr_ipv6                    = optional(string)<br/>      description                  = optional(string)<br/>      from_port                    = optional(number)<br/>      ip_protocol                  = string<br/>      prefix_list_id               = optional(string)<br/>      referenced_security_group_id = optional(string)<br/>      tags                         = optional(map(string))<br/>      to_port                      = optional(number)<br/>    })))<br/>    security_group_tags = optional(map(string))<br/>    mount_targets = optional(map(object({<br/>      subnet_id       = string<br/>      ip_address_type = optional(string)<br/>      ipv4_address    = optional(string)<br/>      ipv6_address    = optional(string)<br/>      timeouts = optional(object({<br/>        create = optional(string)<br/>        delete = optional(string)<br/>        update = optional(string)<br/>      }))<br/>    })), {})<br/><br/>    # Access point(s)<br/>    access_points = optional(map(object({<br/>      name = optional(string) # Will fall back to map key<br/>      tags = optional(map(string))<br/><br/>      posix_user = optional(object({<br/>        gid            = number<br/>        uid            = number<br/>        secondary_gids = optional(list(number))<br/>      }))<br/>      root_directory = optional(object({<br/>        path = optional(string)<br/>        creation_permissions = optional(object({<br/>          owner_gid   = number<br/>          owner_uid   = number<br/>          permissions = string<br/>        }))<br/>      }))<br/><br/>      timeouts = optional(object({<br/>        create = optional(string)<br/>        delete = optional(string)<br/>      }))<br/><br/>      # A principal listed here is denied every other way into this file system, including mounting without an access point<br/>      read_access_arns       = optional(list(string))<br/>      read_write_access_arns = optional(list(string))<br/>    })), {})<br/><br/>    # File system policy<br/>    create_policy             = optional(bool, false)<br/>    source_policy_documents   = optional(list(string), [])<br/>    override_policy_documents = optional(list(string), [])<br/>    policy_statements = optional(list(object({<br/>      sid           = optional(string)<br/>      actions       = optional(list(string))<br/>      not_actions   = optional(list(string))<br/>      effect        = optional(string)<br/>      resources     = optional(list(string))<br/>      not_resources = optional(list(string))<br/>      principals = optional(list(object({<br/>        type        = string<br/>        identifiers = list(string)<br/>      })))<br/>      not_principals = optional(list(object({<br/>        type        = string<br/>        identifiers = list(string)<br/>      })))<br/>      conditions = optional(list(object({<br/>        test     = string<br/>        values   = list(string)<br/>        variable = string<br/>      })))<br/>    })))<br/><br/>    # Synchronization<br/>    synchronization_configuration = optional(object({<br/>      import_data_rule = list(object({<br/>        prefix         = string<br/>        size_less_than = number<br/>        trigger        = string<br/>      }))<br/>      # Required: the API takes exactly one expiration rule with every synchronization configuration<br/>      expiration_data_rule = object({<br/>        days_after_last_access = number<br/>      })<br/>    }))<br/>  }))</pre> | `{}` | no |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable | `bool` | `false` | no |
 | <a name="input_grant"></a> [grant](#input\_grant) | ACL policy grants for the bucket. Conflicts with `acl` | <pre>list(object({<br/>    id         = optional(string)<br/>    type       = string<br/>    permission = string<br/>    uri        = optional(string)<br/>    email      = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_ignore_public_acls"></a> [ignore\_public\_acls](#input\_ignore\_public\_acls) | Whether Amazon S3 should ignore public ACLs for this bucket | `bool` | `true` | no |
@@ -352,6 +380,12 @@ No modules.
 | Name | Description |
 | ---- | ----------- |
 | <a name="output_aws_s3_bucket_versioning_status"></a> [aws\_s3\_bucket\_versioning\_status](#output\_aws\_s3\_bucket\_versioning\_status) | The versioning status of the bucket. Will be 'Enabled', 'Suspended', or 'Disabled' |
+| <a name="output_file_system_access_points"></a> [file\_system\_access\_points](#output\_file\_system\_access\_points) | Map of file system access points created and their attributes, keyed by file system and then by access point |
+| <a name="output_file_system_iam_roles"></a> [file\_system\_iam\_roles](#output\_file\_system\_iam\_roles) | Map of file system IAM roles created, with their ARN, name and unique ID |
+| <a name="output_file_system_mount_targets"></a> [file\_system\_mount\_targets](#output\_file\_system\_mount\_targets) | Map of file system mount targets created and their attributes, keyed by file system and then by mount target |
+| <a name="output_file_system_security_group_arns"></a> [file\_system\_security\_group\_arns](#output\_file\_system\_security\_group\_arns) | Map of the security group created for each file system's mount targets, by ARN |
+| <a name="output_file_system_security_group_ids"></a> [file\_system\_security\_group\_ids](#output\_file\_system\_security\_group\_ids) | Map of the security group created for each file system's mount targets, by ID |
+| <a name="output_file_systems"></a> [file\_systems](#output\_file\_systems) | Map of file systems created and their attributes |
 | <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname |
 | <a name="output_s3_bucket_bucket_domain_name"></a> [s3\_bucket\_bucket\_domain\_name](#output\_s3\_bucket\_bucket\_domain\_name) | The bucket domain name. Will be of format bucketname.s3.amazonaws.com |
 | <a name="output_s3_bucket_bucket_namespace"></a> [s3\_bucket\_bucket\_namespace](#output\_s3\_bucket\_bucket\_namespace) | The namespace of the bucket |

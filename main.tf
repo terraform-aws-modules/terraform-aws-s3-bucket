@@ -1,4 +1,6 @@
 data "aws_region" "current" {
+  count = local.create_bucket ? 1 : 0
+
   region = var.region
 }
 
@@ -6,9 +8,20 @@ data "aws_canonical_user_id" "this" {
   count = local.create_bucket && local.create_bucket_acl && try(var.owner["id"], null) == null ? 1 : 0
 }
 
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+  count = local.create_bucket ? 1 : 0
+}
 
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+  count = local.create_bucket ? 1 : 0
+}
+
+locals {
+  account_id = try(data.aws_caller_identity.current[0].account_id, "")
+  partition  = try(data.aws_partition.current[0].partition, "")
+  region     = try(data.aws_region.current[0].region, "")
+}
+
 locals {
   create_bucket = var.create_bucket && var.putin_khuylo
 
@@ -20,7 +33,7 @@ locals {
   policy_placeholders = {
     "_S3_BUCKET_ID_"   = try(var.is_directory_bucket ? aws_s3_directory_bucket.this[0].bucket : aws_s3_bucket.this[0].id, null),
     "_S3_BUCKET_ARN_"  = try(var.is_directory_bucket ? aws_s3_directory_bucket.this[0].arn : aws_s3_bucket.this[0].arn, null),
-    "_AWS_ACCOUNT_ID_" = try(data.aws_caller_identity.current.account_id, null)
+    "_AWS_ACCOUNT_ID_" = local.account_id
   }
 
   policy = local.create_bucket && local.attach_policy ? replace(
@@ -91,6 +104,14 @@ resource "aws_s3_directory_bucket" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    # Saying so beats dropping the entries silently, which is what filtering them out would do
+    precondition {
+      condition     = length(var.file_systems) == 0
+      error_message = "S3 Files is not supported on a directory bucket, so file_systems must be empty when is_directory_bucket is true."
+    }
+  }
 }
 
 ################################################################################
@@ -785,14 +806,14 @@ data "aws_iam_policy_document" "elb_log_delivery" {
 
   # Policy for AWS Regions created before August 2022 (e.g. US East (N. Virginia), Asia Pacific (Singapore), Asia Pacific (Sydney), Asia Pacific (Tokyo), Europe (Ireland))
   dynamic "statement" {
-    for_each = { for k, v in local.elb_service_accounts : k => v if k == data.aws_region.current.region }
+    for_each = { for k, v in local.elb_service_accounts : k => v if k == local.region }
 
     content {
       sid = format("ELBRegion%s", title(statement.key))
 
       principals {
         type        = "AWS"
-        identifiers = [format("arn:%s:iam::%s:root", data.aws_partition.current.partition, statement.value)]
+        identifiers = [format("arn:%s:iam::%s:root", local.partition, statement.value)]
       }
 
       effect = "Allow"
@@ -828,7 +849,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
   }
 }
 
-# ALB/NLB
+# Network Load Balancer access logs
 data "aws_iam_policy_document" "lb_log_delivery" {
   count = local.create_bucket && var.attach_lb_log_delivery_policy && !var.is_directory_bucket ? 1 : 0
 
@@ -1002,7 +1023,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+      "${aws_s3_bucket.this[0].arn}/AWSLogs/${local.account_id}/*",
     ]
 
     condition {
@@ -1013,13 +1034,13 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.account_id]
+      values   = [local.account_id]
       variable = "aws:SourceAccount"
     }
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:${data.aws_partition.current.partition}:logs:*:${data.aws_caller_identity.current.account_id}:*"]
+      values   = ["arn:${local.partition}:logs:*:${local.account_id}:*"]
       variable = "aws:SourceArn"
     }
   }
@@ -1044,13 +1065,13 @@ data "aws_iam_policy_document" "waf_log_delivery" {
 
     condition {
       test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.account_id]
+      values   = [local.account_id]
       variable = "aws:SourceAccount"
     }
 
     condition {
       test     = "ArnLike"
-      values   = ["arn:${data.aws_partition.current.partition}:logs:*:${data.aws_caller_identity.current.account_id}:*"]
+      values   = ["arn:${local.partition}:logs:*:${local.account_id}:*"]
       variable = "aws:SourceArn"
     }
   }
@@ -1461,8 +1482,8 @@ data "aws_iam_policy_document" "inventory_and_analytics_destination_policy" {
     condition {
       test = "StringEquals"
       values = compact(distinct([
-        var.inventory_self_source_destination ? data.aws_caller_identity.current.account_id : var.inventory_source_account_id,
-        var.analytics_self_source_destination ? data.aws_caller_identity.current.account_id : var.analytics_source_account_id
+        var.inventory_self_source_destination ? local.account_id : var.inventory_source_account_id,
+        var.analytics_self_source_destination ? local.account_id : var.analytics_source_account_id
       ]))
       variable = "aws:SourceAccount"
     }
@@ -1508,7 +1529,7 @@ resource "aws_s3_bucket_analytics_configuration" "this" {
 
           s3_bucket_destination {
             bucket_arn        = storage_class_analysis.value.destination_bucket_arn != null ? storage_class_analysis.value.destination_bucket_arn : try(aws_s3_bucket.this[0].arn, null)
-            bucket_account_id = coalesce(storage_class_analysis.value.destination_account_id, data.aws_caller_identity.current.account_id)
+            bucket_account_id = coalesce(storage_class_analysis.value.destination_account_id, local.account_id)
             format            = coalesce(storage_class_analysis.value.export_format, "CSV")
             prefix            = storage_class_analysis.value.export_prefix
           }
@@ -1548,4 +1569,73 @@ resource "aws_s3_bucket_metadata_configuration" "this" {
       }
     }
   }
+}
+
+################################################################################
+# File System(s)
+################################################################################
+
+locals {
+  # S3 Files supports general purpose buckets only
+  file_systems = { for k, v in var.file_systems : k => v if local.create_bucket && !var.is_directory_bucket }
+}
+
+module "s3_file_system" {
+  source = "./modules/file-system"
+
+  for_each = local.file_systems
+
+  create = each.value.create
+  region = var.region
+
+  name       = coalesce(each.value.name, each.key)
+  bucket_arn = aws_s3_bucket.this[0].arn
+  # Passing the versioning resource's own status is what creates the file system after versioning,
+  # and deletes it before versioning is suspended
+  bucket_versioning_status = try(aws_s3_bucket_versioning.this[0].versioning_configuration[0].status, null)
+
+  prefix                = each.value.prefix
+  kms_key_id            = each.value.kms_key_id
+  accept_bucket_warning = each.value.accept_bucket_warning
+  timeouts              = each.value.timeouts
+
+  create_iam_role                           = each.value.create_iam_role
+  iam_role_arn                              = each.value.iam_role_arn
+  iam_role_name                             = each.value.iam_role_name
+  iam_role_use_name_prefix                  = each.value.iam_role_use_name_prefix
+  iam_role_path                             = each.value.iam_role_path
+  iam_role_description                      = each.value.iam_role_description
+  iam_role_permissions_boundary             = each.value.iam_role_permissions_boundary
+  iam_role_kms_key_arns                     = each.value.iam_role_kms_key_arns
+  iam_role_policies                         = each.value.iam_role_policies
+  iam_role_policy_name                      = each.value.iam_role_policy_name
+  iam_role_source_assume_policy_documents   = each.value.iam_role_source_assume_policy_documents
+  iam_role_override_assume_policy_documents = each.value.iam_role_override_assume_policy_documents
+  iam_role_source_policy_documents          = each.value.iam_role_source_policy_documents
+  iam_role_override_policy_documents        = each.value.iam_role_override_policy_documents
+  iam_role_tags                             = each.value.iam_role_tags
+
+  mount_targets   = each.value.mount_targets
+  security_groups = each.value.security_groups
+
+  # Each file system gets its own group, so a rule can be withdrawn from one without touching the rest.
+  # The root settings are the defaults, and a file system can replace any of them
+  create_security_group          = each.value.create_security_group != null ? each.value.create_security_group : var.create_file_system_security_group
+  security_group_name            = each.value.security_group_name
+  security_group_use_name_prefix = each.value.security_group_use_name_prefix
+  security_group_description     = each.value.security_group_description
+  security_group_vpc_id          = var.file_system_security_group_vpc_id
+  security_group_ingress_rules   = each.value.security_group_ingress_rules != null ? each.value.security_group_ingress_rules : var.file_system_security_group_ingress_rules
+  security_group_egress_rules    = each.value.security_group_egress_rules != null ? each.value.security_group_egress_rules : var.file_system_security_group_egress_rules
+  security_group_tags            = each.value.security_group_tags != null ? each.value.security_group_tags : var.file_system_security_group_tags
+
+  access_points             = each.value.access_points
+  create_policy             = each.value.create_policy
+  source_policy_documents   = each.value.source_policy_documents
+  override_policy_documents = each.value.override_policy_documents
+  policy_statements         = each.value.policy_statements
+
+  synchronization_configuration = each.value.synchronization_configuration
+
+  tags = merge(var.tags, each.value.tags)
 }

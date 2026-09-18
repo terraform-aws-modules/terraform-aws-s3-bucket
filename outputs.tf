@@ -103,3 +103,45 @@ output "s3_bucket_policy" {
   description = "The policy of the bucket, if the bucket is configured with a policy"
   value       = try(aws_s3_bucket_policy.this[0].policy, null)
 }
+
+################################################################################
+# File System(s)
+################################################################################
+
+output "file_systems" {
+  description = "Map of file systems created and their attributes"
+  value       = module.s3_file_system
+}
+
+output "file_system_iam_roles" {
+  description = "Map of file system IAM roles created, with their ARN, name and unique ID"
+  value = { for k, v in module.s3_file_system : k => {
+    arn       = v.iam_role_arn
+    name      = v.iam_role_name
+    unique_id = v.iam_role_unique_id
+  } }
+}
+
+output "file_system_mount_targets" {
+  description = "Map of file system mount targets created and their attributes, keyed by file system and then by mount target"
+  value       = { for k, v in module.s3_file_system : k => v.mount_targets }
+}
+
+################################################################################
+# File System Security Group
+################################################################################
+
+output "file_system_security_group_arns" {
+  description = "Map of the security group created for each file system's mount targets, by ARN"
+  value       = { for k, v in module.s3_file_system : k => v.security_group_arn }
+}
+
+output "file_system_security_group_ids" {
+  description = "Map of the security group created for each file system's mount targets, by ID"
+  value       = { for k, v in module.s3_file_system : k => v.security_group_id }
+}
+
+output "file_system_access_points" {
+  description = "Map of file system access points created and their attributes, keyed by file system and then by access point"
+  value       = { for k, v in module.s3_file_system : k => v.access_points }
+}

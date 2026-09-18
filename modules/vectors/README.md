@@ -10,7 +10,7 @@ Amazon S3 Vectors is a vector embedding storage service built into Amazon S3 tha
 
 ```hcl
 module "vector_bucket" {
-  source = "../../modules/vectors"
+  source = "terraform-aws-modules/s3-bucket/aws//modules/vectors"
 
   vector_bucket_name = "my-vector-bucket"
 
@@ -29,7 +29,7 @@ module "vector_bucket" {
 
 ```hcl
 module "vector_bucket" {
-  source = "../../modules/vectors"
+  source = "terraform-aws-modules/s3-bucket/aws//modules/vectors"
 
   vector_bucket_name = "my-vector-bucket"
 
@@ -57,7 +57,7 @@ module "vector_bucket" {
 
 ```hcl
 module "vector_bucket" {
-  source = "../../modules/vectors"
+  source = "terraform-aws-modules/s3-bucket/aws//modules/vectors"
 
   vector_bucket_name = "my-vector-bucket"
 
@@ -94,13 +94,13 @@ module "vector_bucket" {
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.44 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.42 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.44 |
 
 ## Modules
 
