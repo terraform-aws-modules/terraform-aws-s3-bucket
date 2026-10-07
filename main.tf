@@ -802,7 +802,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
       ]
 
       resources = [
-        "${aws_s3_bucket.this[0].arn}/*",
+        "_S3_BUCKET_ARN_/*",
       ]
     }
   }
@@ -823,7 +823,7 @@ data "aws_iam_policy_document" "elb_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*",
+      "_S3_BUCKET_ARN_/*",
     ]
   }
 }
@@ -847,7 +847,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*",
+      "_S3_BUCKET_ARN_/*",
     ]
 
     condition {
@@ -883,7 +883,7 @@ data "aws_iam_policy_document" "lb_log_delivery" {
     ]
 
     resources = [
-      aws_s3_bucket.this[0].arn,
+      "_S3_BUCKET_ARN_",
     ]
 
     dynamic "condition" {
@@ -919,7 +919,7 @@ data "aws_iam_policy_document" "access_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*",
+      "_S3_BUCKET_ARN_/*",
     ]
 
     dynamic "condition" {
@@ -967,7 +967,7 @@ data "aws_iam_policy_document" "access_log_delivery" {
     ]
 
     resources = [
-      aws_s3_bucket.this[0].arn,
+      "_S3_BUCKET_ARN_",
     ]
 
     dynamic "condition" {
@@ -1002,7 +1002,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+      "_S3_BUCKET_ARN_/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
     ]
 
     condition {
@@ -1039,7 +1039,7 @@ data "aws_iam_policy_document" "waf_log_delivery" {
     ]
 
     resources = [
-      aws_s3_bucket.this[0].arn,
+      "_S3_BUCKET_ARN_",
     ]
 
     condition {
@@ -1070,7 +1070,7 @@ data "aws_iam_policy_document" "cloudtrail_log_delivery" {
       "s3:GetBucketAcl",
     ]
     resources = [
-      aws_s3_bucket.this[0].arn,
+      "_S3_BUCKET_ARN_",
     ]
   }
 
@@ -1084,7 +1084,7 @@ data "aws_iam_policy_document" "cloudtrail_log_delivery" {
       "s3:PutObject",
     ]
     resources = [
-      "${aws_s3_bucket.this[0].arn}/AWSLogs/*",
+      "_S3_BUCKET_ARN_/AWSLogs/*",
     ]
     condition {
       test     = "StringEquals"
@@ -1108,8 +1108,8 @@ data "aws_iam_policy_document" "deny_insecure_transport" {
     ]
 
     resources = [
-      aws_s3_bucket.this[0].arn,
-      "${aws_s3_bucket.this[0].arn}/*",
+      "_S3_BUCKET_ARN_",
+      "_S3_BUCKET_ARN_/*",
     ]
 
     principals {
@@ -1139,8 +1139,8 @@ data "aws_iam_policy_document" "require_latest_tls" {
     ]
 
     resources = [
-      aws_s3_bucket.this[0].arn,
-      "${aws_s3_bucket.this[0].arn}/*",
+      "_S3_BUCKET_ARN_",
+      "_S3_BUCKET_ARN_/*",
     ]
 
     principals {
@@ -1170,7 +1170,7 @@ data "aws_iam_policy_document" "deny_incorrect_encryption_headers" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*"
+      "_S3_BUCKET_ARN_/*"
     ]
 
     principals {
@@ -1198,7 +1198,7 @@ data "aws_iam_policy_document" "deny_incorrect_kms_key_sse" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*"
+      "_S3_BUCKET_ARN_/*"
     ]
 
     principals {
@@ -1226,7 +1226,7 @@ data "aws_iam_policy_document" "deny_unencrypted_object_uploads" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*"
+      "_S3_BUCKET_ARN_/*"
     ]
 
     principals {
@@ -1254,7 +1254,7 @@ data "aws_iam_policy_document" "deny_ssec_encrypted_object_uploads" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*"
+      "_S3_BUCKET_ARN_/*"
     ]
 
     principals {
@@ -1441,7 +1441,7 @@ data "aws_iam_policy_document" "inventory_and_analytics_destination_policy" {
     ]
 
     resources = [
-      "${aws_s3_bucket.this[0].arn}/*",
+      "_S3_BUCKET_ARN_/*",
     ]
 
     principals {
@@ -1453,8 +1453,8 @@ data "aws_iam_policy_document" "inventory_and_analytics_destination_policy" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = compact(distinct([
-        var.inventory_self_source_destination ? aws_s3_bucket.this[0].arn : var.inventory_source_bucket_arn,
-        var.analytics_self_source_destination ? aws_s3_bucket.this[0].arn : var.analytics_source_bucket_arn
+        var.inventory_self_source_destination ? "_S3_BUCKET_ARN_" : var.inventory_source_bucket_arn,
+        var.analytics_self_source_destination ? "_S3_BUCKET_ARN_" : var.analytics_source_bucket_arn
       ]))
     }
 
