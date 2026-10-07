@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.16.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.16.1...v5.16.2) (2026-10-07)
+
+### Bug Fixes
+
+* Use the bucket ARN placeholder in built-in policy documents ([#412](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/412)) ([63f82d5](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/63f82d5f3c0853ee4fd08f0875ab2382aedcfaec))
+
 ## [5.16.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.16.0...v5.16.1) (2026-09-18)
 
 ### Bug Fixes
