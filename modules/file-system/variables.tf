@@ -364,7 +364,7 @@ variable "policy_statements" {
   default = null
 
   validation {
-    condition     = var.policy_statements == null || alltrue([for s in var.policy_statements : s.resources == null || s.not_resources == null])
+    condition     = alltrue([for s in(var.policy_statements != null ? var.policy_statements : []) : s.resources == null || s.not_resources == null])
     error_message = "A policy statement can set resources or not_resources, not both."
   }
 }
