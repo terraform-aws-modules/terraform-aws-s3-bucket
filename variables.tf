@@ -778,7 +778,7 @@ variable "metadata_journal_table_record_expiration" {
 ################################################################################
 
 variable "file_systems" {
-  description = "Map of Amazon S3 Files file system definitions to create on the bucket. Requires bucket versioning, and is not supported on a directory bucket"
+  description = "Map of Amazon S3 Files file system definitions to create on the bucket. Requires versioning enabled through `versioning`, even when it is already enabled outside this module, and is not supported on a directory bucket"
   type = map(object({
     create = optional(bool, true)
     name   = optional(string) # Will fall back to map key
@@ -787,7 +787,7 @@ variable "file_systems" {
     # File system. Changing the prefix, the KMS key or the IAM role (including the created role's name or path)
     # replaces the file system, its mount targets and its access points
     prefix                = optional(string)
-    kms_key_id            = optional(string)
+    kms_key_id            = optional(string) # ARN, a key ID or alias is rejected by the provider
     accept_bucket_warning = optional(bool)
     timeouts = optional(object({
       create = optional(string)
@@ -805,7 +805,7 @@ variable "file_systems" {
     iam_role_description                      = optional(string)
     iam_role_permissions_boundary             = optional(string)
     iam_role_kms_key_arns                     = optional(list(string))
-    iam_role_policies                         = optional(map(string), {})
+    iam_role_policies                         = optional(map(string), {}) # Ignored when create_iam_role is false
     iam_role_policy_name                      = optional(string)
     iam_role_source_assume_policy_documents   = optional(list(string), [])
     iam_role_override_assume_policy_documents = optional(list(string), [])
@@ -814,7 +814,8 @@ variable "file_systems" {
     iam_role_tags                             = optional(map(string))
 
     # Mount target(s). Key them by a value known at plan time, such as the Availability Zone
-    # security_groups are added to every mount target, alongside the group this module creates
+    # security_groups are added to every mount target, alongside the group this module creates unless
+    # create_security_group is false
     security_groups                = optional(list(string), [])
     create_security_group          = optional(bool)
     security_group_name            = optional(string)
@@ -852,6 +853,7 @@ variable "file_systems" {
       ip_address_type = optional(string)
       ipv4_address    = optional(string)
       ipv6_address    = optional(string)
+      security_groups = optional(list(string), [])
       timeouts = optional(object({
         create = optional(string)
         delete = optional(string)
@@ -936,7 +938,7 @@ variable "file_systems" {
 ################################################################################
 
 variable "create_file_system_security_group" {
-  description = "Whether each file system creates a security group for its mount targets. A file system that sets its own `security_groups` never creates one"
+  description = "Whether each file system creates a security group for its mount targets. A file system can override it with its own `create_security_group`, and setting `security_groups` does not turn it off"
   type        = bool
   default     = true
 }

@@ -53,7 +53,7 @@ resource "aws_s3files_file_system" "this" {
     # versioning on create, and before it on destroy, when the caller passes that resource's attribute
     precondition {
       condition     = var.bucket_versioning_status == "Enabled"
-      error_message = "S3 Files requires versioning to be enabled on the bucket."
+      error_message = "S3 Files requires versioning to be enabled on the bucket, and bucket_versioning_status must pass the versioning resource's status. From the root module, versioning must be enabled through its versioning input, even when it is already enabled on the bucket outside this module."
     }
 
     # A directory bucket ARN names the s3express service, and S3 Files does not support one
@@ -313,9 +313,10 @@ resource "aws_s3files_mount_target" "this" {
 ################################################################################
 
 locals {
-  # Only created when the mount targets rely on it rather than on groups the caller supplies
-  # Mount targets take no part in this: they can be keyed by values known only after apply, which would
-  # make this count unknown at plan time. The precondition below is what keeps a group out of the default VPC
+  # Created whenever create_security_group is true, including alongside groups the caller supplies.
+  # Neither security_groups nor the mount targets take part in this: either can hold values known only
+  # after apply, which would make this count unknown at plan time. The precondition below is what keeps
+  # a group out of the default VPC
   create_security_group = var.create && var.create_security_group
 
   # Without a name to build on, the provider generates one
@@ -346,7 +347,7 @@ resource "aws_security_group" "this" {
     # Without a VPC the group would be created in the account's default VPC, where no mount target can use it
     precondition {
       condition     = var.security_group_vpc_id != null
-      error_message = "Set security_group_vpc_id, supply security_groups, or set create_security_group to false."
+      error_message = "Set security_group_vpc_id, or set create_security_group to false."
     }
   }
 }
@@ -476,6 +477,14 @@ locals {
 
   # Presence is tested rather than length, which is unknown at plan time for a list built from computed values
   has_access_point_grants = anytrue([for ap in values(var.access_points) : ap.read_access_arns != null || ap.read_write_access_arns != null])
+
+  # Statements merged from source and override documents never appear in the data source's own statement list
+  has_policy_content = anytrue([
+    try(length(var.policy_statements), 0) > 0,
+    length(var.source_policy_documents) > 0,
+    length(var.override_policy_documents) > 0,
+    local.has_access_point_grants,
+  ])
 }
 
 data "aws_iam_policy_document" "policy" {
@@ -588,10 +597,11 @@ resource "aws_s3files_file_system_policy" "this" {
 
   lifecycle {
     # An empty list of statements renders a document AWS rejects, and the message it returns says
-    # nothing about which input produced it
+    # nothing about which input produced it. The inputs are tested rather than the rendered document,
+    # which references the file system and so is unknown at plan time
     precondition {
-      condition     = length(data.aws_iam_policy_document.policy[0].statement) > 0
-      error_message = "The file system policy has no statements. Give policy_statements at least one entry, or leave it unset."
+      condition     = local.has_policy_content
+      error_message = "The file system policy has no statements. Give policy_statements, source_policy_documents or override_policy_documents at least one statement, or set create_policy to false."
     }
   }
 }

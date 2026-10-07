@@ -33,7 +33,7 @@ variable "bucket_arn" {
 }
 
 variable "bucket_versioning_status" {
-  description = "Versioning status of the bucket. Pass the versioning resource's own attribute, which makes the file system wait for versioning on create and be deleted before it is suspended on destroy"
+  description = "Versioning status of the bucket, which must be `Enabled`. Pass the versioning resource's own attribute, which makes the file system wait for versioning on create and be deleted before it is suspended on destroy"
   type        = string
 }
 
@@ -46,7 +46,7 @@ variable "prefix" {
 }
 
 variable "kms_key_id" {
-  description = "ID of the KMS key used to encrypt the file system. An AWS owned key is used when not set"
+  description = "ARN of the KMS key used to encrypt the file system. A key ID or alias is rejected by the provider. An AWS owned key is used when not set"
   type        = string
   default     = null
 }
@@ -139,7 +139,7 @@ variable "iam_role_override_policy_documents" {
 }
 
 variable "iam_role_policies" {
-  description = "Policies to attach to the IAM role, keyed by a name of your choosing, valued by the policy ARN"
+  description = "Policies to attach to the IAM role this module creates, keyed by a name of your choosing, valued by the policy ARN. Ignored when `create_iam_role` is `false`, since a role brought in must already carry its permissions"
   type        = map(string)
   default     = {}
   nullable    = false
@@ -203,7 +203,7 @@ variable "security_groups" {
 ################################################################################
 
 variable "create_security_group" {
-  description = "Whether to create a security group for the mount targets"
+  description = "Whether to create a security group for the mount targets. The group is created even when `security_groups` is set, so set this to `false` to use only the groups you supply"
   type        = bool
   default     = true
   nullable    = false
@@ -362,6 +362,11 @@ variable "policy_statements" {
     })))
   }))
   default = null
+
+  validation {
+    condition     = var.policy_statements == null || alltrue([for s in var.policy_statements : s.resources == null || s.not_resources == null])
+    error_message = "A policy statement can set resources or not_resources, not both."
+  }
 }
 
 ################################################################################
