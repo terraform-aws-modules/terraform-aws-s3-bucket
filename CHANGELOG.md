@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.17.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.16.2...v5.17.0) (2026-10-11)
+
+### Features
+
+* Add Amazon S3 Files support ([#410](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/410)) ([c8ac60f](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/c8ac60f56c26706b8f81416621175ee2534999db))
+
 ## [5.16.2](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.16.1...v5.16.2) (2026-10-07)
 
 ### Bug Fixes
