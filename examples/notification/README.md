@@ -20,14 +20,14 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.44 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 2.0 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.42 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.44 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 2.0 |
 
 ## Modules
