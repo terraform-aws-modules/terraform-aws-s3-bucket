@@ -55,6 +55,7 @@ No inputs.
 | <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname |
 | <a name="output_s3_bucket_id"></a> [s3\_bucket\_id](#output\_s3\_bucket\_id) | The name of the bucket |
 | <a name="output_s3_object_etag"></a> [s3\_object\_etag](#output\_s3\_object\_etag) | The ETag generated for the object (an MD5 sum of the object content) |
-| <a name="output_s3_object_id"></a> [s3\_object\_id](#output\_s3\_object\_id) | The key of S3 object |
+| <a name="output_s3_object_id"></a> [s3\_object\_id](#output\_s3\_object\_id) | The S3 object ID |
+| <a name="output_s3_object_key"></a> [s3\_object\_key](#output\_s3\_object\_key) | The S3 object key |
 | <a name="output_s3_object_version_id"></a> [s3\_object\_version\_id](#output\_s3\_object\_version\_id) | A unique version ID value for the object, if bucket versioning is enabled |
 <!-- END_TF_DOCS -->
