@@ -1318,7 +1318,7 @@ resource "aws_s3_bucket_ownership_controls" "this" {
 
   region = var.region
 
-  bucket = local.attach_policy ? aws_s3_bucket_policy.this[0].id : aws_s3_bucket.this[0].id
+  bucket = aws_s3_bucket.this[0].id
 
   rule {
     object_ownership = var.object_ownership

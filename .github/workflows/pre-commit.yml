@@ -170,3 +170,10 @@ jobs:
           tflint-version: ${{ env.TFLINT_VERSION }}
           terraform-docs-version: ${{ env.TERRAFORM_DOCS_VERSION }}
           install-hcledit: true
+
+      - name: Ownership controls regression tests
+        run: |
+          terraform init -backend=false -input=false
+          terraform test -filter=tests/ownership-controls.tftest.hcl
+          terraform -chdir=examples/acl init -backend=false -input=false
+          terraform -chdir=examples/acl test
