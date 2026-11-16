@@ -441,7 +441,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - filter - without any key arguments or tags
       dynamic "filter" {
-        for_each = rule.value.filter == null || max(
+        for_each = (rule.value.filter == null ? 0 : max(
           length([for k, a in {
             object_size_greater_than = rule.value.filter.object_size_greater_than
             object_size_less_than    = rule.value.filter.object_size_less_than
@@ -449,7 +449,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
             tags                     = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
           } : k if a != null]),
           length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
-        ) == 0 ? [true] : []
+        )) == 0 ? [true] : []
 
         content {
           #          prefix = ""
@@ -458,7 +458,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - filter - with one key argument or a single tag
       dynamic "filter" {
-        for_each = rule.value.filter != null && max(
+        for_each = (rule.value.filter == null ? 0 : max(
           length([for k, a in {
             object_size_greater_than = rule.value.filter.object_size_greater_than
             object_size_less_than    = rule.value.filter.object_size_less_than
@@ -466,7 +466,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
             tags                     = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
           } : k if a != null]),
           length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
-        ) == 1 ? [rule.value.filter] : []
+        )) == 1 ? [rule.value.filter] : []
 
         content {
           object_size_greater_than = filter.value.object_size_greater_than
@@ -486,7 +486,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
       # Max 1 block - filter - with more than one key arguments or multiple tags
       dynamic "filter" {
-        for_each = rule.value.filter != null && max(
+        for_each = (rule.value.filter == null ? 0 : max(
           length([for k, a in {
             object_size_greater_than = rule.value.filter.object_size_greater_than
             object_size_less_than    = rule.value.filter.object_size_less_than
@@ -494,7 +494,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
             tags                     = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
           } : k if a != null]),
           length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
-        ) > 1 ? [rule.value.filter] : []
+        )) > 1 ? [rule.value.filter] : []
 
         content {
           and {
@@ -667,13 +667,13 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 
       # Max 1 block - filter - without any key arguments or tags
       dynamic "filter" {
-        for_each = rule.value.filter == null || max(
+        for_each = (rule.value.filter == null ? 0 : max(
           length([for k, a in {
             prefix = rule.value.filter.prefix
             tags   = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
           } : k if a != null]),
           length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
-        ) == 0 ? [true] : []
+        )) == 0 ? [true] : []
 
         content {
         }
@@ -681,13 +681,13 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 
       # Max 1 block - filter - with one key argument or a single tag
       dynamic "filter" {
-        for_each = rule.value.filter != null && max(
+        for_each = (rule.value.filter == null ? 0 : max(
           length([for k, a in {
             prefix = rule.value.filter.prefix
             tags   = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
           } : k if a != null]),
           length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
-        ) == 1 ? [rule.value.filter] : []
+        )) == 1 ? [rule.value.filter] : []
 
         content {
           prefix = filter.value.prefix
@@ -705,13 +705,13 @@ resource "aws_s3_bucket_replication_configuration" "this" {
 
       # Max 1 block - filter - with more than one key arguments or multiple tags
       dynamic "filter" {
-        for_each = rule.value.filter != null && max(
+        for_each = (rule.value.filter == null ? 0 : max(
           length([for k, a in {
             prefix = rule.value.filter.prefix
             tags   = rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag
           } : k if a != null]),
           length(rule.value.filter.tags != null ? rule.value.filter.tags : rule.value.filter.tag != null ? rule.value.filter.tag : {})
-        ) > 1 ? [rule.value.filter] : []
+        )) > 1 ? [rule.value.filter] : []
 
         content {
           and {
