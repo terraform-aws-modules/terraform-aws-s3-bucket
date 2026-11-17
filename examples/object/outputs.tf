@@ -1,7 +1,12 @@
 # S3 object
 output "s3_object_id" {
-  description = "The key of S3 object"
+  description = "The S3 object ID"
   value       = module.object.s3_object_id
+}
+
+output "s3_object_key" {
+  description = "The S3 object key"
+  value       = module.object.s3_object_key
 }
 
 output "s3_object_etag" {

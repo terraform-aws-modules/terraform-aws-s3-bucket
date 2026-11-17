@@ -1,6 +1,11 @@
 output "s3_object_id" {
-  description = "The key of S3 object"
+  description = "The S3 object ID"
   value       = try(aws_s3_object.this[0].id, null)
+}
+
+output "s3_object_key" {
+  description = "The S3 object key"
+  value       = try(aws_s3_object.this[0].key, null)
 }
 
 output "s3_object_etag" {
