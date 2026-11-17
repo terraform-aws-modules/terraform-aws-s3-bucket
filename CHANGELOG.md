@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.17.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.17.0...v5.17.1) (2026-11-16)
+
+### Bug Fixes
+
+* Avoid null filter attribute lookups on Terraform versions before 1.12 ([#416](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/416)) ([0149a92](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/0149a92f8b6321b9c79f4a785ea9f0a2c03f2c19))
+
 ## [5.17.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.16.2...v5.17.0) (2026-10-11)
 
 ### Features
