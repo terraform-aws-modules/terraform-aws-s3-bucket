@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.18.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.17.1...v5.18.0) (2026-11-17)
+
+### Features
+
+* Add object key output in object module ([#415](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/issues/415)) ([a136186](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/commit/a13618635a1de8264d6aa2d6d6b3f04334043ec6))
+
 ## [5.17.1](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/compare/v5.17.0...v5.17.1) (2026-11-16)
 
 ### Bug Fixes
