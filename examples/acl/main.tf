@@ -39,6 +39,8 @@ module "acl_canned" {
   object_ownership         = "BucketOwnerPreferred"
   acl                      = "private"
 
+  attach_deny_insecure_transport_policy = var.attach_deny_insecure_transport_policy
+
   # For example only
   force_destroy = true
 
